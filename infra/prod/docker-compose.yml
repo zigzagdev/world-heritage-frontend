@@ -1,0 +1,11 @@
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: ./infra/prod/web.Dockerfile
+    ports:
+      - "3876:3876"
+    environment:
+      NODE_ENV: production
+      PORT: 3876
+      NEXT_PUBLIC_API_BASE_URL: "https://api.example.com"

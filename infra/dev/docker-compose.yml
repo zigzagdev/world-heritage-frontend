@@ -1,0 +1,14 @@
+services:
+  web:
+    build:
+      context: ../..
+      dockerfile: ./infra/dev/web.Dockerfile
+    command: sh -c "cd client && pnpm install && pnpm dev -p 3876"
+    ports:
+      - "3876:3876"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: "http://host.docker.internal:8000"
+      NODE_ENV: development
+    volumes:
+      - ../..:/work
+    working_dir: /work
