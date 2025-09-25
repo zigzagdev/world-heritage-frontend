@@ -1,0 +1,16 @@
+services:
+  frontend:
+    build:
+      context: ../..
+      dockerfile: ./infra/local/Dockerfile
+    command: sh -lc "cd /app/src && npm run dev -- --port 3876 --host 0.0.0.0"
+    ports:
+      - "3876:3876"
+    networks:
+      - appnet
+    environment:
+      NODE_ENV: development
+
+networks:
+  appnet:
+    driver: bridge
