@@ -11,6 +11,13 @@
     "preview": "vite preview",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": "prettier --write"
+  },
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
