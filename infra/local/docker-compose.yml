@@ -1,15 +1,16 @@
 services:
   frontend:
-    build:
-      context: ../..
-      dockerfile: ./infra/local/Dockerfile
-    command: sh -lc "cd /app/src && npm run dev -- --port 3876 --host 0.0.0.0"
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "sleep infinity"
     ports:
       - "3876:3876"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ../../client:/app
     networks:
       - appnet
-    environment:
-      NODE_ENV: development
 
 networks:
   appnet:
