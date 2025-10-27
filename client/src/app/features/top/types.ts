@@ -1,7 +1,5 @@
 export type Category = "Cultural" | "Natural" | "Mixed";
-
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
-
 export type CriteriaCode = (typeof CRITERIA)[number];
 
 export type WorldHeritageDto = {
@@ -29,6 +27,35 @@ export type WorldHeritageDto = {
 
 export type Paginated<T> = { data: T[]; meta?: unknown } | T[];
 
+export type WorldHeritageVm = {
+  id: number;
+  officialName: string;
+  name: string;
+  nameJp: string;
+  country: string;
+  region: string;
+  stateParty: string | null;
+  category: Category;
+  criteria: CriteriaCode[];
+  yearInscribed: number;
+  areaHectares: number | null;
+  bufferZoneHectares: number | null;
+  isEndangered: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  shortDescription: string;
+  unescoSiteUrl: string;
+  statePartyCodes: string[];
+  statePartiesMeta: Record<string, { isPrimary: boolean; inscriptionYear: number }>;
+  thumbnail?: string;
+
+  title: string;
+  subtitle: string;
+  areaText: string;
+  bufferText: string;
+  criteriaText: string;
+};
+
 export type TopListItemVm = {
   id: number;
   title: string;
@@ -38,6 +65,5 @@ export type TopListItemVm = {
   areaText: string;
   bufferText: string;
   thumbnail?: string;
+  criteriaCodes?: CriteriaCode[];
 };
-
-export type LoadState<T> = { data: T | null; loading: boolean; error: unknown | null };
