@@ -1,7 +1,7 @@
 import * as React from "react";
-import { fetchTopFirstPage } from "../apis/index.ts";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 import type { WorldHeritageVm } from "../types";
+import { fetchTopFirstPage } from "../apis";
 
 type State = {
   data: WorldHeritageVm[];

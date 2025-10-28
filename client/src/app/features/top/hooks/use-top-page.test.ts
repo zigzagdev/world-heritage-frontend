@@ -1,139 +1,187 @@
-import { renderHook, act } from "@testing-library/react";
-import { describe, it, expect, jest, beforeEach } from "@jest/globals";
-import type { ApiWorldHeritageDto, WorldHeritageVm } from "../types";
+/** @jest-environment jsdom */
 
-type FetchFn = (init?: unknown) => Promise<ApiWorldHeritageDto[]>;
-type MapFn = (list: ApiWorldHeritageDto[]) => WorldHeritageVm[];
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { jest, expect, test, beforeEach, describe } from "@jest/globals";
+import { useTopPage } from "./use-top-page";
+import { fetchTopFirstPage } from "../apis";
+import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 
-const mockFetch = jest.fn() as jest.MockedFunction<FetchFn>;
-const mockMap = jest.fn() as jest.MockedFunction<MapFn>;
+if (!global.AbortController) {
+  class FakeAbortController {
+    aborted = false;
+    abort() {
+      this.aborted = true;
+    }
+    get signal() {
+      return this;
+    }
+  }
+  global.AbortController = FakeAbortController as unknown as typeof AbortController;
+}
 
-await jest.unstable_mockModule("../apis/index.ts", () => ({
-  fetchTopFirstPage: mockFetch,
+jest.mock("../apis", () => ({
+  fetchTopFirstPage: jest.fn(),
 }));
-await jest.unstable_mockModule("../mappers/to-world-heritage-vm.js", () => ({
-  toWorldHeritageListVm: mockMap,
+jest.mock("../mappers/to-world-heritage-vm", () => ({
+  toWorldHeritageListVm: jest.fn(),
 }));
 
-const { useTopPage } = await import("./use-top-page.js");
+type Deferred<T> = {
+  promise: Promise<T>;
+  resolve: (v: T) => void;
+  reject: (e: unknown) => void;
+};
+const deferred = <T>(): Deferred<T> => {
+  let resolve!: (v: T) => void;
+  let reject!: (e: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+};
 
 describe("useTopPage", () => {
   beforeEach(() => {
-    mockFetch.mockReset();
-    mockMap.mockReset();
+    jest.clearAllMocks();
   });
 
-  it("初回マウントでデータをロードして items に反映（ハッピーパス）", async () => {
-    const dtoList: ApiWorldHeritageDto[] = [
-      {
-        id: 1,
-        official_name: "A",
-        name: "A",
-        name_jp: "A",
-        country: "X",
-        region: "Y",
-        state_party: "JPN",
-        category: "Cultural",
-        criteria: ["i"],
-        year_inscribed: 1993,
-        area_hectares: null,
-        buffer_zone_hectares: null,
-        is_endangered: false,
-        latitude: null,
-        longitude: null,
-        short_description: "",
-        unesco_site_url: "https://ex.com/1",
-        state_party_codes: ["JPN"],
-        state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-        thumbnail: null,
-      },
-    ];
-    const vmList: WorldHeritageVm[] = [
-      {
-        id: 1,
-        officialName: "A",
-        name: "A",
-        nameJp: "A",
-        country: "X",
-        region: "Y",
-        stateParty: "JPN",
-        category: "Cultural",
-        criteria: ["i"],
-        yearInscribed: 1993,
-        areaHectares: null,
-        bufferZoneHectares: null,
-        isEndangered: false,
-        latitude: null,
-        longitude: null,
-        shortDescription: "",
-        unescoSiteUrl: "https://ex.com/1",
-        statePartyCodes: ["JPN"],
-        statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
-        // 派生
-        thumbnail: undefined,
-        title: "A",
-        subtitle: "X · Y",
-        areaText: "—",
-        bufferText: "—",
-        criteriaText: "i",
-      },
-    ];
+  test("初期マウント直後: isLoading=true, items=[], isError=false", () => {
+    const d = deferred<unknown[]>();
+    (fetchTopFirstPage as jest.Mock).mockImplementation(() => d.promise);
+    const { result } = renderHook(() => useTopPage());
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.items).toEqual([]);
+    expect(result.current.isError).toBe(false);
+  });
 
-    mockFetch.mockResolvedValueOnce(dtoList);
-    mockMap.mockReturnValueOnce(vmList);
+  test("成功パス: fetch -> map -> state 反映", async () => {
+    const raw = [{ id: 1 }];
+    const vm = [{ id: 1, name: "Site" }];
+    const d = deferred<unknown[]>();
+
+    (fetchTopFirstPage as jest.Mock).mockImplementation(() => d.promise);
+    (toWorldHeritageListVm as jest.Mock).mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
-    expect(result.current.isLoading).toBe(true);
+    await act(async () => {
+      d.resolve(raw);
+      await Promise.resolve();
+    });
 
-    await act(async () => {});
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.items).toEqual(vm);
+      expect(result.current.isError).toBe(false);
+    });
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockMap).toHaveBeenCalledWith(dtoList);
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.isError).toBe(false);
-    expect(result.current.items).toEqual(vmList);
+    expect(fetchTopFirstPage).toHaveBeenCalledTimes(1);
+    expect(toWorldHeritageListVm).toHaveBeenCalledWith(raw);
   });
 
-  it("reload() 連打でも最後の結果だけ反映（前回は Abort 扱い）", async () => {
-    let rejectFirst!: (e: unknown) => void;
-    const firstPromise = new Promise<ApiWorldHeritageDto[]>((_, rej) => {
-      rejectFirst = rej;
-    });
-    mockFetch.mockImplementationOnce(() => firstPromise);
+  test("通常エラー: isError=true, items=[], isLoading=false, error が保持される", async () => {
+    const d = deferred<unknown[]>();
+    (fetchTopFirstPage as jest.Mock).mockImplementation(() => d.promise);
 
-    const dto2: ApiWorldHeritageDto[] = [];
-    const vm2: WorldHeritageVm[] = [];
-    mockFetch.mockResolvedValueOnce(dto2);
-    mockMap.mockReturnValueOnce(vm2);
+    const { result } = renderHook(() => useTopPage());
+
+    const boom = new Error("boom");
+    await act(async () => {
+      d.reject(boom);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.isError).toBe(true);
+      expect(result.current.items).toEqual([]);
+      expect(result.current.error).toBe(boom);
+    });
+  });
+
+  test("AbortError は無視される（エラー状態にしない）", async () => {
+    const first = deferred<unknown[]>();
+    const second = deferred<unknown[]>();
+
+    const calls: Array<{ signal?: AbortSignal }> = [];
+    (fetchTopFirstPage as jest.Mock).mockImplementation((opts?: { signal?: AbortSignal }) => {
+      calls.push({ signal: opts?.signal });
+      return calls.length === 1 ? first.promise : second.promise;
+    });
+
+    const vm = [{ id: 2, name: "Ok" }];
+    (toWorldHeritageListVm as jest.Mock).mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
     await act(async () => {
       result.current.reload();
     });
-    await act(async () => {});
+
     await act(async () => {
-      rejectFirst({ name: "AbortError" });
+      first.reject({ name: "AbortError" });
+      await Promise.resolve();
     });
 
-    expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(result.current.items).toEqual(vm2);
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.isError).toBe(false);
+    await act(async () => {
+      second.resolve([{ id: 2 }]);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.isError).toBe(false);
+      expect(result.current.items).toEqual(vm);
+    });
+
+    expect(calls.length).toBe(2);
+    expect(calls[0].signal?.aborted).toBe(true);
   });
 
-  it("エラー時は isError と error がセットされる", async () => {
-    const boom = new Error("boom");
-    mockFetch.mockRejectedValueOnce(boom);
+  test("reload は in-flight リクエストを中断して再度発火する", async () => {
+    const first = deferred<unknown[]>();
+    const second = deferred<unknown[]>();
+
+    const signals: (AbortSignal | undefined)[] = [];
+    (fetchTopFirstPage as jest.Mock).mockImplementation((opts?: { signal?: AbortSignal }) => {
+      signals.push(opts?.signal);
+      return signals.length === 1 ? first.promise : second.promise;
+    });
+
+    const vm = [{ id: 3, name: "R" }];
+    (toWorldHeritageListVm as jest.Mock).mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
-    await act(async () => {});
+    await act(async () => {
+      result.current.reload();
+    });
 
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.isError).toBe(true);
-    expect(result.current.error).toBe(boom);
-    expect(result.current.items).toEqual([]);
+    await act(async () => {
+      second.resolve([{ id: 3 }]);
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(signals[0]?.aborted).toBe(true);
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.items).toEqual(vm);
+    });
+  });
+
+  test("アンマウント時に現在のリクエストを abort する", () => {
+    const d = deferred<unknown[]>();
+    const captured: (AbortSignal | undefined)[] = [];
+    (fetchTopFirstPage as jest.Mock).mockImplementation((opts?: { signal?: AbortSignal }) => {
+      captured.push(opts?.signal);
+      return d.promise;
+    });
+
+    const { unmount } = renderHook(() => useTopPage());
+    unmount();
+
+    expect(captured[0]).toBeDefined();
+    expect(captured[0]?.aborted).toBe(true);
   });
 });
