@@ -1,8 +1,8 @@
-import { toWorldHeritageVm, toWorldHeritageListVm } from "./to-world-heritage-vm";
-import type { WorldHeritageDto } from "../types";
 import { describe, it, expect } from "@jest/globals";
+import { toWorldHeritageVm, toWorldHeritageListVm } from "./to-world-heritage-vm.js";
+import type { ApiWorldHeritageDto, WorldHeritageVm } from "../types";
 
-const base: WorldHeritageDto = {
+const base: ApiWorldHeritageDto = {
   id: 663,
   official_name: "Shirakami-Sanchi",
   name: "Shirakami-Sanchi",
@@ -26,70 +26,72 @@ const base: WorldHeritageDto = {
 };
 
 describe("toWorldHeritageVm", () => {
-  it("maps fields and formats derived values", () => {
+  it("view model is mapping correctly and, Derived values are also formatted correctly", () => {
     const vm = toWorldHeritageVm(base);
 
-    expect(vm.id).toBe(663);
-    expect(vm.officialName).toBe("Shirakami-Sanchi");
-    expect(vm.nameJp).toBe("白神山地");
-    expect(vm.country).toBe("Japan");
-    expect(vm.region).toBe("Asia");
-    expect(vm.stateParty).toBe("JPN");
-    expect(vm.category).toBe("Natural");
-    expect(vm.yearInscribed).toBe(1993);
-    expect(vm.areaHectares).toBe(442);
-    expect(vm.bufferZoneHectares).toBe(320);
-    expect(vm.isEndangered).toBe(false);
-    expect(vm.latitude).toBeNull();
-    expect(vm.longitude).toBeNull();
-    expect(vm.shortDescription).toBe("desc");
-    expect(vm.unescoSiteUrl).toBe("https://whc.unesco.org/en/list/663");
-    expect(vm.statePartyCodes).toEqual(["JPN"]);
-    expect(vm.statePartiesMeta).toEqual({
-      JPN: { isPrimary: true, inscriptionYear: 1993 },
-    });
-    expect(vm.thumbnail).toBe("https://example.com/img.jpg");
+    const expected: WorldHeritageVm = {
+      id: 663,
+      officialName: "Shirakami-Sanchi",
+      name: "Shirakami-Sanchi",
+      nameJp: "白神山地",
+      country: "Japan",
+      region: "Asia",
+      stateParty: "JPN",
+      category: "Natural",
+      criteria: ["ix", "x"],
+      yearInscribed: 1993,
+      areaHectares: 442,
+      bufferZoneHectares: 320,
+      isEndangered: false,
+      latitude: null,
+      longitude: null,
+      shortDescription: "desc",
+      unescoSiteUrl: "https://whc.unesco.org/en/list/663",
+      statePartyCodes: ["JPN"],
+      statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
+      thumbnail: "https://example.com/img.jpg",
 
-    expect(vm.criteria).toEqual(["ix", "x"]);
-    expect(vm.title).toBe("Shirakami-Sanchi");
-    expect(vm.subtitle).toBe("Japan · Asia");
-    expect(vm.areaText).toBe("442 ha");
-    expect(vm.bufferText).toBe("320 ha");
-    expect(vm.criteriaText).toBe("ix, x");
+      title: "Shirakami-Sanchi",
+      subtitle: "Japan · Asia",
+      areaText: "442 ha",
+      bufferText: "320 ha",
+      criteriaText: "ix, x",
+    };
+
+    expect(vm).toStrictEqual(expected);
   });
 
-  it("falls back to name when official_name is empty", () => {
+  it("if official name is null, using a title for name", () => {
     const vm = toWorldHeritageVm({ ...base, official_name: "" });
     expect(vm.title).toBe("Shirakami-Sanchi");
   });
 
-  it("handles nulls and removes thumbnail when null/undefined", () => {
+  it("display null on correctly, and if thumbnail type is null or undefined, it's omitted.", () => {
     const vm = toWorldHeritageVm({
       ...base,
       area_hectares: null,
       buffer_zone_hectares: null,
       thumbnail: null,
     });
+
     expect(vm.areaText).toBe("—");
     expect(vm.bufferText).toBe("—");
     expect(vm.thumbnail).toBeUndefined();
   });
 
-  it("does not mutate input DTO", () => {
-    const dto: WorldHeritageDto = {
-      ...base,
-      criteria: ["x", "ix", "ix"],
-    };
-    const original = [...dto.criteria];
+  it("input dto assert immutable", () => {
+    const dto: ApiWorldHeritageDto = { ...base, criteria: ["x", "ix", "ix"] };
+    const snapshot = [...dto.criteria];
+
     const vm = toWorldHeritageVm(dto);
 
-    expect(dto.criteria).toEqual(original);
-    expect(vm.criteria).toEqual(["ix", "x"]);
+    expect(dto.criteria).toStrictEqual(snapshot);
+    expect(vm.criteria).toStrictEqual(["ix", "x"]);
   });
 });
 
 describe("toWorldHeritageListVm", () => {
-  it("maps a list of DTOs to VMs", () => {
+  it("mapping dto array into view model array", () => {
     const vms = toWorldHeritageListVm([base, { ...base, id: 661 }]);
     expect(vms).toHaveLength(2);
     expect(vms[0].id).toBe(663);

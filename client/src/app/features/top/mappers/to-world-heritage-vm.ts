@@ -1,17 +1,23 @@
-import type { WorldHeritageDto, WorldHeritageVm, CriteriaCode } from "../types";
+import type { ApiWorldHeritageDto, WorldHeritageVm, CriteriaCode } from "../types";
 
 const ORDER: CriteriaCode[] = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
 
+const isCode = (v: string): v is CriteriaCode => (ORDER as readonly string[]).includes(v);
+
+const normalize = (arr: readonly string[]): CriteriaCode[] =>
+  Array.from(new Set(arr))
+    .filter(isCode)
+    .sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+
 const fmtHa = (v: number | null) => (v == null ? "—" : `${Number(v).toLocaleString("en-CA")} ha`);
 
-const titleOf = (d: WorldHeritageDto) => d.official_name || d.name;
-const subtitleOf = (d: WorldHeritageDto) => [d.country, d.region].filter(Boolean).join(" · ");
+const titleOf = (data: ApiWorldHeritageDto) => data.official_name || data.name;
 
-const normalizeCriteria = (arr: readonly CriteriaCode[]): CriteriaCode[] =>
-  Array.from(new Set(arr)).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+const subtitleOf = (data: ApiWorldHeritageDto) =>
+  [data.country, data.region].filter(Boolean).join(" · ");
 
-export function toWorldHeritageVm(data: WorldHeritageDto): WorldHeritageVm {
-  const codes = normalizeCriteria(data.criteria);
+export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
+  const codes = normalize(data.criteria);
   return {
     id: data.id,
     officialName: data.official_name,
@@ -32,11 +38,11 @@ export function toWorldHeritageVm(data: WorldHeritageDto): WorldHeritageVm {
     unescoSiteUrl: data.unesco_site_url,
     statePartyCodes: data.state_party_codes,
     statePartiesMeta: Object.fromEntries(
-      Object.entries(data.state_parties_meta).map(([key, value]) => [
-        key,
+      Object.entries(data.state_parties_meta).map(([k, v]) => [
+        k,
         {
-          isPrimary: value.is_primary,
-          inscriptionYear: value.inscription_year,
+          isPrimary: v.is_primary,
+          inscriptionYear: v.inscription_year,
         },
       ]),
     ),
@@ -49,4 +55,4 @@ export function toWorldHeritageVm(data: WorldHeritageDto): WorldHeritageVm {
   };
 }
 
-export const toWorldHeritageListVm = (list: WorldHeritageDto[]) => list.map(toWorldHeritageVm);
+export const toWorldHeritageListVm = (list: ApiWorldHeritageDto[]) => list.map(toWorldHeritageVm);
