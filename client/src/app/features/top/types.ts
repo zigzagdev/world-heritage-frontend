@@ -2,7 +2,7 @@ export type Category = "Cultural" | "Natural" | "Mixed";
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
 export type CriteriaCode = (typeof CRITERIA)[number];
 
-export type WorldHeritageDto = {
+export type ApiWorldHeritageDto = {
   id: number;
   official_name: string;
   name: string;
@@ -11,7 +11,7 @@ export type WorldHeritageDto = {
   region: string;
   state_party: string | null;
   category: Category;
-  criteria: CriteriaCode[];
+  criteria: string[];
   year_inscribed: number;
   area_hectares: number | null;
   buffer_zone_hectares: number | null;
@@ -24,8 +24,6 @@ export type WorldHeritageDto = {
   state_parties_meta: Record<string, { is_primary: boolean; inscription_year: number }>;
   thumbnail?: string | null;
 };
-
-export type Paginated<T> = { data: T[]; meta?: unknown } | T[];
 
 export type WorldHeritageVm = {
   id: number;
@@ -48,7 +46,6 @@ export type WorldHeritageVm = {
   statePartyCodes: string[];
   statePartiesMeta: Record<string, { isPrimary: boolean; inscriptionYear: number }>;
   thumbnail?: string;
-
   title: string;
   subtitle: string;
   areaText: string;
@@ -56,14 +53,4 @@ export type WorldHeritageVm = {
   criteriaText: string;
 };
 
-export type TopListItemVm = {
-  id: number;
-  title: string;
-  subtitle: string;
-  category: string;
-  year: number;
-  areaText: string;
-  bufferText: string;
-  thumbnail?: string;
-  criteriaCodes?: CriteriaCode[];
-};
+export type Paginated<T> = { data: T[]; meta?: unknown } | T[];
