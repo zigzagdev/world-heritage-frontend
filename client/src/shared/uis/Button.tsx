@@ -1,11 +1,10 @@
 import * as React from "react";
 import { Button as MuiButton, CircularProgress } from "@mui/material";
 import type { ButtonProps as MuiButtonProps } from "@mui/material";
-import type { SxProps, Theme, SystemStyleObject } from "@mui/system";
+import type { Theme, SystemStyleObject } from "@mui/system";
 
 import type { AppVariant, AppSize } from "../types/primitives";
 import type { AppButtonProps } from "../types/button";
-import { mergeSx } from "../ui/sx/mergeSx";
 
 const sizeMap: Record<AppSize, NonNullable<MuiButtonProps["size"]>> = {
   sm: "small",
@@ -62,8 +61,9 @@ export const Button = React.forwardRef<HTMLButtonElement, AppButtonProps>(functi
     startIcon,
     endIcon,
     children,
-    sx,
     component,
+    type,
+    sx,
     ...rest
   },
   ref,
@@ -73,10 +73,33 @@ export const Button = React.forwardRef<HTMLButtonElement, AppButtonProps>(functi
   const start = isLoading ? <CircularProgress size={18} thickness={4} /> : startIcon;
   const aria = isLoading ? ({ "aria-busy": true, "aria-disabled": true } as const) : undefined;
 
-  const baseSx = styleOf(variant, size);
-  const mergedSx: SxProps<Theme> = mergeSx(baseSx, sx);
+  // component / href から最終コンポーネントを決定
+  const finalComponent: MuiButtonProps["component"] = component ?? (href ? "a" : "button");
+  const finalType: MuiButtonProps["type"] | undefined =
+    type ?? (finalComponent === "button" || !finalComponent ? "button" : undefined);
 
-  const finalComponent: MuiButtonProps["component"] = component ?? (href ? "a" : undefined);
+  const isIconOnly = !children && (startIcon || endIcon || isLoading);
+  if (
+    process.env.NODE_ENV !== "production" &&
+    isIconOnly &&
+    !(rest as MuiButtonProps)["aria-label"]
+  ) {
+    console.warn("[AppButton] Icon-only button should have an aria-label for accessibility.");
+  }
+
+  const baseSx = styleOf(variant, size);
+  const mergedSx: MuiButtonProps["sx"] =
+    typeof sx === "function"
+      ? (theme) => ({
+          ...baseSx(theme as Theme),
+          ...(sx as Exclude<typeof sx, undefined>)(theme),
+        })
+      : sx
+        ? (theme) => ({
+            ...baseSx(theme as Theme),
+            ...(sx as object),
+          })
+        : baseSx;
 
   const commonProps: MuiButtonProps = {
     ref,
@@ -89,9 +112,10 @@ export const Button = React.forwardRef<HTMLButtonElement, AppButtonProps>(functi
     endIcon: isLoading ? undefined : endIcon,
     disabled: disabled || isLoading,
     disableElevation: true,
-    sx: mergedSx,
     component: finalComponent,
     href,
+    type: finalType,
+    sx: mergedSx,
   };
 
   return <MuiButton {...commonProps}>{children}</MuiButton>;

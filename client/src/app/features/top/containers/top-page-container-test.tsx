@@ -1,9 +1,8 @@
 // containers/__tests__/top-page-container.test.tsx
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, vi, beforeEach, type MockedFunction } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import React from "react";
 
-// ===== Types =====
 type CriteriaCode = "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii" | "viii" | "ix" | "x";
 
 interface WorldHeritageDto {
@@ -88,12 +87,11 @@ vi.mock("../../components/TopPage", () => {
 import { fetchTopFirstPage } from "../apis";
 import TopPageContainer from "./top-page-container";
 
-// 型付きモックハンドル
-const fetchTopFirstPageMock = fetchTopFirstPage as unknown as vi.MockedFunction<
+const fetchTopFirstPageMock: MockedFunction<
+  (opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>
+> = fetchTopFirstPage as unknown as MockedFunction<
   (opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>
 >;
-
-// ===== Fixtures =====
 const HIMEJI: WorldHeritageDto = {
   id: 661,
   official_name: "Himeji-jo",
@@ -174,13 +172,11 @@ describe("TopPageContainer", () => {
 
     render(<TopPageContainer />);
 
-    // 初期ローディング
-    expect(screen.getByText(/Loading/i)).toBeInTheDocument();
+    screen.getByText(/Loading/i);
 
-    // データ表示
     await waitFor(() => {
-      expect(screen.getByText("Himeji-jo")).toBeInTheDocument();
-      expect(screen.getByText("Yakushima")).toBeInTheDocument();
+      screen.getByText("Himeji-jo");
+      screen.getByText("Yakushima");
     });
   });
 
@@ -191,17 +187,14 @@ describe("TopPageContainer", () => {
 
     render(<TopPageContainer />);
 
-    // エラー表示
     await waitFor(() => {
-      expect(screen.getByText(/Failed to load/i)).toBeInTheDocument();
+      screen.getByText(/Failed to load/i);
     });
 
-    // リトライ
     fireEvent.click(screen.getByText(/Retry/i));
 
-    // 成功後にアイテム表示
     await waitFor(() => {
-      expect(screen.getByText("Shirakami-Sanchi")).toBeInTheDocument();
+      screen.getByText("Shirakami-Sanchi");
     });
   });
 });
