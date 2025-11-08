@@ -6,17 +6,25 @@ import { useTopPage } from "./use-top-page";
 import { fetchTopFirstPage } from "../apis";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 
-if (!global.AbortController) {
-  class FakeAbortController {
-    aborted = false;
-    abort() {
-      this.aborted = true;
+type MinimalAbortSignal = { aborted: boolean };
+
+interface MinimalAbortController {
+  readonly signal: MinimalAbortSignal;
+  abort(): void;
+}
+type AbortControllerCtor = new () => MinimalAbortController;
+
+if (!("AbortController" in globalThis) || typeof globalThis.AbortController !== "function") {
+  class FakeAbortController implements MinimalAbortController {
+    private _signal: MinimalAbortSignal = { aborted: false };
+    get signal(): MinimalAbortSignal {
+      return this._signal;
     }
-    get signal() {
-      return this;
+    abort(): void {
+      this._signal.aborted = true;
     }
   }
-  global.AbortController = FakeAbortController as unknown as typeof AbortController;
+  (globalThis as { AbortController: AbortControllerCtor }).AbortController = FakeAbortController;
 }
 
 jest.mock("../apis", () => ({
@@ -26,6 +34,13 @@ jest.mock("../mappers/to-world-heritage-vm", () => ({
   toWorldHeritageListVm: jest.fn(),
 }));
 
+type FetchFn = (opts?: { signal?: AbortSignal }) => Promise<unknown[]>;
+const fetchTopFirstPageMock = fetchTopFirstPage as unknown as jest.MockedFunction<FetchFn>;
+
+type MapFn = (dtoList: unknown[]) => unknown[];
+const toWorldHeritageListVmMock = toWorldHeritageListVm as unknown as jest.MockedFunction<MapFn>;
+
+// ---- deferred ヘルパ
 type Deferred<T> = {
   promise: Promise<T>;
   resolve: (v: T) => void;
@@ -48,7 +63,8 @@ describe("useTopPage", () => {
 
   test("初期マウント直後: isLoading=true, items=[], isError=false", () => {
     const d = deferred<unknown[]>();
-    (fetchTopFirstPage as jest.Mock).mockImplementation(() => d.promise);
+    fetchTopFirstPageMock.mockImplementation(() => d.promise);
+
     const { result } = renderHook(() => useTopPage());
     expect(result.current.isLoading).toBe(true);
     expect(result.current.items).toEqual([]);
@@ -60,8 +76,8 @@ describe("useTopPage", () => {
     const vm = [{ id: 1, name: "Site" }];
     const d = deferred<unknown[]>();
 
-    (fetchTopFirstPage as jest.Mock).mockImplementation(() => d.promise);
-    (toWorldHeritageListVm as jest.Mock).mockReturnValue(vm);
+    fetchTopFirstPageMock.mockImplementation(() => d.promise);
+    toWorldHeritageListVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
@@ -76,13 +92,13 @@ describe("useTopPage", () => {
       expect(result.current.isError).toBe(false);
     });
 
-    expect(fetchTopFirstPage).toHaveBeenCalledTimes(1);
-    expect(toWorldHeritageListVm).toHaveBeenCalledWith(raw);
+    expect(fetchTopFirstPageMock).toHaveBeenCalledTimes(1);
+    expect(toWorldHeritageListVmMock).toHaveBeenCalledWith(raw);
   });
 
   test("通常エラー: isError=true, items=[], isLoading=false, error が保持される", async () => {
     const d = deferred<unknown[]>();
-    (fetchTopFirstPage as jest.Mock).mockImplementation(() => d.promise);
+    fetchTopFirstPageMock.mockImplementation(() => d.promise);
 
     const { result } = renderHook(() => useTopPage());
 
@@ -105,25 +121,23 @@ describe("useTopPage", () => {
     const second = deferred<unknown[]>();
 
     const calls: Array<{ signal?: AbortSignal }> = [];
-    (fetchTopFirstPage as jest.Mock).mockImplementation((opts?: { signal?: AbortSignal }) => {
+    fetchTopFirstPageMock.mockImplementation((opts) => {
       calls.push({ signal: opts?.signal });
       return calls.length === 1 ? first.promise : second.promise;
     });
 
     const vm = [{ id: 2, name: "Ok" }];
-    (toWorldHeritageListVm as jest.Mock).mockReturnValue(vm);
+    toWorldHeritageListVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
     await act(async () => {
       result.current.reload();
     });
-
     await act(async () => {
       first.reject({ name: "AbortError" });
       await Promise.resolve();
     });
-
     await act(async () => {
       second.resolve([{ id: 2 }]);
       await Promise.resolve();
@@ -144,20 +158,19 @@ describe("useTopPage", () => {
     const second = deferred<unknown[]>();
 
     const signals: (AbortSignal | undefined)[] = [];
-    (fetchTopFirstPage as jest.Mock).mockImplementation((opts?: { signal?: AbortSignal }) => {
+    fetchTopFirstPageMock.mockImplementation((opts) => {
       signals.push(opts?.signal);
       return signals.length === 1 ? first.promise : second.promise;
     });
 
     const vm = [{ id: 3, name: "R" }];
-    (toWorldHeritageListVm as jest.Mock).mockReturnValue(vm);
+    toWorldHeritageListVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
     await act(async () => {
       result.current.reload();
     });
-
     await act(async () => {
       second.resolve([{ id: 3 }]);
       await Promise.resolve();
@@ -173,7 +186,7 @@ describe("useTopPage", () => {
   test("アンマウント時に現在のリクエストを abort する", () => {
     const d = deferred<unknown[]>();
     const captured: (AbortSignal | undefined)[] = [];
-    (fetchTopFirstPage as jest.Mock).mockImplementation((opts?: { signal?: AbortSignal }) => {
+    fetchTopFirstPageMock.mockImplementation((opts) => {
       captured.push(opts?.signal);
       return d.promise;
     });
