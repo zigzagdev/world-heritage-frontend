@@ -1,0 +1,10 @@
+module.exports = {
+  content: [
+    "./index.html",
+    "./*.{js,jsx,ts,tsx}",
+    "./{components,containers,hooks,mappers,pages,assets,shared}/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  theme: { extend: {} },
+  plugins: [],
+};
