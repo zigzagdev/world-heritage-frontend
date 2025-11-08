@@ -1,35 +1,53 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import React, { useMemo } from "react";
+import TopPage from "./app/features/top/components/TopPage";
+import { useTopPage } from "./app/features/top/hooks/use-top-page";
+import type { WorldHeritageVm } from "./app/features/top/types";
 
-function App() {
-  const [count, setCount] = useState(0);
+type Item = {
+  id: number;
+  title: string;
+  subtitle: string;
+  category: string;
+  year: number;
+  areaText: string;
+  bufferText: string;
+  thumbnail?: string;
+};
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  );
+function vmToItem(vm: WorldHeritageVm): Item {
+  return {
+    id: vm.id,
+    title: vm.title,
+    subtitle: vm.subtitle,
+    category: vm.category,
+    year: vm.yearInscribed,
+    areaText: vm.areaText,
+    bufferText: vm.bufferText,
+    thumbnail: vm.thumbnail,
+  };
 }
 
-export default App;
+export default function App(): React.ReactElement {
+  const { items, reload, isLoading, isError, error } = useTopPage();
+
+  const uiItems = useMemo(() => items.map(vmToItem), [items]);
+
+  if (isLoading) {
+    return <main className="p-6">Loading…</main>;
+  }
+  if (isError) {
+    return (
+      <main className="p-6 space-y-3">
+        <div className="text-red-700">Failed to load.</div>
+        <pre className="text-xs opacity-70">{String(error)}</pre>
+        <button type="button" onClick={reload} className="underline">
+          Retry
+        </button>
+      </main>
+    );
+  }
+
+  return (
+    <TopPage items={uiItems} onReload={reload} onClickItem={(id) => console.log("clicked", id)} />
+  );
+}
