@@ -1,6 +1,6 @@
 import type { Paginated, ApiWorldHeritageDto } from "../types";
 
-const ENDPOINT = "http://localhost:8700/api/v1/heritages";
+const ENDPOINT = import.meta.env.VITE_API_BASE_URL + "/api/v1/heritages";
 
 export async function fetchTopFirstPage(init?: RequestInit): Promise<ApiWorldHeritageDto[]> {
   const url = `${ENDPOINT}?page=1&per_page=20`;
