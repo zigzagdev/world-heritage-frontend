@@ -91,7 +91,6 @@ export default function TopPage({ items, onReload, onClickItem }: TopPageProps) 
           ))}
         </ul>
       )}
-      <div className="h-16">llll</div>
     </main>
   );
 }
