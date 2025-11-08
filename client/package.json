@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "format": "prettier -w .",
+    "format": "prettier --check .",
     "preview": "vite preview",
     "test": "jest",
     "test:watch": "jest --watch",
