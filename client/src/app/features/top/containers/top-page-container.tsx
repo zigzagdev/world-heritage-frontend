@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { WorldHeritageVm } from "../types";
-import { fetchTopFirstPage } from "../apis"; // ← indexでfetchTopFirstPageをre-exportしている前提
+import { fetchTopFirstPage } from "../apis";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 import TopPage from "../components/TopPage";
 
-// TopPage が受け取る Item 形にVMをマッピング
 type Item = {
   id: number;
   title: string;
@@ -37,7 +36,6 @@ export default function TopPageContainer(): React.ReactElement {
 
   const abortRef = useRef<AbortController | null>(null);
 
-  // 取得処理
   const load = useCallback(() => {
     abortRef.current?.abort();
     const ac = new AbortController();
@@ -57,24 +55,20 @@ export default function TopPageContainer(): React.ReactElement {
       .finally(() => setIsLoading(false));
   }, []);
 
-  // 初回＆再取得
   useEffect(() => {
     load();
     return () => abortRef.current?.abort();
   }, [load, reloadTick]);
 
-  // TopPage の props へ詰め替え
   const pageProps = useMemo(
     () => ({
       items,
       onReload: () => setReloadTick((n) => n + 1),
-      // 必要なら onClickItem を渡す（未指定ならTopPage側の?なので省略可）
       // onClickItem: (id: number) => router.push(`/sites/${id}`),
     }),
     [items],
   );
 
-  // TopPage は UI専門。ローディング/エラーはここで簡易分岐。
   if (isLoading) {
     return (
       <main className="p-6">
