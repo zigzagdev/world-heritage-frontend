@@ -60,13 +60,16 @@ export default function TopPageContainer(): React.ReactElement {
     return () => abortRef.current?.abort();
   }, [load, reloadTick]);
 
+  const handleReload = useCallback(() => {
+    setReloadTick((n) => n + 1);
+  }, []);
+
   const pageProps = useMemo(
     () => ({
       items,
-      onReload: () => setReloadTick((n) => n + 1),
-      // onClickItem: (id: number) => router.push(`/sites/${id}`),
+      onReload: handleReload,
     }),
-    [items],
+    [items, handleReload],
   );
 
   if (isLoading) {
@@ -81,7 +84,7 @@ export default function TopPageContainer(): React.ReactElement {
     return (
       <main className="p-6 space-y-3">
         <div className="text-red-700">Failed to load.</div>
-        <button type="button" onClick={() => setReloadTick((n) => n + 1)} className="underline">
+        <button type="button" onClick={handleReload} className="underline">
           Retry
         </button>
       </main>
