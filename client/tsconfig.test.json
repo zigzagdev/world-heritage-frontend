@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "es2022",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": false,
+    "jsx": "react-jsx",
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    "baseUrl": "./src",
+    "paths": {
+      "@features/*": ["app/features/*"],
+      "@shared/*": ["shared/*"],
+      "@/*": ["*"]
+    },
+
+    "types": ["vite/client", "jest", "node"]
+  },
+  "include": ["src"]
+}

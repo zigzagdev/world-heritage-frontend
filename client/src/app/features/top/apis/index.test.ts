@@ -1,14 +1,48 @@
-import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { describe, it, expect, beforeEach, beforeAll, afterAll, jest } from "@jest/globals";
 import { fetchTopFirstPage } from "./index.js";
 import type { ApiWorldHeritageDto, Paginated } from "../types";
 
-let fetchSpy: jest.SpiedFunction<typeof fetch>;
-beforeEach(() => {
-  if (fetchSpy) fetchSpy.mockRestore();
-  fetchSpy = jest.spyOn(globalThis, "fetch");
+type MockResponse = Pick<Response, "ok" | "status" | "json">;
+
+// Node 環境の globalThis に fetch を追加するための型拡張
+type GlobalWithFetch = typeof globalThis & { fetch?: typeof fetch };
+
+const g = globalThis as GlobalWithFetch;
+
+let fetchSpy: jest.MockedFunction<typeof fetch>;
+let originalFetch: typeof fetch | undefined;
+
+beforeAll(() => {
+  // 元の fetch（あれば）を退避
+  originalFetch = g.fetch;
 });
 
-type MockResponse = Pick<Response, "ok" | "status" | "json">;
+beforeEach(() => {
+  // テスト毎に新しいモックを差し込む
+  fetchSpy = jest.fn() as jest.MockedFunction<typeof fetch>;
+  g.fetch = fetchSpy;
+});
+
+afterAll(() => {
+  if (originalFetch) {
+    g.fetch = originalFetch;
+  }
+});
+
+const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
+const EXPECTED_URL = `${API_BASE}/api/v1/heritages?page=1&per_page=20`;
+
+const makeOkResponse = (body: unknown): MockResponse => ({
+  ok: true,
+  status: 200,
+  json: async () => body,
+});
+
+const makeNgResponse = (status: number): MockResponse => ({
+  ok: false,
+  status,
+  json: async () => ({}),
+});
 
 describe("fetchTopFirstPage", () => {
   it("return array response", async () => {
@@ -36,13 +70,13 @@ describe("fetchTopFirstPage", () => {
         thumbnail: null,
       },
     ];
-    const okRes: MockResponse = { ok: true, status: 200, json: async () => data };
-    fetchSpy.mockResolvedValue(okRes as unknown as Response);
+
+    fetchSpy.mockResolvedValue(makeOkResponse(data) as Response);
 
     const out = await fetchTopFirstPage();
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      "/api/world-heritage?page=1&per_page=20",
+      EXPECTED_URL,
       expect.objectContaining({
         headers: expect.objectContaining({ Accept: "application/json" }),
         credentials: "omit",
@@ -53,8 +87,7 @@ describe("fetchTopFirstPage", () => {
 
   it("{data: ...} レスポンスも配列に正規化して返す", async () => {
     const paginated: Paginated<ApiWorldHeritageDto> = { data: [] };
-    const okRes: MockResponse = { ok: true, status: 200, json: async () => paginated };
-    fetchSpy.mockResolvedValue(okRes as unknown as Response);
+    fetchSpy.mockResolvedValue(makeOkResponse(paginated) as Response);
 
     const out = await fetchTopFirstPage();
 
@@ -63,9 +96,10 @@ describe("fetchTopFirstPage", () => {
   });
 
   it("headers/credentials/signal が引数で上書きされる", async () => {
+    const paginated: Paginated<ApiWorldHeritageDto> = { data: [] };
+    fetchSpy.mockResolvedValue(makeOkResponse(paginated) as Response);
+
     const ac = new AbortController();
-    const okRes: MockResponse = { ok: true, status: 200, json: async () => [] };
-    fetchSpy.mockResolvedValue(okRes as unknown as Response);
 
     await fetchTopFirstPage({
       headers: { "X-Trace": "t" },
@@ -74,9 +108,12 @@ describe("fetchTopFirstPage", () => {
     });
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      "/api/world-heritage?page=1&per_page=20",
+      EXPECTED_URL,
       expect.objectContaining({
-        headers: expect.objectContaining({ Accept: "application/json", "X-Trace": "t" }),
+        headers: expect.objectContaining({
+          Accept: "application/json",
+          "X-Trace": "t",
+        }),
         credentials: "include",
         signal: ac.signal,
       }),
@@ -84,8 +121,7 @@ describe("fetchTopFirstPage", () => {
   });
 
   it("HTTP エラー時は例外を投げる", async () => {
-    const ngRes: MockResponse = { ok: false, status: 500, json: async () => ({}) };
-    fetchSpy.mockResolvedValue(ngRes as unknown as Response);
+    fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
     await expect(fetchTopFirstPage()).rejects.toThrow("HTTP 500");
   });
