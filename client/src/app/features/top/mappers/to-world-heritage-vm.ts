@@ -1,4 +1,5 @@
 import type { ApiWorldHeritageDto, WorldHeritageVm, CriteriaCode } from "../types";
+import { statePartyLabels } from "@features/constants/state-party-labels";
 
 const ORDER: CriteriaCode[] = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"];
 
@@ -16,8 +17,13 @@ const titleOf = (data: ApiWorldHeritageDto) => data.official_name || data.name;
 const subtitleOf = (data: ApiWorldHeritageDto) =>
   [data.country, data.region].filter(Boolean).join(" · ");
 
+const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
+  codes.map((code) => statePartyLabels[code]).filter((label): label is string => Boolean(label));
+
 export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
   const codes = normalize(data.criteria);
+  const statePartyCodes = data.state_party_codes ?? [];
+
   return {
     id: data.id,
     officialName: data.official_name,
@@ -36,7 +42,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     longitude: data.longitude,
     shortDescription: data.short_description,
     unescoSiteUrl: data.unesco_site_url,
-    statePartyCodes: data.state_party_codes,
+    statePartyCodes: toStatePartyLabelsJp(statePartyCodes),
     statePartiesMeta: Object.fromEntries(
       Object.entries(data.state_parties_meta).map(([k, v]) => [
         k,

@@ -47,7 +47,7 @@ describe("toWorldHeritageVm", () => {
       longitude: null,
       shortDescription: "desc",
       unescoSiteUrl: "https://whc.unesco.org/en/list/663",
-      statePartyCodes: ["JPN"],
+      statePartyCodes: ["日本"],
       statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
       thumbnail: "https://example.com/img.jpg",
 
