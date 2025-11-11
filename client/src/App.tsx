@@ -1,36 +1,41 @@
 import React, { useMemo } from "react";
-import TopPage from "./app/features/top/components/TopPage";
-import { useTopPage } from "./app/features/top/hooks/use-top-page";
-import type { WorldHeritageVm } from "./app/features/top/types";
+import TopPage from "@features/top/components/TopPage";
+import { useTopPage } from "@features/top/hooks/use-top-page";
+import type { WorldHeritageVm } from "@features/top/types";
 
-type Item = {
-  id: number;
-  title: string;
-  subtitle: string;
-  category: string;
-  year: number;
-  areaText: string;
-  bufferText: string;
-  thumbnail?: string;
+const dummyItem: WorldHeritageVm = {
+  id: 999999,
+  officialName: "Dummy Site For UI Test",
+  name: "Dummy Site For UI Test",
+  nameJp: "UIテスト用ダミー世界遺産",
+  country: "Japan",
+  region: "Asia",
+  stateParty: "Japan",
+  category: "Cultural",
+  criteria: [],
+  yearInscribed: 2099,
+  areaHectares: 12345,
+  bufferZoneHectares: 67890,
+  isEndangered: false,
+  latitude: null,
+  longitude: null,
+  shortDescription:
+    "これはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きます",
+  unescoSiteUrl: "#",
+  statePartyCodes: [],
+  statePartiesMeta: {},
+  thumbnail: undefined,
+  title: "UIテスト用ダミーサイト",
+  subtitle: "Japan · Asia",
+  areaText: "12,345 ha",
+  bufferText: "67,890 ha",
+  criteriaText: "",
 };
-
-function vmToItem(vm: WorldHeritageVm): Item {
-  return {
-    id: vm.id,
-    title: vm.title,
-    subtitle: vm.subtitle,
-    category: vm.category,
-    year: vm.yearInscribed,
-    areaText: vm.areaText,
-    bufferText: vm.bufferText,
-    thumbnail: vm.thumbnail,
-  };
-}
 
 export default function App(): React.ReactElement {
   const { items, reload, isLoading, isError, error } = useTopPage();
 
-  const uiItems = useMemo(() => items.map(vmToItem), [items]);
+  const uiItems = useMemo(() => (items.length ? [dummyItem, ...items] : items), [items]);
 
   if (isLoading) {
     return <main className="p-6">Loading…</main>;
