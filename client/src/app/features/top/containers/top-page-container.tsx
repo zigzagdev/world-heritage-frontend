@@ -4,32 +4,8 @@ import { fetchTopFirstPage } from "../apis";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 import TopPage from "../components/TopPage";
 
-type Item = {
-  id: number;
-  title: string;
-  subtitle: string;
-  category: string;
-  year: number;
-  areaText: string;
-  bufferText: string;
-  thumbnail?: string;
-};
-
-function vmToItem(vm: WorldHeritageVm): Item {
-  return {
-    id: vm.id,
-    title: vm.title,
-    subtitle: vm.subtitle,
-    category: vm.category,
-    year: vm.yearInscribed,
-    areaText: vm.areaText,
-    bufferText: vm.bufferText,
-    thumbnail: vm.thumbnail,
-  };
-}
-
 export default function TopPageContainer(): React.ReactElement {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<WorldHeritageVm[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
   const [reloadTick, setReloadTick] = useState<number>(0);
@@ -45,8 +21,10 @@ export default function TopPageContainer(): React.ReactElement {
     setError(null);
 
     fetchTopFirstPage({ signal: ac.signal })
-      .then((dtoList) => toWorldHeritageListVm(dtoList))
-      .then((vmList) => setItems(vmList.map(vmToItem)))
+      .then(toWorldHeritageListVm)
+      .then((vmList) => {
+        setItems(vmList);
+      })
       .catch((err: unknown) => {
         if ((err as { name?: string }).name === "AbortError") return;
         setItems([]);
@@ -90,6 +68,5 @@ export default function TopPageContainer(): React.ReactElement {
       </main>
     );
   }
-
   return <TopPage {...pageProps} />;
 }
