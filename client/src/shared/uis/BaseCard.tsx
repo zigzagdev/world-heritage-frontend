@@ -15,7 +15,7 @@ export function BaseCard({ children, as = "li", onClick }: BaseCardProps) {
             group list-none overflow-hidden rounded-2xl border border-zinc-200/70
             bg-white/70 shadow-sm backdrop-blur transition
             hover:shadow-md dark:border-zinc-800
-            dark:bg-zinc-900/70"
+            dark:bg-zinc-900/70 min-h-[600px]"
     >
       <button
         type="button"
