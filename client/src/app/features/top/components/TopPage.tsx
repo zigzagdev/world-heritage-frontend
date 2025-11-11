@@ -1,22 +1,12 @@
-export type Item = {
-  id: number;
-  title: string;
-  subtitle: string;
-  category: string;
-  year: number;
-  areaText: string;
-  bufferText: string;
-  thumbnail?: string;
-};
+import type { WorldHeritageVm } from "../types";
+import { HeritageCard } from "../cards/HeritageCard";
+import { Button } from "@shared/uis/Button.tsx";
 
 export type TopPageProps = {
-  items: ReadonlyArray<Item>;
+  items: ReadonlyArray<WorldHeritageVm>;
   onReload?: () => void;
   onClickItem?: (id: number) => void;
 };
-
-import { HeritageCard } from "../cards/HeritageCard";
-import { Button } from "@shared/uis/Button.tsx";
 
 export default function TopPage({ items, onReload, onClickItem }: TopPageProps) {
   return (

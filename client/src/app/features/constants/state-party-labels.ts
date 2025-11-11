@@ -45,6 +45,7 @@ export const statePartyLabels: Record<string, string> = {
   SVK: "スロバキア",
   SVN: "スロベニア",
   SWE: "スウェーデン",
+  TJK: "タジキスタン",
   TUR: "トルコ",
   UKR: "ウクライナ",
   VAT: "バチカン市国",
