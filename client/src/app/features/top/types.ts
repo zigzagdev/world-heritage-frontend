@@ -1,6 +1,15 @@
 export type Category = "Cultural" | "Natural" | "Mixed";
+
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
+
 export type CriteriaCode = (typeof CRITERIA)[number];
+
+export type StatePartyMetaDto = {
+  is_primary: boolean;
+  inscription_year: number;
+};
+
+export type StatePartiesMetaDto = Record<string, StatePartyMetaDto> | [];
 
 export type ApiWorldHeritageDto = {
   id: number;
@@ -11,7 +20,7 @@ export type ApiWorldHeritageDto = {
   region: string;
   state_party: string | null;
   category: Category;
-  criteria: string[];
+  criteria: CriteriaCode[];
   year_inscribed: number;
   area_hectares: number | null;
   buffer_zone_hectares: number | null;
@@ -21,8 +30,14 @@ export type ApiWorldHeritageDto = {
   short_description: string;
   unesco_site_url: string;
   state_party_codes: string[];
-  state_parties_meta: Record<string, { is_primary: boolean; inscription_year: number }>;
-  thumbnail?: string | null;
+  state_parties_meta: StatePartiesMetaDto;
+  primary_state_party_code: string | null;
+  thumbnail_url: string | null;
+};
+
+export type StatePartyMetaVm = {
+  isPrimary: boolean;
+  inscriptionYear: number;
 };
 
 export type WorldHeritageVm = {
@@ -44,7 +59,9 @@ export type WorldHeritageVm = {
   shortDescription: string;
   unescoSiteUrl: string;
   statePartyCodes: string[];
-  statePartiesMeta: Record<string, { isPrimary: boolean; inscriptionYear: number }>;
+  statePartiesMeta: Record<string, StatePartyMetaVm>;
+  primaryStatePartyCode: string | null;
+
   thumbnail?: string;
   title: string;
   subtitle: string;

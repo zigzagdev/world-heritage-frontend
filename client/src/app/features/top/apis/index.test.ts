@@ -3,8 +3,6 @@ import { fetchTopFirstPage } from "./index.js";
 import type { ApiWorldHeritageDto, Paginated } from "../types";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
-
-// Node 環境の globalThis に fetch を追加するための型拡張
 type GlobalWithFetch = typeof globalThis & { fetch?: typeof fetch };
 
 const g = globalThis as GlobalWithFetch;
@@ -13,12 +11,10 @@ let fetchSpy: jest.MockedFunction<typeof fetch>;
 let originalFetch: typeof fetch | undefined;
 
 beforeAll(() => {
-  // 元の fetch（あれば）を退避
   originalFetch = g.fetch;
 });
 
 beforeEach(() => {
-  // テスト毎に新しいモックを差し込む
   fetchSpy = jest.fn() as jest.MockedFunction<typeof fetch>;
   g.fetch = fetchSpy;
 });
@@ -30,7 +26,7 @@ afterAll(() => {
 });
 
 const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
-const EXPECTED_URL = `${API_BASE}/api/v1/heritages?page=1&per_page=20`;
+const EXPECTED_URL = `${API_BASE}/api/v1/heritages`;
 
 const makeOkResponse = (body: unknown): MockResponse => ({
   ok: true,
@@ -67,7 +63,8 @@ describe("fetchTopFirstPage", () => {
         unesco_site_url: "https://ex.com/1",
         state_party_codes: ["JPN"],
         state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-        thumbnail: null,
+        thumbnail_url: null,
+        primary_state_party_code: "JPN",
       },
     ];
 
