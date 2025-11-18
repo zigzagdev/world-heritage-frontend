@@ -30,6 +30,7 @@ const dummyItem: WorldHeritageVm = {
   areaText: "12,345 ha",
   bufferText: "67,890 ha",
   criteriaText: "",
+  primaryStatePartyCode: null,
 };
 
 export default function App(): React.ReactElement {
