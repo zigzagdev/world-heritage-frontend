@@ -22,7 +22,8 @@ const base: ApiWorldHeritageDto = {
   unesco_site_url: "https://whc.unesco.org/en/list/663",
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-  thumbnail: "https://example.com/img.jpg",
+  thumbnail_url: "https://example.com/img.jpg",
+  primary_state_party_code: "JPN",
 };
 
 describe("toWorldHeritageVm", () => {
@@ -49,6 +50,7 @@ describe("toWorldHeritageVm", () => {
       unescoSiteUrl: "https://whc.unesco.org/en/list/663",
       statePartyCodes: ["日本"],
       statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
+      primaryStatePartyCode: "JPN",
       thumbnail: "https://example.com/img.jpg",
 
       title: "Shirakami-Sanchi",
@@ -71,7 +73,7 @@ describe("toWorldHeritageVm", () => {
       ...base,
       area_hectares: null,
       buffer_zone_hectares: null,
-      thumbnail: null,
+      thumbnail_url: null,
     });
 
     expect(vm.areaText).toBe("—");
