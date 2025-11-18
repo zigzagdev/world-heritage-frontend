@@ -63,22 +63,19 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
     advancePreviewOrNavigate();
   };
 
-  // 表示するテキストを段階ごとに決める
   const visibleDescription = (() => {
     if (!rawDesc) return "";
 
     if (len <= SHORT_DESC_MAX) {
-      // 短いものは常に全文
       return rawDesc;
     }
 
     if (previewStage === "short") {
-      // 50 文字プレビュー
       return rawDesc.slice(0, SHORT_DESC_MAX) + "…";
     }
 
-    // previewStage === "medium"
     const visibleLen = Math.min(len, MEDIUM_DESC_MAX);
+
     return rawDesc.slice(0, visibleLen) + (len > visibleLen ? "…" : "");
   })();
 
@@ -117,7 +114,6 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
       </div>
 
       <div className="space-y-3 px-4 py-5">
-        {/* タイトル + カテゴリ */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3 className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-100">
@@ -141,7 +137,6 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
           )}
         </div>
 
-        {/* メタ情報 */}
         <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
           <MetaChip label="Year" value={item.yearInscribed} />
           {item.region && <MetaChip label="Region" value={item.region} />}
@@ -162,7 +157,6 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
           ) : null}
         </div>
 
-        {/* 説明文 */}
         {rawDesc && (
           <div className="pt-1">
             <p className="whitespace-pre-wrap text-sm leading-6 text-zinc-700 dark:text-zinc-200">
