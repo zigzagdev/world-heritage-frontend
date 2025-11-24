@@ -1,6 +1,6 @@
 import * as React from "react";
-import { toWorldHeritageVm } from "../mappers/to-world-heritage-vm";
-import type { WorldHeritageVm } from "../types";
+import { toWorldHeritageVm } from "../mappers/to-world-heritage-vm.ts";
+import type { WorldHeritageVm } from "../types.ts";
 import { fetchWorldHeritageDetail } from "../apis";
 
 type State = {

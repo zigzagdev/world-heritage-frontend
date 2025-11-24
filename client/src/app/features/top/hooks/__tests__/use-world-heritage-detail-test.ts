@@ -7,8 +7,6 @@ import { fetchWorldHeritageDetail } from "../../apis";
 import { toWorldHeritageVm } from "../../mappers/to-world-heritage-vm";
 import type { WorldHeritageVm, ApiWorldHeritageDto } from "../../types";
 
-// ---- AbortController polyfill（useTopPage側と同じパターン） ----
-
 type MinimalAbortSignal = { aborted: boolean };
 
 interface MinimalAbortController {
