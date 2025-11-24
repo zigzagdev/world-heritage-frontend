@@ -2,9 +2,9 @@
 
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { jest, expect, test, beforeEach, describe } from "@jest/globals";
-import { useTopPage } from "./use-top-page";
-import { fetchTopFirstPage } from "../apis";
-import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
+import { useTopPage } from "../use-top-page.ts";
+import { fetchTopFirstPage } from "../../apis";
+import { toWorldHeritageListVm } from "../../mappers/to-world-heritage-vm.ts";
 
 type MinimalAbortSignal = { aborted: boolean };
 
@@ -27,10 +27,10 @@ if (!("AbortController" in globalThis) || typeof globalThis.AbortController !== 
   (globalThis as { AbortController: AbortControllerCtor }).AbortController = FakeAbortController;
 }
 
-jest.mock("../apis", () => ({
+jest.mock("../../apis", () => ({
   fetchTopFirstPage: jest.fn(),
 }));
-jest.mock("../mappers/to-world-heritage-vm", () => ({
+jest.mock("../../mappers/to-world-heritage-vm.ts", () => ({
   toWorldHeritageListVm: jest.fn(),
 }));
 
@@ -40,7 +40,6 @@ const fetchTopFirstPageMock = fetchTopFirstPage as unknown as jest.MockedFunctio
 type MapFn = (dtoList: unknown[]) => unknown[];
 const toWorldHeritageListVmMock = toWorldHeritageListVm as unknown as jest.MockedFunction<MapFn>;
 
-// ---- deferred ヘルパ
 type Deferred<T> = {
   promise: Promise<T>;
   resolve: (v: T) => void;
