@@ -84,8 +84,8 @@ vi.mock("../../components/TopPage", () => {
   return { default: TopPage };
 });
 
-import { fetchTopFirstPage } from "../apis";
-import TopPageContainer from "./top-page-container";
+import { fetchTopFirstPage } from "../../apis";
+import TopPageContainer from "../top-page-container.tsx";
 
 const fetchTopFirstPageMock: MockedFunction<
   (opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>
