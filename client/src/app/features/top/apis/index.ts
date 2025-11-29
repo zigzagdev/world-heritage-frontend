@@ -3,6 +3,11 @@ import type { Paginated, ApiWorldHeritageDto } from "../types";
 const apiBase = "http://localhost:8700".replace(/\/+$/, "");
 const ENDPOINT = `${apiBase}/api/v1/heritages`;
 
+type DetailResponse<T> = {
+  status: string;
+  data: T;
+};
+
 export async function fetchTopFirstPage(init?: RequestInit): Promise<ApiWorldHeritageDto[]> {
   const res = await fetch(ENDPOINT, {
     headers: { Accept: "application/json", ...(init?.headers ?? {}) },
@@ -27,7 +32,11 @@ export async function fetchWorldHeritageDetail(
     signal: init?.signal,
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const json = (await res.json()) as ApiWorldHeritageDto;
 
-  return json;
+  const json = (await res.json()) as DetailResponse<ApiWorldHeritageDto>;
+
+  if (json.status !== "success") {
+    throw new Error(`API status is not success: ${json.status}`);
+  }
+  return json.data;
 }
