@@ -1,9 +1,7 @@
-/** @jest-environment jsdom */
-// @ts-nocheck
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { jest, describe, beforeEach, test, expect } from "@jest/globals";
+import { jest } from "@jest/globals";
+
 import { WorldHeritageDetailContainer } from "../world-heritage-detail-container";
 import { useWorldHeritageDetail } from "../../hooks/use-world-heritage-detail";
 import type { WorldHeritageVm } from "../../types";
@@ -15,7 +13,7 @@ jest.mock("../../components/HeritageDetailLayout", () => ({
   ),
 }));
 
-const useWorldHeritageDetailMock = useWorldHeritageDetail as unknown as jest.MockedFunction<
+const useWorldHeritageDetailMock = useWorldHeritageDetail as jest.MockedFunction<
   (id: string | null) => {
     item: WorldHeritageVm | null;
     isLoading: boolean;
@@ -25,15 +23,14 @@ const useWorldHeritageDetailMock = useWorldHeritageDetail as unknown as jest.Moc
   }
 >;
 
-function renderWithRoute(path: string, initialEntry: string) {
-  return render(
+const renderWithRoute = (path: "/heritages" | "/heritages/:id", initialEntry: string) =>
+  render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path={path} element={<WorldHeritageDetailContainer />} />
       </Routes>
     </MemoryRouter>,
   );
-}
 
 describe("WorldHeritageDetailContainer", () => {
   beforeEach(() => {
@@ -60,7 +57,7 @@ describe("WorldHeritageDetailContainer", () => {
     expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
-  test("エラーの場合 'Failed to load world heritage detail.' と Retry ボタンを表示し、クリックで reload を呼ぶ", () => {
+  test("エラーの場合 メッセージと Retry ボタンを表示し、クリックで reload を呼ぶ", () => {
     const reload = jest.fn();
     const error = new Error("boom");
 
