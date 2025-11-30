@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { describe, it, vi, beforeEach, type MockedFunction } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import React from "react";
