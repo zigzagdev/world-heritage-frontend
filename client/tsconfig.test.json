@@ -5,7 +5,6 @@
     "moduleResolution": "node",
     "verbatimModuleSyntax": false,
     "jsx": "react-jsx",
-    "types": ["vite/client", "jest", "@testing-library/jest-dom", "node"],
 
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -17,7 +16,8 @@
       "@features/*": ["app/features/*"],
       "@shared/*": ["shared/*"],
       "@/*": ["*"]
-    }
+    },
+    "types": ["vite/client", "jest", "@testing-library/jest-dom", "node"]
   },
   "include": ["src"]
 }
