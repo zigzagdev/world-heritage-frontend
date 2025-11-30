@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { WorldHeritageVm } from "../types";
 import { fetchTopFirstPage } from "../apis";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
@@ -20,8 +21,7 @@ const dummyItem: WorldHeritageVm = {
   isEndangered: false,
   latitude: null,
   longitude: null,
-  shortDescription:
-    "これはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きますこれはUIテスト用のダミーデータです。説明文を長くして折りたたみ表示(Read more)の挙動を確認するために使います。とても長い説明が続きます…とても長い説明が続きます…とても長い説明が続きます",
+  shortDescription: "……(略)",
   unescoSiteUrl: "#",
   statePartyCodes: [],
   statePartiesMeta: {},
@@ -41,6 +41,7 @@ export default function TopPageContainer(): React.ReactElement {
   const [reloadTick, setReloadTick] = useState<number>(0);
 
   const abortRef = useRef<AbortController | null>(null);
+  const navigate = useNavigate();
 
   const load = useCallback(() => {
     abortRef.current?.abort();
@@ -72,14 +73,23 @@ export default function TopPageContainer(): React.ReactElement {
     setReloadTick((n) => n + 1);
   }, []);
 
+  const handleClickItem = useCallback(
+    (id: number) => {
+      if (id === dummyItem.id) return;
+      navigate(`/heritages/${id}`);
+    },
+    [navigate],
+  );
+
   const uiItems = useMemo(() => (items.length ? [dummyItem, ...items] : [dummyItem]), [items]);
 
   const pageProps = useMemo(
     () => ({
       items: uiItems,
       onReload: handleReload,
+      onClickItem: handleClickItem,
     }),
-    [uiItems, handleReload],
+    [uiItems, handleReload, handleClickItem],
   );
 
   if (isLoading) {

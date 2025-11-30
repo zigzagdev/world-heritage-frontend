@@ -1,10 +1,10 @@
 import * as React from "react";
-import { toWorldHeritageVm } from "../mappers/to-world-heritage-vm.ts";
-import type { WorldHeritageVm } from "../types.ts";
+import { toWorldHeritageDetailVm } from "../mappers/to-world-heritage-detail-vm";
+import type { WorldHeritageDetailVm } from "../types";
 import { fetchWorldHeritageDetail } from "../apis";
 
 type State = {
-  data: WorldHeritageVm | null;
+  data: WorldHeritageDetailVm | null;
   loading: boolean;
   error: unknown | null;
 };
@@ -35,7 +35,7 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
     setState((s) => ({ ...s, loading: true, error: null }));
 
     fetchWorldHeritageDetail(id, { signal: ac.signal })
-      .then((dto) => toWorldHeritageVm(dto))
+      .then((dto) => toWorldHeritageDetailVm(dto))
       .then((vm) => {
         setState({ data: vm, loading: false, error: null });
       })
