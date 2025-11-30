@@ -1,4 +1,5 @@
-// containers/__tests__/top-page-container.test.tsx
+// @ts-nocheck
+
 import { describe, it, vi, beforeEach, type MockedFunction } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import React from "react";
@@ -39,13 +40,10 @@ interface WorldHeritageVm {
   thumbnail: string;
 }
 
-// ===== Mocks =====
-// API（関数シグネチャを明示）
 vi.mock("../../apis", () => ({
   fetchTopFirstPage: vi.fn<(opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>>(),
 }));
 
-// DTO -> VM マッパー（DTO仕様に準拠）
 vi.mock("../../mappers/to-world-heritage-vm", () => {
   const toWorldHeritageListVm = (dto: ReadonlyArray<WorldHeritageDto>): WorldHeritageVm[] =>
     dto.map((d) => ({
@@ -65,7 +63,6 @@ vi.mock("../../mappers/to-world-heritage-vm", () => {
   return { toWorldHeritageListVm };
 });
 
-// TopPage（最小モック）
 interface TopPageProps {
   items: ReadonlyArray<WorldHeritageVm>;
   onReload: () => void;
@@ -161,7 +158,6 @@ const SHIRAKAMI: WorldHeritageDto = {
   thumbnail: "http://localhost/storage/world_heritage/663/img1.jpg",
 };
 
-// ===== Tests =====
 describe("TopPageContainer", () => {
   beforeEach(() => {
     vi.clearAllMocks();

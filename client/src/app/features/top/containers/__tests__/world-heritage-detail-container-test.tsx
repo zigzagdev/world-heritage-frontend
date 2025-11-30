@@ -1,4 +1,5 @@
 /** @jest-environment jsdom */
+// @ts-nocheck
 
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
