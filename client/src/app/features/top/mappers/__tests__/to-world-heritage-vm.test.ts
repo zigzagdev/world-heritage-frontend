@@ -1,6 +1,6 @@
 import { describe, it, expect } from "@jest/globals";
-import { toWorldHeritageVm, toWorldHeritageListVm } from "./to-world-heritage-vm.js";
-import type { ApiWorldHeritageDto, WorldHeritageVm } from "../types";
+import { toWorldHeritageVm, toWorldHeritageListVm } from "../to-world-heritage-vm.ts";
+import type { ApiWorldHeritageDto, WorldHeritageVm } from "../../types.ts";
 
 const base: ApiWorldHeritageDto = {
   id: 663,

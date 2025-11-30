@@ -1,7 +1,6 @@
 export type Category = "Cultural" | "Natural" | "Mixed";
 
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
-
 export type CriteriaCode = (typeof CRITERIA)[number];
 
 export type StatePartyMetaDto = {
@@ -33,6 +32,20 @@ export type ApiWorldHeritageDto = {
   state_parties_meta: StatePartiesMetaDto;
   primary_state_party_code: string | null;
   thumbnail_url: string | null;
+  images?: ApiWorldHeritageImageDto[];
+};
+
+export type ApiWorldHeritageImageDto = {
+  id: number;
+  url: string;
+  sort_order: number;
+  width: number | null;
+  height: number | null;
+  format: string;
+  alt: string | null;
+  credit: string | null;
+  is_primary: boolean;
+  checksum: string;
 };
 
 export type StatePartyMetaVm = {
@@ -68,6 +81,20 @@ export type WorldHeritageVm = {
   areaText: string;
   bufferText: string;
   criteriaText: string;
+};
+
+export type WorldHeritageImageVm = {
+  id: number;
+  url: string;
+  alt: string;
+  credit: string | null;
+  width: number | null;
+  height: number | null;
+  isPrimary: boolean;
+};
+
+export type WorldHeritageDetailVm = WorldHeritageVm & {
+  images: WorldHeritageImageVm[];
 };
 
 export type Paginated<T> = { data: T[]; meta?: unknown } | T[];

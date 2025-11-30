@@ -1,17 +1,17 @@
 import * as React from "react";
-import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm.ts";
-import type { WorldHeritageVm } from "../types.ts";
-import { fetchTopFirstPage } from "../apis";
+import { toWorldHeritageDetailVm } from "../mappers/to-world-heritage-detail-vm";
+import type { WorldHeritageDetailVm } from "../types";
+import { fetchWorldHeritageDetail } from "../apis";
 
 type State = {
-  data: WorldHeritageVm[];
+  data: WorldHeritageDetailVm | null;
   loading: boolean;
   error: unknown | null;
 };
 
-export function useTopPage() {
+export function useWorldHeritageDetail(id: string | null | undefined) {
   const [state, setState] = React.useState<State>({
-    data: [],
+    data: null,
     loading: true,
     error: null,
   });
@@ -19,22 +19,31 @@ export function useTopPage() {
   const abortRef = React.useRef<AbortController | null>(null);
 
   const load = React.useCallback(() => {
+    if (!id) {
+      setState((s) => ({
+        ...s,
+        loading: false,
+        error: new Error("World heritage id is required"),
+      }));
+      return;
+    }
+
     abortRef.current?.abort();
     const ac = new AbortController();
     abortRef.current = ac;
 
     setState((s) => ({ ...s, loading: true, error: null }));
 
-    fetchTopFirstPage({ signal: ac.signal })
-      .then((dtoList) => toWorldHeritageListVm(dtoList))
-      .then((vmList) => {
-        setState({ data: vmList, loading: false, error: null });
+    fetchWorldHeritageDetail(id, { signal: ac.signal })
+      .then((dto) => toWorldHeritageDetailVm(dto))
+      .then((vm) => {
+        setState({ data: vm, loading: false, error: null });
       })
       .catch((err: unknown) => {
         if ((err as { name?: string }).name === "AbortError") return;
-        setState({ data: [], loading: false, error: err });
+        setState({ data: null, loading: false, error: err });
       });
-  }, []);
+  }, [id]);
 
   React.useEffect(() => {
     load();
@@ -48,7 +57,7 @@ export function useTopPage() {
   }, [load]);
 
   return {
-    items: state.data,
+    item: state.data,
     reload,
     isLoading: state.loading,
     isError: state.error != null,

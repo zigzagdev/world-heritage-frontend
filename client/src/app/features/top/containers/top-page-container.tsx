@@ -1,8 +1,38 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import type { WorldHeritageVm } from "../types";
 import { fetchTopFirstPage } from "../apis";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 import TopPage from "../components/TopPage";
+
+const dummyItem: WorldHeritageVm = {
+  id: 999999,
+  officialName: "Dummy Site For UI Test",
+  name: "Dummy Site For UI Test",
+  nameJp: "UIテスト用ダミー世界遺産",
+  country: "Japan",
+  region: "Asia",
+  stateParty: "Japan",
+  category: "Cultural",
+  criteria: [],
+  yearInscribed: 2099,
+  areaHectares: 12345,
+  bufferZoneHectares: 67890,
+  isEndangered: false,
+  latitude: null,
+  longitude: null,
+  shortDescription: "……(略)",
+  unescoSiteUrl: "#",
+  statePartyCodes: [],
+  statePartiesMeta: {},
+  thumbnail: undefined,
+  title: "UIテスト用ダミーサイト",
+  subtitle: "Japan · Asia",
+  areaText: "12,345 ha",
+  bufferText: "67,890 ha",
+  criteriaText: "",
+  primaryStatePartyCode: null,
+};
 
 export default function TopPageContainer(): React.ReactElement {
   const [items, setItems] = useState<WorldHeritageVm[]>([]);
@@ -11,6 +41,7 @@ export default function TopPageContainer(): React.ReactElement {
   const [reloadTick, setReloadTick] = useState<number>(0);
 
   const abortRef = useRef<AbortController | null>(null);
+  const navigate = useNavigate();
 
   const load = useCallback(() => {
     abortRef.current?.abort();
@@ -42,12 +73,23 @@ export default function TopPageContainer(): React.ReactElement {
     setReloadTick((n) => n + 1);
   }, []);
 
+  const handleClickItem = useCallback(
+    (id: number) => {
+      if (id === dummyItem.id) return;
+      navigate(`/heritages/${id}`);
+    },
+    [navigate],
+  );
+
+  const uiItems = useMemo(() => (items.length ? [dummyItem, ...items] : [dummyItem]), [items]);
+
   const pageProps = useMemo(
     () => ({
-      items,
+      items: uiItems,
       onReload: handleReload,
+      onClickItem: handleClickItem,
     }),
-    [items, handleReload],
+    [uiItems, handleReload, handleClickItem],
   );
 
   if (isLoading) {
@@ -68,5 +110,6 @@ export default function TopPageContainer(): React.ReactElement {
       </main>
     );
   }
+
   return <TopPage {...pageProps} />;
 }
