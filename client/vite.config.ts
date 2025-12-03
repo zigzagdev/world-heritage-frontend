@@ -4,9 +4,7 @@ import tailwindcss from "tailwindcss";
 import autoprefixer from "autoprefixer";
 import path from "node:path";
 
-export default defineConfig(() => {
-  const apiBase = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
-
+export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     css: {
@@ -20,8 +18,16 @@ export default defineConfig(() => {
         "@features": path.resolve(__dirname, "src/app/features"),
       },
     },
-    define: {
-      "process.env.VITE_API_BASE_URL": JSON.stringify(apiBase),
+    server: {
+      proxy:
+        mode === "development"
+          ? {
+              "/api": {
+                target: "http://localhost:8700",
+                changeOrigin: true,
+              },
+            }
+          : undefined,
     },
   };
 });

@@ -1,6 +1,6 @@
 import type { Paginated, ApiWorldHeritageDto } from "../types";
 
-const apiBase = "http://localhost:8700".replace(/\/+$/, "");
+const apiBase = import.meta.env.VITE_API_BASE_URL ?? "";
 const ENDPOINT = `${apiBase}/api/v1/heritages`;
 
 type DetailResponse<T> = {
