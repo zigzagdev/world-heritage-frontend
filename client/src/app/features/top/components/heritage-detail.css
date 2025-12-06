@@ -38,3 +38,85 @@
 .heritage-detail__link {
   text-decoration: underline;
 }
+
+/* レイアウト */
+.heritage-detail__body {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 2rem;
+  align-items: flex-start;
+  margin-top: 2rem;
+}
+
+.heritage-detail__main {
+  min-width: 0; /* grid子要素の長文折り返し対策 */
+}
+
+.heritage-detail__sidebar {
+  min-width: 0;
+}
+
+/* サイドバー本体 */
+.heritage-detail__sidebar-card {
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+}
+
+.heritage-detail__sidebar-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.heritage-detail__definition-list {
+  margin: 0;
+  padding: 0;
+}
+
+.heritage-detail__definition-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.heritage-detail__definition-item dt {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.heritage-detail__definition-item dd {
+  margin: 0;
+  text-align: right;
+  color: #111827;
+}
+
+.heritage-detail__unesco-link {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+
+.heritage-detail__unesco-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .heritage-detail__body {
+    grid-template-columns: 1fr;
+  }
+  .heritage-detail__sidebar {
+    order: 2;
+  }
+
+  .heritage-detail__main {
+    order: 1;
+  }
+}
