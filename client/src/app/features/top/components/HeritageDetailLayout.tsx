@@ -52,71 +52,126 @@ export function HeritageDetailLayout({ item }: Props) {
       </header>
 
       <main className="heritage-detail__body">
-        <section className="heritage-detail__section">
-          <h2 className="heritage-detail__section-title">Overview</h2>
-          <p className="heritage-detail__description">{item.shortDescription}</p>
-
-          <dl className="heritage-detail__definition-list">
-            <div className="heritage-detail__definition-item">
-              <dt>Criteria</dt>
-              <dd>{item.criteriaText || "—"}</dd>
-            </div>
-            <div className="heritage-detail__definition-item">
-              <dt>Area</dt>
-              <dd>{item.areaText}</dd>
-            </div>
-            <div className="heritage-detail__definition-item">
-              <dt>Buffer zone</dt>
-              <dd>{item.bufferText}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <section className="heritage-detail__section">
-          <h2 className="heritage-detail__section-title">Location</h2>
-          <dl className="heritage-detail__definition-list">
-            <div className="heritage-detail__definition-item">
-              <dt>Country</dt>
-              <dd>{item.country}</dd>
-            </div>
-            <div className="heritage-detail__definition-item">
-              <dt>Region</dt>
-              <dd>{item.region}</dd>
-            </div>
-            {(item.latitude != null || item.longitude != null) && (
-              <div className="heritage-detail__definition-item">
-                <dt>Coordinates</dt>
-                <dd>
-                  {item.latitude != null && item.longitude != null
-                    ? `${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)}`
-                    : "—"}
-                </dd>
-              </div>
-            )}
-          </dl>
-        </section>
-
-        {item.images.length > 1 && (
+        <div className="heritage-detail__main">
           <section className="heritage-detail__section">
-            <h2 className="heritage-detail__section-title">Gallery</h2>
-            <div className="heritage-detail__gallery">
-              {item.images.map((img) => (
-                <figure
-                  key={img.id}
-                  className={`heritage-detail__thumbnail${
-                    img.isPrimary ? " heritage-detail__thumbnail--primary" : ""
-                  }`}
-                >
-                  <img src={img.url} alt={img.alt} className="heritage-detail__thumbnail-image" />
-                  <figcaption className="heritage-detail__thumbnail-caption">
-                    {img.isPrimary && <span className="badge badge--primary">Primary</span>}
-                    {img.credit && <span className="credit">© {img.credit}</span>}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+            <h2 className="heritage-detail__section-title">Overview</h2>
+            <p className="heritage-detail__description">{item.shortDescription}</p>
+
+            <dl className="heritage-detail__definition-list">
+              <div className="heritage-detail__definition-item">
+                <dt>Criteria</dt>
+                <dd>{item.criteriaText || "—"}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Area</dt>
+                <dd>{item.areaText}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Buffer zone</dt>
+                <dd>{item.bufferText}</dd>
+              </div>
+            </dl>
           </section>
-        )}
+
+          <section className="heritage-detail__section">
+            <h2 className="heritage-detail__section-title">Location</h2>
+            <dl className="heritage-detail__definition-list">
+              <div className="heritage-detail__definition-item">
+                <dt>Country</dt>
+                <dd>{item.country}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Region</dt>
+                <dd>{item.region}</dd>
+              </div>
+              {(item.latitude != null || item.longitude != null) && (
+                <div className="heritage-detail__definition-item">
+                  <dt>Coordinates</dt>
+                  <dd>
+                    {item.latitude != null && item.longitude != null
+                      ? `${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)}`
+                      : "—"}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </section>
+
+          {item.images.length > 1 && (
+            <section className="heritage-detail__section">
+              <h2 className="heritage-detail__section-title">Gallery</h2>
+              <div className="heritage-detail__gallery">
+                {item.images.map((img) => (
+                  <figure
+                    key={img.id}
+                    className={`heritage-detail__thumbnail${
+                      img.isPrimary ? " heritage-detail__thumbnail--primary" : ""
+                    }`}
+                  >
+                    <img src={img.url} alt={img.alt} className="heritage-detail__thumbnail-image" />
+                    <figcaption className="heritage-detail__thumbnail-caption">
+                      {img.isPrimary && <span className="badge badge--primary">Primary</span>}
+                      {img.credit && <span className="credit">© {img.credit}</span>}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        <aside className="heritage-detail__sidebar" aria-label="Summary">
+          <div className="heritage-detail__sidebar-card">
+            <h2 className="heritage-detail__sidebar-title">Info</h2>
+            <dl className="heritage-detail__definition-list">
+              <div className="heritage-detail__definition-item">
+                <dt>Country</dt>
+                <dd>{item.country}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Region</dt>
+                <dd>{item.region}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Year of inscription</dt>
+                <dd>{item.yearInscribed}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Criteria</dt>
+                <dd>{item.criteriaText || "—"}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Area</dt>
+                <dd>{item.areaText}</dd>
+              </div>
+              <div className="heritage-detail__definition-item">
+                <dt>Buffer zone</dt>
+                <dd>{item.bufferText}</dd>
+              </div>
+              {(item.latitude != null || item.longitude != null) && (
+                <div className="heritage-detail__definition-item">
+                  <dt>Coordinates</dt>
+                  <dd>
+                    {item.latitude != null && item.longitude != null
+                      ? `${item.latitude.toFixed(4)}, ${item.longitude.toFixed(4)}`
+                      : "—"}
+                  </dd>
+                </div>
+              )}
+            </dl>
+
+            {item.unescoSiteUrl && (
+              <a
+                href={item.unescoSiteUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="heritage-detail__link heritage-detail__unesco-link"
+              >
+                View on UNESCO
+              </a>
+            )}
+          </div>
+        </aside>
       </main>
     </div>
   );
