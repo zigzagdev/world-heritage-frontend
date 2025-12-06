@@ -1,4 +1,6 @@
 import type { WorldHeritageDetailVm } from "../types";
+import "./heritage-detail.css";
+import { HeroImage } from "./HeroImage.tsx";
 
 type Props = {
   item: WorldHeritageDetailVm;
@@ -29,11 +31,7 @@ export function HeritageDetailLayout({ item }: Props) {
 
         {primaryImage && (
           <figure className="heritage-detail__hero">
-            <img
-              src={primaryImage.url}
-              alt={primaryImage.alt}
-              className="heritage-detail__hero-image"
-            />
+            <HeroImage src={primaryImage.url} alt={primaryImage.alt} />
             {(primaryImage.credit || item.unescoSiteUrl) && (
               <figcaption className="heritage-detail__hero-caption">
                 {primaryImage.credit && <span>© {primaryImage.credit}</span>}
