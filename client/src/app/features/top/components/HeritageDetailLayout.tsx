@@ -1,7 +1,7 @@
-// HeritageDetailLayout.tsx
 import type { WorldHeritageDetailVm } from "../types";
 import "./heritage-detail.css";
 import { HeroImage } from "./HeroImage";
+import { HeritageGallery } from "./HeritageGallery";
 
 type Props = {
   item: WorldHeritageDetailVm;
@@ -12,7 +12,6 @@ export function HeritageDetailLayout({ item }: Props) {
 
   return (
     <div className="heritage-detail">
-      {/* ===== Header: title + hero ===== */}
       <header className="heritage-detail__header">
         <div className="heritage-detail__title-block">
           <h1 className="heritage-detail__title">
@@ -53,23 +52,18 @@ export function HeritageDetailLayout({ item }: Props) {
         )}
       </header>
 
-      {/* ===== Body: main (left) + sidebar (right) ===== */}
       <main className="heritage-detail__body">
-        {/* ---------- LEFT: main content column ---------- */}
         <div className="heritage-detail__main">
-          {/* Overview */}
           <section className="heritage-detail__section">
             <h2 className="heritage-detail__section-title">Overview</h2>
             <p className="heritage-detail__description">{item.shortDescription}</p>
           </section>
 
-          {/* Criteria */}
           <section className="heritage-detail__section">
             <h3 className="heritage-detail__subsection-title">Criteria</h3>
             <p className="heritage-detail__text">{item.criteriaText || "—"}</p>
           </section>
 
-          {/* Area & Buffer */}
           <section className="heritage-detail__section">
             <h3 className="heritage-detail__subsection-title">Area &amp; Buffer zone</h3>
             <dl className="heritage-detail__definition-list">
@@ -84,7 +78,6 @@ export function HeritageDetailLayout({ item }: Props) {
             </dl>
           </section>
 
-          {/* Danger status */}
           {item.isEndangered && (
             <section className="heritage-detail__section heritage-detail__section--danger">
               <h3 className="heritage-detail__subsection-title">Danger status</h3>
@@ -94,7 +87,6 @@ export function HeritageDetailLayout({ item }: Props) {
             </section>
           )}
 
-          {/* Location */}
           <section className="heritage-detail__section">
             <h2 className="heritage-detail__section-title">Location</h2>
             <dl className="heritage-detail__definition-list">
@@ -118,32 +110,9 @@ export function HeritageDetailLayout({ item }: Props) {
               )}
             </dl>
           </section>
-
-          {/* Gallery */}
-          {item.images.length > 1 && (
-            <section className="heritage-detail__section">
-              <h2 className="heritage-detail__section-title">Gallery</h2>
-              <div className="heritage-detail__gallery">
-                {item.images.map((img) => (
-                  <figure
-                    key={img.id}
-                    className={`heritage-detail__thumbnail${
-                      img.isPrimary ? " heritage-detail__thumbnail--primary" : ""
-                    }`}
-                  >
-                    <img src={img.url} alt={img.alt} className="heritage-detail__thumbnail-image" />
-                    <figcaption className="heritage-detail__thumbnail-caption">
-                      {img.isPrimary && <span className="badge badge--primary">Primary</span>}
-                      {img.credit && <span className="credit">© {img.credit}</span>}
-                    </figcaption>
-                  </figure>
-                ))}
-              </div>
-            </section>
-          )}
+          <HeritageGallery images={item.images} />
         </div>
 
-        {/* ---------- RIGHT: sidebar summary ---------- */}
         <aside className="heritage-detail__sidebar" aria-label="Summary">
           <div className="heritage-detail__sidebar-card">
             <h2 className="heritage-detail__sidebar-title">Info</h2>
