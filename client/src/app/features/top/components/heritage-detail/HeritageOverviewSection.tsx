@@ -8,16 +8,19 @@ type Props = {
 
 export function HeritageOverviewSection({ item }: Props) {
   return (
-    <section className="heritage-detail__section">
-      <h2 className="heritage-detail__section-title">Overview</h2>
+    <section className="heritage-detail__section" aria-labelledby="heritage-overview-heading">
+      <h2 id="heritage-overview-heading" className="heritage-detail__section-title">
+        Overview
+      </h2>
+
       <p className="heritage-detail__description">{item.shortDescription}</p>
 
-      <section className="heritage-detail__section">
+      <div className="heritage-detail__section">
         <h3 className="heritage-detail__subsection-title">Criteria</h3>
         <p className="heritage-detail__text">{item.criteriaText || "—"}</p>
-      </section>
+      </div>
 
-      <section className="heritage-detail__section">
+      <div className="heritage-detail__section">
         <h3 className="heritage-detail__subsection-title">Area &amp; Buffer zone</h3>
         <HeritageMetadataList
           items={[
@@ -25,15 +28,15 @@ export function HeritageOverviewSection({ item }: Props) {
             { label: "Buffer zone", value: item.bufferText },
           ]}
         />
-      </section>
+      </div>
 
       {item.isEndangered && (
-        <section className="heritage-detail__section heritage-detail__section--danger">
+        <div className="heritage-detail__section heritage-detail__section--danger">
           <h3 className="heritage-detail__subsection-title">Danger status</h3>
           <p className="heritage-detail__danger-text">
             This property is inscribed on the List of World Heritage in Danger.
           </p>
-        </section>
+        </div>
       )}
     </section>
   );
