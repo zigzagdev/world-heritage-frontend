@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useWorldHeritageDetail } from "../hooks/use-world-heritage-detail";
-import { HeritageDetailLayout } from "../components/HeritageDetailLayout";
+import { HeritageDetailLayout } from "../components/heritage-detail/HeritageDetailLayout.tsx";
 
 export function WorldHeritageDetailContainer() {
   const params = useParams<{ id: string }>();
