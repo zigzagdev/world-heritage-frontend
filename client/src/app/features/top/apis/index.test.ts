@@ -1,29 +1,10 @@
-import { describe, it, expect, beforeEach, beforeAll, afterAll, jest } from "@jest/globals";
-import { fetchTopFirstPage } from "./index.js";
+import { describe, it, expect, beforeEach, jest } from "@jest/globals";
+import { createTopApi } from "./top-api";
 import type { ApiWorldHeritageDto, Paginated } from "../types";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
-type GlobalWithFetch = typeof globalThis & { fetch?: typeof fetch };
-
-const g = globalThis as GlobalWithFetch;
 
 let fetchSpy: jest.MockedFunction<typeof fetch>;
-let originalFetch: typeof fetch | undefined;
-
-beforeAll(() => {
-  originalFetch = g.fetch;
-});
-
-beforeEach(() => {
-  fetchSpy = jest.fn() as jest.MockedFunction<typeof fetch>;
-  g.fetch = fetchSpy;
-});
-
-afterAll(() => {
-  if (originalFetch) {
-    g.fetch = originalFetch;
-  }
-});
 
 const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
 const EXPECTED_URL = `${API_BASE}/api/v1/heritages`;
@@ -40,8 +21,15 @@ const makeNgResponse = (status: number): MockResponse => ({
   json: async () => ({}),
 });
 
-describe("fetchTopFirstPage", () => {
-  it("return array response", async () => {
+describe("fetchTopFirstPage (createTopApi)", () => {
+  let api: ReturnType<typeof createTopApi>;
+
+  beforeEach(() => {
+    fetchSpy = jest.fn() as jest.MockedFunction<typeof fetch>;
+    api = createTopApi({ apiBase: API_BASE, fetchImpl: fetchSpy });
+  });
+
+  it("配列レスポンスをそのまま返す", async () => {
     const data: ApiWorldHeritageDto[] = [
       {
         id: 1,
@@ -70,7 +58,7 @@ describe("fetchTopFirstPage", () => {
 
     fetchSpy.mockResolvedValue(makeOkResponse(data) as Response);
 
-    const out = await fetchTopFirstPage();
+    const out = await api.fetchTopFirstPage();
 
     expect(fetchSpy).toHaveBeenCalledWith(
       EXPECTED_URL,
@@ -86,7 +74,7 @@ describe("fetchTopFirstPage", () => {
     const paginated: Paginated<ApiWorldHeritageDto> = { data: [] };
     fetchSpy.mockResolvedValue(makeOkResponse(paginated) as Response);
 
-    const out = await fetchTopFirstPage();
+    const out = await api.fetchTopFirstPage();
 
     expect(Array.isArray(out)).toBe(true);
     expect(out).toEqual([]);
@@ -98,7 +86,7 @@ describe("fetchTopFirstPage", () => {
 
     const ac = new AbortController();
 
-    await fetchTopFirstPage({
+    await api.fetchTopFirstPage({
       headers: { "X-Trace": "t" },
       credentials: "include",
       signal: ac.signal,
@@ -120,6 +108,6 @@ describe("fetchTopFirstPage", () => {
   it("HTTP エラー時は例外を投げる", async () => {
     fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
-    await expect(fetchTopFirstPage()).rejects.toThrow("HTTP 500");
+    await expect(api.fetchTopFirstPage()).rejects.toThrow("HTTP 500");
   });
 });

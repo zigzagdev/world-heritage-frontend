@@ -165,7 +165,6 @@
   gap: 16px;
 }
 
-/* サムネ1枚の枠 */
 .heritage-detail__thumb {
   position: relative;
   border-radius: 8px;
@@ -179,14 +178,12 @@
     outline-color 0.15s ease-out;
 }
 
-/* 一貫したアスペクト比（3:2）を作る */
 .heritage-detail__thumb::before {
   content: "";
   display: block;
-  padding-top: calc(2 / 3 * 100%); /* 3:2 */
+  padding-top: calc(2 / 3 * 100%);
 }
 
-/* 画像自体は絶対配置でフィット */
 .heritage-detail__thumb-image {
   position: absolute;
   inset: 0;
@@ -199,7 +196,6 @@
     filter 0.15s ease-out;
 }
 
-/* hover / focus 時の軽いインタラクション */
 .heritage-detail__thumb:hover .heritage-detail__thumb-image,
 .heritage-detail__thumb:focus-visible .heritage-detail__thumb-image {
   transform: scale(1.03);
@@ -212,7 +208,6 @@
   outline-offset: 2px;
 }
 
-/* Primary 表示用 */
 .heritage-detail__thumb--primary {
   border: 2px solid #1d4ed8;
 }
@@ -228,7 +223,6 @@
   font-weight: 500;
 }
 
-/* キャプション */
 .heritage-detail__thumb-caption {
   position: relative;
   z-index: 1;

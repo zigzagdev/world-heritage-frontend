@@ -1,0 +1,40 @@
+import type { WorldHeritageDetailVm } from "../../types";
+import "./heritage-detail.css";
+import { HeritageMetadataList } from "./HeritageMetadataList";
+
+type Props = {
+  item: WorldHeritageDetailVm;
+};
+
+export function HeritageOverviewSection({ item }: Props) {
+  return (
+    <section className="heritage-detail__section">
+      <h2 className="heritage-detail__section-title">Overview</h2>
+      <p className="heritage-detail__description">{item.shortDescription}</p>
+
+      <section className="heritage-detail__section">
+        <h3 className="heritage-detail__subsection-title">Criteria</h3>
+        <p className="heritage-detail__text">{item.criteriaText || "—"}</p>
+      </section>
+
+      <section className="heritage-detail__section">
+        <h3 className="heritage-detail__subsection-title">Area &amp; Buffer zone</h3>
+        <HeritageMetadataList
+          items={[
+            { label: "Area", value: item.areaText },
+            { label: "Buffer zone", value: item.bufferText },
+          ]}
+        />
+      </section>
+
+      {item.isEndangered && (
+        <section className="heritage-detail__section heritage-detail__section--danger">
+          <h3 className="heritage-detail__subsection-title">Danger status</h3>
+          <p className="heritage-detail__danger-text">
+            This property is inscribed on the List of World Heritage in Danger.
+          </p>
+        </section>
+      )}
+    </section>
+  );
+}
