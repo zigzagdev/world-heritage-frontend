@@ -7,7 +7,7 @@ import { useWorldHeritageDetail } from "../../hooks/use-world-heritage-detail";
 import type { WorldHeritageVm } from "../../types";
 
 jest.mock("../../hooks/use-world-heritage-detail");
-jest.mock("../../components/HeritageDetailLayout", () => ({
+jest.mock("../../components/heritage-detail/HeritageDetailLayout.tsx", () => ({
   HeritageDetailLayout: ({ item }: { item: WorldHeritageVm }) => (
     <div data-testid="heritage-detail-layout">Detail Layout: {item.title}</div>
   ),
