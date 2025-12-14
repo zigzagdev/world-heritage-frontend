@@ -1,0 +1,42 @@
+{
+  "i": {
+    "title": "Masterpiece",
+    "description": "Represents a masterpiece of human creative genius."
+  },
+  "ii": {
+    "title": "Interchange of values",
+    "description": "Shows an important interchange of human values over time or within a cultural area."
+  },
+  "iii": {
+    "title": "Unique testimony",
+    "description": "Bears a unique or exceptional testimony to a cultural tradition or civilization."
+  },
+  "iv": {
+    "title": "Architectural ensemble",
+    "description": "An outstanding example of a type of building, architectural or technological ensemble, or landscape illustrating a significant stage in human history."
+  },
+  "v": {
+    "title": "Traditional human settlement",
+    "description": "An outstanding example of traditional human settlement or land-use representative of a culture."
+  },
+  "vi": {
+    "title": "Associative significance",
+    "description": "Directly associated with events, living traditions, ideas, beliefs, or artistic works of outstanding universal significance."
+  },
+  "vii": {
+    "title": "Natural beauty",
+    "description": "Contains superlative natural phenomena or areas of exceptional natural beauty."
+  },
+  "viii": {
+    "title": "Earth’s history",
+    "description": "Outstanding examples representing major stages of Earth’s history, including geological processes."
+  },
+  "ix": {
+    "title": "Ecological processes",
+    "description": "Outstanding examples representing significant ongoing ecological and biological processes."
+  },
+  "x": {
+    "title": "Biodiversity",
+    "description": "Contains important natural habitats for in-situ conservation of biological diversity."
+  }
+}
