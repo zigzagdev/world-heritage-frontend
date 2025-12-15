@@ -7,8 +7,6 @@ import {
 } from "../../domain/criteria";
 
 type Props = {
-  // DB/APIがCriteriaCode[]で保証されてるなら CriteriaCode[] のままでOK
-  // もし実態が string[] なら string[] に変えて isCriteriaCode で絞る
   criteria: Array<CriteriaCode | string>;
   locale: Locale;
 };
