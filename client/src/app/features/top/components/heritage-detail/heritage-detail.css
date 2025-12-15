@@ -251,3 +251,50 @@
   color: #b91c1c;
   margin: 0.25rem 0 0;
 }
+
+.heritage-detail__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.heritage-detail__sidebar {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.heritage-detail__facts-card,
+.heritage-detail__map-card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px;
+}
+
+.heritage-detail__facts-title {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.heritage-detail__map-placeholder {
+  height: 220px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.06);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+@media (max-width: 900px) {
+  .heritage-detail__layout {
+    grid-template-columns: 1fr;
+  }
+  .heritage-detail__sidebar {
+    position: static;
+  }
+}
