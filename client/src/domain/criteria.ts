@@ -32,8 +32,15 @@ const CRITERIA_BY_LOCALE: Record<Locale, CriteriaDict> = {
 };
 
 export const getCriteriaDict = (locale: Locale): CriteriaDict => CRITERIA_BY_LOCALE[locale];
+
 export const getCriteria = (code: CriteriaCode, locale: Locale): CriteriaText => {
-  return CRITERIA_BY_LOCALE[locale][code];
+  const entry = CRITERIA_BY_LOCALE[locale]?.[code];
+  if (entry) return entry;
+
+  const fallback = CRITERIA_BY_LOCALE.en?.[code];
+  if (fallback) return fallback;
+
+  return { title: code, description: "" };
 };
 
 export const getCriteriaSafe = (code: CriteriaCode, locale: string): CriteriaText => {
