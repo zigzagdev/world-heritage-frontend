@@ -1,12 +1,15 @@
 import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../types";
 import { HeroImage } from "./HeroImage";
 import "./heritage-detail.css";
+import { CriteriaTags } from "@shared/uis/CriteriaTags.tsx";
+import type { Locale } from "../../../../../domain/criteria.ts";
 
 type Props = {
   item: WorldHeritageDetailVm;
+  locale: Locale;
 };
 
-export function HeritageHero({ item }: Props) {
+export function HeritageHero({ item, locale }: Props) {
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
@@ -20,7 +23,7 @@ export function HeritageHero({ item }: Props) {
         <p className="heritage-detail__subtitle">{item.subtitle}</p>
 
         <div className="heritage-detail__meta-chips">
-          <span className="chip chip--category">{item.category}</span>
+          <CriteriaTags criteria={item.criteria} locale={locale} />
           {item.stateParty && <span className="chip chip--country">{item.stateParty}</span>}
           {item.yearInscribed && (
             <span className="chip chip--year">Inscribed: {item.yearInscribed}</span>
