@@ -1,19 +1,24 @@
-import { useParams } from "react-router-dom";
+import { useMemo } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useWorldHeritageDetail } from "../hooks/use-world-heritage-detail";
-import { HeritageDetailLayout } from "../components/heritage-detail/HeritageDetailLayout.tsx";
+import { HeritageDetailLayout } from "../components/heritage-detail/HeritageDetailLayout";
+import { LOCALES, type Locale } from "../../../../domain/criteria";
+
+function resolveLocale(raw: string | null): Locale {
+  if (!raw) return "en";
+  return (LOCALES as readonly string[]).includes(raw) ? (raw as Locale) : "en";
+}
 
 export function WorldHeritageDetailContainer() {
   const params = useParams<{ id: string }>();
   const id = params.id ?? null;
+  const [searchParams] = useSearchParams();
+  const locale = useMemo(() => resolveLocale(searchParams.get("lang")), [searchParams]);
+
   const { item, isLoading, isError, error, reload } = useWorldHeritageDetail(id);
 
-  if (!id) {
-    return <p>World Heritage id is required.</p>;
-  }
-
-  if (isLoading) {
-    return <p>Loading…</p>;
-  }
+  if (!id) return <p>World Heritage id is required.</p>;
+  if (isLoading) return <p>Loading…</p>;
 
   if (isError || !item) {
     return (
@@ -27,5 +32,5 @@ export function WorldHeritageDetailContainer() {
     );
   }
 
-  return <HeritageDetailLayout item={item} />;
+  return <HeritageDetailLayout item={item} locale={locale} />;
 }
