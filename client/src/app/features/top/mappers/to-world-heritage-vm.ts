@@ -71,12 +71,22 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     statePartyCodes: statePartyLabelsJp,
     statePartiesMeta: normalizeStatePartiesMeta(data.state_parties_meta),
     primaryStatePartyCode: data.primary_state_party_code ?? null,
-    thumbnail: data.thumbnail_url ?? undefined,
     title: titleOf(data),
     subtitle: subtitleOf(data),
     areaText: fmtHa(data.area_hectares),
     bufferText: fmtHa(data.buffer_zone_hectares),
     criteriaText: criteriaCodes.join(", "),
+    thumbnail: data.image_url
+      ? {
+          id: data.image_url.id,
+          url: data.image_url.url,
+          alt: data.image_url.alt ?? titleOf(data),
+          credit: data.image_url.credit,
+          width: data.image_url.width,
+          height: data.image_url.height,
+          isPrimary: data.image_url.is_primary,
+        }
+      : null,
   };
 }
 
