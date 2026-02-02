@@ -5,35 +5,6 @@ import { fetchTopFirstPage } from "../apis";
 import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm";
 import TopPage from "../components/TopPage";
 
-const dummyItem: WorldHeritageVm = {
-  id: 999999,
-  officialName: "Dummy Site For UI Test",
-  name: "Dummy Site For UI Test",
-  nameJp: "UIテスト用ダミー世界遺産",
-  country: "Japan",
-  region: "Asia",
-  stateParty: "Japan",
-  category: "Cultural",
-  criteria: [],
-  yearInscribed: 2099,
-  areaHectares: 12345,
-  bufferZoneHectares: 67890,
-  isEndangered: false,
-  latitude: null,
-  longitude: null,
-  shortDescription: "……(略)",
-  unescoSiteUrl: "#",
-  statePartyCodes: [],
-  statePartiesMeta: {},
-  thumbnail: undefined,
-  title: "UIテスト用ダミーサイト",
-  subtitle: "Japan · Asia",
-  areaText: "12,345 ha",
-  bufferText: "67,890 ha",
-  criteriaText: "",
-  primaryStatePartyCode: null,
-};
-
 export default function TopPageContainer(): React.ReactElement {
   const [items, setItems] = useState<WorldHeritageVm[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -75,21 +46,18 @@ export default function TopPageContainer(): React.ReactElement {
 
   const handleClickItem = useCallback(
     (id: number) => {
-      if (id === dummyItem.id) return;
       navigate(`/heritages/${id}`);
     },
     [navigate],
   );
 
-  const uiItems = useMemo(() => (items.length ? [dummyItem, ...items] : [dummyItem]), [items]);
-
   const pageProps = useMemo(
     () => ({
-      items: uiItems,
+      items: items,
       onReload: handleReload,
       onClickItem: handleClickItem,
     }),
-    [uiItems, handleReload, handleClickItem],
+    [items, handleReload, handleClickItem],
   );
 
   if (isLoading) {
