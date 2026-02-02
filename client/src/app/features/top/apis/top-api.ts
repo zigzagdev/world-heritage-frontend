@@ -1,4 +1,3 @@
-// src/app/features/top/apis/top-api.ts
 import type { Paginated, ApiWorldHeritageDto } from "../types";
 
 export type TopApiDeps = {
@@ -12,7 +11,7 @@ type DetailResponse<T> = {
 };
 
 export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
-  const base = apiBase.replace(/\/+$/, ""); // 末尾 / を削る
+  const base = apiBase.replace(/\/+$/, "");
   const ENDPOINT = `${base}/api/v1/heritages`;
 
   const withCommonInit = (init?: RequestInit): RequestInit => ({
@@ -34,8 +33,6 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
       }
 
       const json = (await res.json()) as Paginated<ApiWorldHeritageDto> | ApiWorldHeritageDto[];
-
-      // 配列 or { data: ... } 両対応
       if (Array.isArray(json)) {
         return json;
       }
