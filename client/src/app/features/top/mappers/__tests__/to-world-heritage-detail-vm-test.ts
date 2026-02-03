@@ -6,6 +6,19 @@ import type {
   WorldHeritageDetailVm,
 } from "../../types.ts";
 
+const image: ApiWorldHeritageImageDto = {
+  id: 11224,
+  url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
+  sort_order: 0,
+  width: 0,
+  height: 0,
+  format: "jpg",
+  alt: null,
+  credit: null,
+  is_primary: true,
+  checksum: "abcd1234",
+};
+
 const baseDto: ApiWorldHeritageDto = {
   id: 661,
   official_name: "Himeji-jo Official",
@@ -32,7 +45,8 @@ const baseDto: ApiWorldHeritageDto = {
     },
   },
   primary_state_party_code: "JPN",
-  thumbnail_url: "http://localhost/storage/world_heritage/661/img1.jpg",
+  image_url: image,
+  images: [],
 };
 
 describe("toWorldHeritageDetailVm", () => {
@@ -71,9 +85,8 @@ describe("toWorldHeritageDetailVm", () => {
 
     const vm: WorldHeritageDetailVm = toWorldHeritageDetailVm(dto);
 
-    // base から引き継いでいること（toWorldHeritageVm の結果）
     expect(vm.id).toBe(dto.id);
-    expect(vm.title).toBe(dto.official_name); // titleOf = official_name || name
+    expect(vm.title).toBe(dto.official_name);
     expect(vm.country).toBe(dto.country);
     expect(vm.region).toBe(dto.region);
 
@@ -91,11 +104,7 @@ describe("toWorldHeritageDetailVm", () => {
     expect(vm.images[0].height).toBe(800);
     expect(vm.images[0].credit).toBe("seed1");
     expect(vm.images[0].url).toBe("http://localhost/storage/world_heritage/661/img1.jpg");
-
-    // alt が null のときは base.title が入ること
     expect(vm.images[0].alt).toBe(vm.title);
-
-    // alt が設定されているときはそれをそのまま使うこと
     expect(vm.images[1].alt).toBe("custom alt 2");
   });
 

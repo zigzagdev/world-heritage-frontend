@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WorldHeritageVm } from "../types";
 import { fetchTopFirstPage } from "../apis";
@@ -10,19 +10,17 @@ export default function TopPageContainer(): React.ReactElement {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<unknown | null>(null);
   const [reloadTick, setReloadTick] = useState<number>(0);
-
   const abortRef = useRef<AbortController | null>(null);
   const navigate = useNavigate();
-
   const load = useCallback(() => {
     abortRef.current?.abort();
-    const ac = new AbortController();
-    abortRef.current = ac;
+    const Aborting = new AbortController();
+    abortRef.current = Aborting;
 
     setIsLoading(true);
     setError(null);
 
-    fetchTopFirstPage({ signal: ac.signal })
+    fetchTopFirstPage({ signal: Aborting.signal })
       .then(toWorldHeritageListVm)
       .then((vmList) => {
         setItems(vmList);
@@ -51,14 +49,9 @@ export default function TopPageContainer(): React.ReactElement {
     [navigate],
   );
 
-  const pageProps = useMemo(
-    () => ({
-      items: items,
-      onReload: handleReload,
-      onClickItem: handleClickItem,
-    }),
-    [items, handleReload, handleClickItem],
-  );
+  const handleSearch = useCallback(() => {
+    console.log("Search is currently disabled.");
+  }, []);
 
   if (isLoading) {
     return (
@@ -79,5 +72,12 @@ export default function TopPageContainer(): React.ReactElement {
     );
   }
 
-  return <TopPage {...pageProps} />;
+  return (
+    <TopPage
+      items={items}
+      onClickItem={handleClickItem}
+      onReload={handleReload}
+      onSearch={handleSearch}
+    />
+  );
 }
