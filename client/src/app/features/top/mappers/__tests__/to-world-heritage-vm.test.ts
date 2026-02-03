@@ -1,6 +1,23 @@
 import { describe, it, expect } from "@jest/globals";
 import { toWorldHeritageVm, toWorldHeritageListVm } from "../to-world-heritage-vm.ts";
-import type { ApiWorldHeritageDto, WorldHeritageVm } from "../../types.ts";
+import type {
+  ApiWorldHeritageDto,
+  ApiWorldHeritageImageDto,
+  WorldHeritageVm,
+} from "../../types.ts";
+
+const image: ApiWorldHeritageImageDto = {
+  id: 11224,
+  url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
+  sort_order: 0,
+  width: 0,
+  height: 0,
+  format: "jpg",
+  alt: null,
+  credit: null,
+  is_primary: true,
+  checksum: "abcd1234",
+};
 
 const base: ApiWorldHeritageDto = {
   id: 663,
@@ -22,12 +39,13 @@ const base: ApiWorldHeritageDto = {
   unesco_site_url: "https://whc.unesco.org/en/list/663",
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-  thumbnail_url: "https://example.com/img.jpg",
+  images: [image],
+  image_url: image,
   primary_state_party_code: "JPN",
 };
 
 describe("toWorldHeritageVm", () => {
-  it("view model is mapping correctly and, Derived values are also formatted correctly", () => {
+  it("view model is mapping correctly and derived values are formatted correctly", () => {
     const vm = toWorldHeritageVm(base);
 
     const expected: WorldHeritageVm = {
@@ -51,37 +69,47 @@ describe("toWorldHeritageVm", () => {
       statePartyCodes: ["日本"],
       statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
       primaryStatePartyCode: "JPN",
-      thumbnail: "https://example.com/img.jpg",
-
       title: "Shirakami-Sanchi",
       subtitle: "Japan · Asia",
       areaText: "442 ha",
       bufferText: "320 ha",
       criteriaText: "ix, x",
+      thumbnail: {
+        id: 11224,
+        url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
+        // ✅ mapper が title で埋めてる挙動に合わせる
+        alt: "Shirakami-Sanchi",
+        credit: null,
+        width: 0,
+        height: 0,
+        isPrimary: true,
+      },
     };
 
     expect(vm).toStrictEqual(expected);
   });
 
-  it("if official name is null, using a title for name", () => {
+  it("if official name is empty, using name as title", () => {
     const vm = toWorldHeritageVm({ ...base, official_name: "" });
     expect(vm.title).toBe("Shirakami-Sanchi");
   });
 
-  it("display null on correctly, and if thumbnail type is null or undefined, it's omitted.", () => {
+  it("when area/buffer are null, text becomes —; and when no image is available, thumbnail becomes null", () => {
+    // ✅ thumbnail を null にしたいなら、image_url / images を消す必要がある
     const vm = toWorldHeritageVm({
       ...base,
       area_hectares: null,
       buffer_zone_hectares: null,
-      thumbnail_url: null,
+      image_url: null,
+      images: [],
     });
 
     expect(vm.areaText).toBe("—");
     expect(vm.bufferText).toBe("—");
-    expect(vm.thumbnail).toBeUndefined();
+    expect(vm.thumbnail).toBeNull();
   });
 
-  it("input dto assert immutable", () => {
+  it("input dto is immutable", () => {
     const dto: ApiWorldHeritageDto = { ...base, criteria: ["x", "ix", "ix"] };
     const snapshot = [...dto.criteria];
 
@@ -89,6 +117,25 @@ describe("toWorldHeritageVm", () => {
 
     expect(dto.criteria).toStrictEqual(snapshot);
     expect(vm.criteria).toStrictEqual(["ix", "x"]);
+  });
+
+  it("thumbnail uses image_url when present", () => {
+    const vm = toWorldHeritageVm({
+      ...base,
+      image_url: image,
+      images: [],
+    });
+
+    expect(vm.thumbnail).toStrictEqual({
+      id: 11224,
+      url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
+      // ✅ここも同じ
+      alt: "Shirakami-Sanchi",
+      credit: null,
+      width: 0,
+      height: 0,
+      isPrimary: true,
+    });
   });
 });
 
