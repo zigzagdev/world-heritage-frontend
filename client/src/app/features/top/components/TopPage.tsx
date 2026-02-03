@@ -4,44 +4,58 @@ import { Button } from "@shared/uis/Button.tsx";
 
 export type TopPageProps = {
   items: ReadonlyArray<WorldHeritageVm>;
-  onSearch?: (keyword: string) => void;
   onClickItem?: (id: number) => void;
+  onReload?: () => void;
+  onSearch?: (keyword: string) => void;
 };
 
-export default function TopPage({ items, onSearch, onClickItem }: TopPageProps) {
+export default function TopPage({ items, onClickItem, onReload, onSearch }: TopPageProps) {
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <header className="mb-10 flex flex-col items-end justify-between border-b border-zinc-100 pb-8 sm:flex-row">
-        <div className="w-full space-y-1 text-left">
-          <h1 className="text-4xl font-black tracking-tighter text-indigo-700">World Heritage</h1>
-          <p className="text-sm font-medium text-zinc-500">Explore the wonders of the world.</p>
+    <main className="mx-auto max-w-7xl px-4 py-12">
+      <header className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-extrabold tracking-tight text-indigo-700 dark:text-indigo-400">
+            World Heritage
+          </h1>
+          <p className="text-lg text-zinc-500 dark:text-zinc-400">
+            Explore the wonders of the world.
+          </p>
         </div>
 
-        <div className="flex w-full items-center gap-3 sm:w-[380px]">
-          <div className="relative flex flex-1 items-center">
-            <input
-              type="search"
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex w-full max-w-sm items-center gap-2">
+            <div className="relative w-full">
+              <input
+                type="text"
+                disabled
+                placeholder="Search sites..."
+                className="w-full rounded-full border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm text-zinc-400 cursor-not-allowed dark:border-zinc-800 dark:bg-zinc-900"
+              />
+              <span className="absolute -bottom-5 right-2 text-[10px] text-zinc-400">
+                Search coming soon
+              </span>
+            </div>
+            <Button
               disabled
-              placeholder="Search sites..."
-              className="
-        w-full rounded-full border border-zinc-200 bg-zinc-50 py-2 px-4 text-sm
-        transition-all focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
-        disabled:cursor-not-allowed disabled:opacity-50
-      "
-            />
+              size="sm"
+              className="rounded-full opacity-50"
+              onClick={() => onSearch?.("")}
+            >
+              Search
+            </Button>
           </div>
-          <Button
-            size="sm"
-            disabled
-            className="rounded-full bg-indigo-700 px-5 font-bold text-white transition-colors hover:bg-indigo-800 disabled:bg-zinc-200"
-            onClick={() => onSearch?.("")}
-          >
-            Search
-          </Button>
+
+          {onReload && (
+            <button
+              onClick={onReload}
+              className="mt-4 text-xs font-medium text-zinc-400 hover:text-zinc-600 hover:underline dark:hover:text-zinc-200"
+            >
+              Reload data
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Block: ContentGrid */}
       {items.length === 0 ? (
         <div className="py-20 text-center">
           <p className="text-sm text-zinc-500">No sites found.</p>
