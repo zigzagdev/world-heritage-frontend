@@ -14,6 +14,8 @@ type Filters = {
   region: string | null;
 };
 
+type SortOption = "default" | "year_asc" | "year_desc";
+
 const initialFilters: Filters = {
   category: null,
   region: null,
@@ -27,6 +29,7 @@ export function useTopPage() {
   });
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
+  const [sort, setSort] = React.useState<SortOption>("default");
 
   const abortRef = React.useRef<AbortController | null>(null);
 
@@ -59,7 +62,6 @@ export function useTopPage() {
     load();
   }, [load]);
 
-  // --- controlled filter actions ---
   const setCategory = React.useCallback((category: string | null) => {
     setFilters((f) => ({ ...f, category }));
   }, []);
@@ -74,7 +76,6 @@ export function useTopPage() {
 
   const hasActiveFilters = Boolean(filters.category || filters.region);
 
-  // --- filter options derived from already-loaded data ---
   const categoryOptions = React.useMemo(() => {
     const set = new Set<string>();
     for (const it of state.data) {
@@ -91,40 +92,47 @@ export function useTopPage() {
     return Array.from(set).sort();
   }, [state.data]);
 
-  // --- filtered results (no refetch) ---
   const filteredItems = React.useMemo(() => {
     const { category, region } = filters;
 
-    // micro-optimisation: no filters -> return original reference
-    if (!category && !region) return state.data;
+    const filtered =
+      !category && !region
+        ? state.data
+        : state.data.filter((it) => {
+            if (category && it.category !== category) return false;
+            if (region && it.region !== region) return false;
+            return true;
+          });
 
-    return state.data.filter((it) => {
-      if (category && it.category !== category) return false;
-      if (region && it.region !== region) return false;
-      return true;
+    return [...filtered].sort((a, b) => {
+      if (sort === "default") return a.id - b.id;
+
+      const d =
+        sort === "year_desc"
+          ? b.yearInscribed - a.yearInscribed
+          : a.yearInscribed - b.yearInscribed;
+
+      if (d !== 0) return d;
+
+      return a.id - b.id;
     });
-  }, [state.data, filters]);
+  }, [state.data, filters, sort]);
 
   return {
-    // list
     items: filteredItems,
     rawItems: state.data,
-
-    // fetch state
     reload,
     isLoading: state.loading,
     isError: state.error != null,
     error: state.error,
-
-    // filters (controlled)
     filters,
     setCategory,
     setRegion,
     clearFilters,
     hasActiveFilters,
-
-    // UI options
     categoryOptions,
     regionOptions,
+    sort,
+    setSort,
   };
 }
