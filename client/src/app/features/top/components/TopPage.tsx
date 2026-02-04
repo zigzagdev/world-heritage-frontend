@@ -46,7 +46,7 @@ function SortSelect({
                    shadow-sm hover:bg-zinc-50
                    dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
       >
-        <option value="default">Default</option>
+        <option value="default"></option>
         <option value="year_desc">Year (new → old)</option>
         <option value="year_asc">Year (old → new)</option>
       </select>
