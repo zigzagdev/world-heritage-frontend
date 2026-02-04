@@ -14,12 +14,19 @@ type Filters = {
   region: string | null;
 };
 
-type SortOption = "default" | "year_asc" | "year_desc";
+type SortOption = "default" | "year_desc" | "year_asc";
 
 const initialFilters: Filters = {
   category: null,
   region: null,
 };
+
+function compareNullableNumber(a: number | null, b: number | null): number {
+  if (a === null && b === null) return 0;
+  if (a === null) return 1;
+  if (b === null) return -1;
+  return a - b;
+}
 
 export function useTopPage() {
   const [state, setState] = React.useState<State>({
@@ -107,12 +114,15 @@ export function useTopPage() {
     return [...filtered].sort((a, b) => {
       if (sort === "default") return a.id - b.id;
 
-      const d =
+      const byYear =
         sort === "year_desc"
           ? b.yearInscribed - a.yearInscribed
           : a.yearInscribed - b.yearInscribed;
 
-      if (d !== 0) return d;
+      if (byYear !== 0) return byYear;
+
+      const byArea = compareNullableNumber(a.areaHectares, b.areaHectares);
+      if (byArea !== 0) return byArea;
 
       return a.id - b.id;
     });
