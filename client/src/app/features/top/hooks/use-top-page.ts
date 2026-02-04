@@ -14,10 +14,19 @@ type Filters = {
   region: string | null;
 };
 
+type SortOption = "default" | "year_desc" | "year_asc";
+
 const initialFilters: Filters = {
   category: null,
   region: null,
 };
+
+function compareNullableNumber(a: number | null, b: number | null): number {
+  if (a === null && b === null) return 0;
+  if (a === null) return 1;
+  if (b === null) return -1;
+  return a - b;
+}
 
 export function useTopPage() {
   const [state, setState] = React.useState<State>({
@@ -27,6 +36,7 @@ export function useTopPage() {
   });
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
+  const [sort, setSort] = React.useState<SortOption>("default");
 
   const abortRef = React.useRef<AbortController | null>(null);
 
@@ -59,7 +69,6 @@ export function useTopPage() {
     load();
   }, [load]);
 
-  // --- controlled filter actions ---
   const setCategory = React.useCallback((category: string | null) => {
     setFilters((f) => ({ ...f, category }));
   }, []);
@@ -74,7 +83,6 @@ export function useTopPage() {
 
   const hasActiveFilters = Boolean(filters.category || filters.region);
 
-  // --- filter options derived from already-loaded data ---
   const categoryOptions = React.useMemo(() => {
     const set = new Set<string>();
     for (const it of state.data) {
@@ -91,40 +99,50 @@ export function useTopPage() {
     return Array.from(set).sort();
   }, [state.data]);
 
-  // --- filtered results (no refetch) ---
   const filteredItems = React.useMemo(() => {
     const { category, region } = filters;
 
-    // micro-optimisation: no filters -> return original reference
-    if (!category && !region) return state.data;
+    const filtered =
+      !category && !region
+        ? state.data
+        : state.data.filter((it) => {
+            if (category && it.category !== category) return false;
+            if (region && it.region !== region) return false;
+            return true;
+          });
 
-    return state.data.filter((it) => {
-      if (category && it.category !== category) return false;
-      if (region && it.region !== region) return false;
-      return true;
+    return [...filtered].sort((a, b) => {
+      if (sort === "default") return a.id - b.id;
+
+      const byYear =
+        sort === "year_desc"
+          ? b.yearInscribed - a.yearInscribed
+          : a.yearInscribed - b.yearInscribed;
+
+      if (byYear !== 0) return byYear;
+
+      const byArea = compareNullableNumber(a.areaHectares, b.areaHectares);
+      if (byArea !== 0) return byArea;
+
+      return a.id - b.id;
     });
-  }, [state.data, filters]);
+  }, [state.data, filters, sort]);
 
   return {
-    // list
     items: filteredItems,
     rawItems: state.data,
-
-    // fetch state
     reload,
     isLoading: state.loading,
     isError: state.error != null,
     error: state.error,
-
-    // filters (controlled)
     filters,
     setCategory,
     setRegion,
     clearFilters,
     hasActiveFilters,
-
-    // UI options
     categoryOptions,
     regionOptions,
+    sort,
+    setSort,
   };
 }

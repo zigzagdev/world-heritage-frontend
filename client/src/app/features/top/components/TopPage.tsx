@@ -2,11 +2,15 @@ import type { WorldHeritageVm } from "../types";
 import { HeritageCard } from "../cards/HeritageCard";
 import { Button } from "@shared/uis/Button.tsx";
 
+export type SortOption = "default" | "year_desc" | "year_asc";
+
 export type TopPageProps = {
   items: ReadonlyArray<WorldHeritageVm>;
   onClickItem?: (id: number) => void;
   onReload?: () => void;
   onSearch?: (keyword: string) => void;
+  sortOption?: SortOption;
+  onChangeSort?: (option: SortOption) => void;
 };
 
 function Chip({ label, disabled = true }: { label: string; disabled?: boolean }) {
@@ -26,7 +30,37 @@ function Chip({ label, disabled = true }: { label: string; disabled?: boolean })
   );
 }
 
-export default function TopPage({ items, onClickItem, onReload }: TopPageProps) {
+function SortSelect({
+  value = "default",
+  onChange,
+}: {
+  value?: SortOption;
+  onChange?: (v: SortOption) => void;
+}) {
+  return (
+    <div className="flex items-center justify-end gap-2">
+      <select
+        value={value}
+        onChange={(e) => onChange?.(e.target.value as SortOption)}
+        className="rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700
+                   shadow-sm hover:bg-zinc-50
+                   dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
+      >
+        <option value="default"></option>
+        <option value="year_desc">Year (new → old)</option>
+        <option value="year_asc">Year (old → new)</option>
+      </select>
+    </div>
+  );
+}
+
+export default function TopPage({
+  items,
+  onClickItem,
+  onReload,
+  sortOption,
+  onChangeSort,
+}: TopPageProps) {
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="sticky top-0 z-20 -mx-4 px-4 pb-4 pt-4 bg-white/95 backdrop-blur border-b border-zinc-200/70">
@@ -80,13 +114,18 @@ export default function TopPage({ items, onClickItem, onReload }: TopPageProps) 
             )}
           </div>
         </div>
+
         <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
           <Chip label="Category" disabled />
           <Chip label="Region" disabled />
           <Chip label="Country" disabled />
           <Chip label="Endangered" disabled />
         </div>
+        <div className="mt-3">
+          <SortSelect value={sortOption} onChange={onChangeSort} />
+        </div>
       </div>
+
       <div className="pt-8">
         {items.length === 0 ? (
           <div className="py-20 text-center">
