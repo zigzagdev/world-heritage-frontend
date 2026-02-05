@@ -5,7 +5,7 @@ import { jest, expect, test, beforeEach, describe } from "@jest/globals";
 import { useWorldHeritageDetail } from "../use-world-heritage-detail";
 import { fetchWorldHeritageDetail } from "../../apis";
 import { toWorldHeritageVm } from "../../mappers/to-world-heritage-vm";
-import type { WorldHeritageVm, ApiWorldHeritageDto } from "../../types";
+import type { WorldHeritageDetailVm, ApiWorldHeritageDto } from "../../types";
 
 type MinimalAbortSignal = { aborted: boolean };
 
@@ -27,8 +27,6 @@ if (!("AbortController" in globalThis) || typeof globalThis.AbortController !== 
   }
   (globalThis as { AbortController: AbortControllerCtor }).AbortController = FakeAbortController;
 }
-
-// ---- モック ----
 
 jest.mock("../../apis", () => ({
   fetchWorldHeritageDetail: jest.fn(),
@@ -101,7 +99,7 @@ describe("useWorldHeritageDetail", () => {
       primary_state_party_code: "JPN",
     };
 
-    const vm: WorldHeritageVm = {
+    const vm: WorldHeritageDetailVm = {
       id: 1,
       officialName: "Historic Monuments of Ancient Kyoto",
       name: "Historic Monuments of Ancient Kyoto",
@@ -128,6 +126,7 @@ describe("useWorldHeritageDetail", () => {
       areaText: "—",
       bufferText: "—",
       criteriaText: "ii, iv",
+      images: [],
     };
 
     const d = deferred<unknown>();
@@ -158,16 +157,17 @@ describe("useWorldHeritageDetail", () => {
     expect(toWorldHeritageVmMock).toHaveBeenCalledWith(raw);
   });
 
-  test("id が null の場合: 即座にエラーになり、API は呼ばれない", () => {
+  test("id が null の場合: errorにせず、API は呼ばれない", async () => {
     const { result } = renderHook(() => useWorldHeritageDetail(null));
 
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.item).toBeNull();
-    expect(result.current.isError).toBe(true);
-    expect(result.current.error).toBeInstanceOf(Error);
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.item).toBeNull();
+      expect(result.current.isError).toBe(false);
+      expect(result.current.error).toBeNull();
+    });
 
     expect(fetchWorldHeritageDetailMock).not.toHaveBeenCalled();
-    expect(toWorldHeritageVmMock).not.toHaveBeenCalled();
   });
 
   test("通常エラー: isError=true, item=null, isLoading=false, error が保持される", async () => {
@@ -200,7 +200,7 @@ describe("useWorldHeritageDetail", () => {
       return calls.length === 1 ? first.promise : second.promise;
     });
 
-    const vm: WorldHeritageVm = {
+    const vm: WorldHeritageDetailVm = {
       id: 2,
       officialName: "Official",
       name: "Ok",
@@ -227,6 +227,7 @@ describe("useWorldHeritageDetail", () => {
       areaText: "—",
       bufferText: "—",
       criteriaText: "",
+      images: [],
     };
 
     toWorldHeritageVmMock.mockReturnValue(vm);
