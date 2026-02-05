@@ -102,7 +102,7 @@ describe("WorldHeritageDetailContainer", () => {
       statePartyCodes: [],
       statePartiesMeta: {},
       primaryStatePartyCode: null,
-      thumbnail: "https://example.com/kyoto.jpg",
+      thumbnail: null,
       title: "Kyoto",
       subtitle: "Japan · Asia",
       areaText: "—",

@@ -99,7 +99,6 @@ describe("useWorldHeritageDetail", () => {
       state_party_codes: ["JPN"],
       state_parties_meta: [],
       primary_state_party_code: "JPN",
-      thumbnail_url: "https://example.com/kyoto.jpg",
     };
 
     const vm: WorldHeritageVm = {
@@ -123,7 +122,7 @@ describe("useWorldHeritageDetail", () => {
       statePartyCodes: ["JPN"],
       statePartiesMeta: {},
       primaryStatePartyCode: "JPN",
-      thumbnail: "https://example.com/kyoto.jpg",
+      thumbnail: null,
       title: "Historic Monuments of Ancient Kyoto",
       subtitle: "Japan · Asia",
       areaText: "—",
@@ -222,7 +221,7 @@ describe("useWorldHeritageDetail", () => {
       statePartyCodes: [],
       statePartiesMeta: {},
       primaryStatePartyCode: null,
-      thumbnail: "https://example.com/kyoto.jpg",
+      thumbnail: null,
       title: "Ok",
       subtitle: "Japan · Asia",
       areaText: "—",
