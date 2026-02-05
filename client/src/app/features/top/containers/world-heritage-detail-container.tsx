@@ -10,14 +10,13 @@ function resolveLocale(raw: string | null): Locale {
 }
 
 export function WorldHeritageDetailContainer() {
-  const params = useParams<{ id: string }>();
-  const id = params.id ?? null;
   const [searchParams] = useSearchParams();
   const locale = useMemo(() => resolveLocale(searchParams.get("lang")), [searchParams]);
-
+  const { id } = useParams();
   const { item, isLoading, isError, error, reload } = useWorldHeritageDetail(id);
 
   if (!id) return <p>World Heritage id is required.</p>;
+
   if (isLoading) return <p>Loading…</p>;
 
   if (isError || !item) {

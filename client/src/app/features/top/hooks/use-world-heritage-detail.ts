@@ -12,7 +12,7 @@ type State = {
 export function useWorldHeritageDetail(id: string | null | undefined) {
   const [state, setState] = React.useState<State>({
     data: null,
-    loading: true,
+    loading: false, // ← 初期は false が自然
     error: null,
   });
 
@@ -20,11 +20,7 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
 
   const load = React.useCallback(() => {
     if (!id) {
-      setState((s) => ({
-        ...s,
-        loading: false,
-        error: new Error("World heritage id is required"),
-      }));
+      setState({ data: null, loading: false, error: null });
       return;
     }
 
@@ -35,10 +31,8 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
     setState((s) => ({ ...s, loading: true, error: null }));
 
     fetchWorldHeritageDetail(id, { signal: ac.signal })
-      .then((dto) => toWorldHeritageDetailVm(dto))
-      .then((vm) => {
-        setState({ data: vm, loading: false, error: null });
-      })
+      .then(toWorldHeritageDetailVm)
+      .then((vm) => setState({ data: vm, loading: false, error: null }))
       .catch((err: unknown) => {
         if ((err as { name?: string }).name === "AbortError") return;
         setState({ data: null, loading: false, error: err });
@@ -47,18 +41,12 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
 
   React.useEffect(() => {
     load();
-    return () => {
-      abortRef.current?.abort();
-    };
-  }, [load]);
-
-  const reload = React.useCallback(() => {
-    load();
+    return () => abortRef.current?.abort();
   }, [load]);
 
   return {
     item: state.data,
-    reload,
+    reload: load,
     isLoading: state.loading,
     isError: state.error != null,
     error: state.error,

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { createTopApi } from "./top-api";
-import type { ApiWorldHeritageDto, Paginated } from "../types";
+import type { ApiWorldHeritageDto, ApiWorldHeritageImageDto, Paginated } from "../types";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
 
@@ -30,6 +30,19 @@ describe("fetchTopFirstPage (createTopApi)", () => {
   });
 
   it("配列レスポンスをそのまま返す", async () => {
+    const image: ApiWorldHeritageImageDto = {
+      id: 11224,
+      url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
+      sort_order: 0,
+      width: 0,
+      height: 0,
+      format: "jpg",
+      alt: null,
+      credit: null,
+      is_primary: true,
+      checksum: "abcd1234",
+    };
+
     const data: ApiWorldHeritageDto[] = [
       {
         id: 1,
@@ -51,8 +64,9 @@ describe("fetchTopFirstPage (createTopApi)", () => {
         unesco_site_url: "https://ex.com/1",
         state_party_codes: ["JPN"],
         state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-        thumbnail_url: null,
         primary_state_party_code: "JPN",
+        image_url: image,
+        images: [image],
       },
     ];
 

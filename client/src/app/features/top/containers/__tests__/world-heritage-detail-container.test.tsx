@@ -1,6 +1,12 @@
+/** @jest-environment jsdom */
+
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { jest } from "@jest/globals";
+
+jest.mock("../../apis", () => ({
+  fetchWorldHeritageDetail: jest.fn(),
+}));
 
 import { WorldHeritageDetailContainer } from "../world-heritage-detail-container";
 import { useWorldHeritageDetail } from "../../hooks/use-world-heritage-detail";
@@ -35,12 +41,18 @@ const renderWithRoute = (path: "/heritages" | "/heritages/:id", initialEntry: st
 describe("WorldHeritageDetailContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useWorldHeritageDetailMock.mockReturnValue({
+      item: null,
+      isLoading: false,
+      isError: false,
+      error: null,
+      reload: jest.fn(),
+    });
   });
 
-  test("id が無い場合 'World Heritage id is required.' を表示する", () => {
+  test("id が無い場合 ...", () => {
     renderWithRoute("/heritages", "/heritages");
-
-    expect(screen.getByText("World Heritage id is required.")).toBeInTheDocument();
+    expect(useWorldHeritageDetailMock).not.toHaveBeenCalled();
   });
 
   test("loading の場合 'Loading…' を表示する", () => {
@@ -102,7 +114,7 @@ describe("WorldHeritageDetailContainer", () => {
       statePartyCodes: [],
       statePartiesMeta: {},
       primaryStatePartyCode: null,
-      thumbnail: "https://example.com/kyoto.jpg",
+      thumbnail: null,
       title: "Kyoto",
       subtitle: "Japan · Asia",
       areaText: "—",

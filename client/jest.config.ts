@@ -3,7 +3,7 @@ import type { JestConfigWithTsJest } from "ts-jest";
 const config: JestConfigWithTsJest = {
   preset: "ts-jest/presets/default-esm",
   extensionsToTreatAsEsm: [".ts", ".tsx"],
-  testEnvironment: "node",
+  testEnvironment: "jsdom",
   roots: ["<rootDir>/src"],
   testMatch: ["**/*.test.ts?(x)"],
   transform: {
@@ -21,12 +21,7 @@ const config: JestConfigWithTsJest = {
     "^@features/(.*)$": "<rootDir>/src/app/features/$1",
     "^@shared/(.*)$": "<rootDir>/src/shared/$1",
   },
-
-  globals: {
-    "ts-jest": {
-      tsconfig: "<rootDir>/tsconfig.test.json",
-    },
-  },
+  setupFiles: ["<rootDir>/src/jest.polyfills.ts"],
   setupFilesAfterEnv: ["<rootDir>/setup.tests.ts"],
 };
 
