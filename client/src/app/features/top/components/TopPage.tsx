@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import type { WorldHeritageVm } from "../types";
 import { HeritageCard } from "../cards/HeritageCard";
 import { Button } from "@shared/uis/Button.tsx";
@@ -32,8 +32,11 @@ function SortSelect({
     <select
       value={value}
       onChange={(e) => onChange?.(e.target.value as SortOption)}
-      className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800
-                 shadow-sm hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300"
+      className="
+        h-10 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-800
+        shadow-sm hover:bg-zinc-50
+        focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
+      "
       aria-label="Sort"
     >
       <option value="default">Sort</option>
@@ -44,7 +47,16 @@ function SortSelect({
 }
 
 function Divider() {
-  return <div className="hidden h-8 w-px bg-zinc-200 md:block" aria-hidden="true" />;
+  return <div className="hidden h-10 w-px bg-zinc-200 md:block" aria-hidden="true" />;
+}
+
+function FieldLabel({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="min-w-[84px] leading-tight">
+      <div className="text-[11px] font-semibold text-zinc-700">{title}</div>
+      <div className="text-[11px] text-zinc-400">{subtitle}</div>
+    </div>
+  );
 }
 
 export default function TopPage({
@@ -62,22 +74,25 @@ export default function TopPage({
   const [category, setCategory] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
 
-  const submitSearch = () => {
+  const submitSearch = useCallback(() => {
     onSearch?.({
       region: region || undefined,
       category: category || undefined,
       keyword: keyword.trim() || undefined,
     });
-  };
+  }, [onSearch, region, category, keyword]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    submitSearch();
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      submitSearch();
+    },
+    [submitSearch],
+  );
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
-      <div className="sticky top-0 z-20 -mx-4 px-4 pb-4 pt-4 bg-white/95 backdrop-blur border-b border-zinc-200/70">
+      <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 pb-4 pt-4 backdrop-blur">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-3xl font-extrabold tracking-tight text-indigo-700">
@@ -94,7 +109,11 @@ export default function TopPage({
               <button
                 type="button"
                 onClick={onReload}
-                className="shrink-0 text-xs font-semibold text-zinc-700 hover:text-zinc-900 hover:underline"
+                className="
+                  h-10 rounded-xl px-3 text-xs font-semibold text-zinc-700
+                  hover:bg-zinc-50 hover:text-zinc-900
+                  focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 focus:ring-offset-white
+                "
               >
                 Reload
               </button>
@@ -104,76 +123,82 @@ export default function TopPage({
         <form onSubmit={handleSubmit} className="mt-5">
           <div
             className="
-              flex flex-col gap-3
               rounded-[28px] border border-zinc-200 bg-white px-4 py-3 shadow-sm
-              md:flex-row md:items-center md:gap-4
+              focus-within:ring-2 focus-within:ring-indigo-200 focus-within:border-indigo-300
             "
           >
-            <div className="flex items-center gap-3 md:w-[220px]">
-              <div className="min-w-[72px] leading-tight">
-                <div className="text-[11px] font-semibold text-zinc-600">Region</div>
-                <div className="text-[11px] text-zinc-400">Area</div>
-              </div>
-              <select
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                className="
-                  w-full rounded-xl bg-white px-2 py-2 text-sm font-semibold text-zinc-900
-                  focus:outline-none
-                "
-                aria-label="Region"
-              >
-                {regionOptions.map((v, i) => (
-                  <option key={`${v || "all"}-${i}`} value={v}>
-                    {v ? v : "All"}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Divider />
-            <div className="flex items-center gap-3 md:w-[260px]">
-              <div className="min-w-[84px] leading-tight">
-                <div className="text-[11px] font-semibold text-zinc-600">Category</div>
-                <div className="text-[11px] text-zinc-400">Type</div>
-              </div>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="
-                  w-full rounded-xl bg-white px-2 py-2 text-sm font-semibold text-zinc-900
-                  focus:outline-none
-                "
-                aria-label="Category"
-              >
-                {categoryOptions.map((v, i) => (
-                  <option key={`${v || "all"}-${i}`} value={v}>
-                    {v ? v : "All"}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Divider />
-
-            <div className="flex items-center gap-3 md:flex-1">
-              <div className="min-w-[84px] leading-tight">
-                <div className="text-[11px] font-semibold text-zinc-600">Keyword</div>
-                <div className="text-[11px] text-zinc-400">Name / Country</div>
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+              <div className="flex items-center gap-3 md:w-[220px]">
+                <FieldLabel title="Region" subtitle="Area" />
+                <select
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  className="
+                    h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900
+                    hover:bg-zinc-50
+                    focus:outline-none
+                  "
+                  aria-label="Region"
+                >
+                  {regionOptions.map((v, i) => (
+                    <option key={`${v || "all"}-${i}`} value={v}>
+                      {v ? v : "All"}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <input
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="Search by name / country / keyword…"
-                className="
-                  w-full rounded-xl bg-white px-2 py-2 text-sm text-zinc-900 placeholder:text-zinc-400
-                  focus:outline-none
-                "
-                aria-label="Keyword"
-              />
+              <Divider />
 
-              <Button type="submit" size="sm" className="rounded-full px-4">
-                <SearchIcon fontSize="small" />
-              </Button>
+              <div className="flex items-center gap-3 md:w-[260px]">
+                <FieldLabel title="Category" subtitle="Type" />
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="
+                    h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900
+                    hover:bg-zinc-50
+                    focus:outline-none
+                  "
+                  aria-label="Category"
+                >
+                  {categoryOptions.map((v, i) => (
+                    <option key={`${v || "all"}-${i}`} value={v}>
+                      {v ? v : "All"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Divider />
+
+              <div className="flex items-center gap-3 md:flex-1">
+                <FieldLabel title="Keyword" subtitle="Name / Country" />
+
+                <input
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="Search by name / country / keyword…"
+                  className="
+                    h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400
+                    hover:bg-zinc-50
+                    focus:outline-none
+                  "
+                  aria-label="Keyword"
+                />
+
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="h-10 w-10 shrink-0 rounded-full p-0 !bg-rose-600 !text-white
+                    hover:!bg-rose-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400
+                    focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  aria-label="Search"
+                  title="Search"
+                >
+                  <SearchIcon fontSize="small" />
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -182,10 +207,11 @@ export default function TopPage({
           </div>
         </form>
       </div>
+
       <div className="pt-8">
         {items.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="text-sm text-zinc-500">No sites found.</p>
+            <p className="text-sm text-zinc-600">No sites found.</p>
           </div>
         ) : (
           <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
