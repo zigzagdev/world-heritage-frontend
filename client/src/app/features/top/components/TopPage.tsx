@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { WorldHeritageVm } from "../types";
 import { HeritageCard } from "../cards/HeritageCard";
 import { Button } from "@shared/uis/Button.tsx";
+import SearchIcon from "@mui/icons-material/Search";
 
 export type SortOption = "default" | "year_desc" | "year_asc";
 
@@ -171,7 +172,7 @@ export default function TopPage({
               />
 
               <Button type="submit" size="sm" className="rounded-full px-4">
-                Search
+                <SearchIcon fontSize="small" />
               </Button>
             </div>
           </div>
