@@ -1,34 +1,25 @@
+import React, { useMemo, useState, useCallback } from "react";
 import type { WorldHeritageVm } from "../types";
 import { HeritageCard } from "../cards/HeritageCard";
 import { Button } from "@shared/uis/Button.tsx";
+import SearchIcon from "@mui/icons-material/Search";
 
 export type SortOption = "default" | "year_desc" | "year_asc";
+
+export type SearchQuery = {
+  region?: string;
+  category?: string;
+  keyword?: string;
+};
 
 export type TopPageProps = {
   items: ReadonlyArray<WorldHeritageVm>;
   onClickItem?: (id: number) => void;
   onReload?: () => void;
-  onSearch?: (keyword: string) => void;
+  onSearch?: (q: SearchQuery) => void;
   sortOption?: SortOption;
   onChangeSort?: (option: SortOption) => void;
 };
-
-function Chip({ label, disabled = true }: { label: string; disabled?: boolean }) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      aria-disabled={disabled}
-      className={[
-        "shrink-0 rounded-full border px-3 py-1 text-xs font-medium",
-        "border-zinc-200 bg-white text-zinc-600",
-        disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-zinc-50 dark:hover:bg-zinc-900",
-      ].join(" ")}
-    >
-      {label}
-    </button>
-  );
-}
 
 function SortSelect({
   value = "default",
@@ -38,18 +29,32 @@ function SortSelect({
   onChange?: (v: SortOption) => void;
 }) {
   return (
-    <div className="flex items-center justify-end gap-2">
-      <select
-        value={value}
-        onChange={(e) => onChange?.(e.target.value as SortOption)}
-        className="rounded-full border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700
-                   shadow-sm hover:bg-zinc-50
-                   dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-900"
-      >
-        <option value="default"></option>
-        <option value="year_desc">Year (new → old)</option>
-        <option value="year_asc">Year (old → new)</option>
-      </select>
+    <select
+      value={value}
+      onChange={(e) => onChange?.(e.target.value as SortOption)}
+      className="
+        h-10 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-800
+        shadow-sm hover:bg-zinc-50
+        focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
+      "
+      aria-label="Sort"
+    >
+      <option value="default">Sort</option>
+      <option value="year_desc">Year (new → old)</option>
+      <option value="year_asc">Year (old → new)</option>
+    </select>
+  );
+}
+
+function Divider() {
+  return <div className="hidden h-10 w-px bg-zinc-200 md:block" aria-hidden="true" />;
+}
+
+function FieldLabel({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="min-w-[84px] leading-tight">
+      <div className="text-[11px] font-semibold text-zinc-700">{title}</div>
+      <div className="text-[11px] text-zinc-400">{subtitle}</div>
     </div>
   );
 }
@@ -58,78 +63,155 @@ export default function TopPage({
   items,
   onClickItem,
   onReload,
+  onSearch,
   sortOption,
   onChangeSort,
 }: TopPageProps) {
+  const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
+  const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
+
+  const [region, setRegion] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [keyword, setKeyword] = useState<string>("");
+
+  const submitSearch = useCallback(() => {
+    onSearch?.({
+      region: region || undefined,
+      category: category || undefined,
+      keyword: keyword.trim() || undefined,
+    });
+  }, [onSearch, region, category, keyword]);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      submitSearch();
+    },
+    [submitSearch],
+  );
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
-      <div className="sticky top-0 z-20 -mx-4 px-4 pb-4 pt-4 bg-white/95 backdrop-blur border-b border-zinc-200/70">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+      <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 pb-4 pt-4 backdrop-blur">
+        <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-3xl font-extrabold tracking-tight text-indigo-700 dark:text-indigo-400">
+            <h1 className="text-3xl font-extrabold tracking-tight text-indigo-700">
               World Heritage
             </h1>
-            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
+            <p className="mt-1 text-sm font-medium text-zinc-700">
               Learn by searching and comparing sites.
             </p>
           </div>
-          <div className="md:flex-1">
-            <div className="relative">
-              <input
-                type="text"
-                disabled
-                aria-disabled="true"
-                placeholder="Search sites…"
-                className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 text-sm
-                text-zinc-800 placeholder:text-zinc-400
-                shadow-sm
-                disabled:bg-zinc-100 disabled:text-zinc-600 disabled:border-zinc-200 disabled:cursor-not-allowed
-                dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100 dark:disabled:bg-zinc-900"
-              />
-              <div className="mt-1 text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
-                Search (Algolia) coming soon
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 md:justify-end">
-            <Button
-              disabled
-              size="sm"
-              className=" rounded-full disabled:opacity-100 disabled:bg-zinc-100 disabled:text-zinc-700
-              disabled:border disabled:border-zinc-200 dark:disabled:bg-zinc-900
-              dark:disabled:text-zinc-300 dark:disabled:border-zinc-700"
-            >
-              Filters
-            </Button>
 
+          <div className="flex items-center gap-2">
+            <SortSelect value={sortOption} onChange={onChangeSort} />
             {onReload && (
               <button
                 type="button"
                 onClick={onReload}
-                className="text-xs font-semibold text-zinc-700 hover:text-zinc-900 hover:underline
-                 dark:text-zinc-300 dark:hover:text-zinc-100"
+                className="
+                  h-10 rounded-xl px-3 text-xs font-semibold text-zinc-700
+                  hover:bg-zinc-50 hover:text-zinc-900
+                  focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 focus:ring-offset-white
+                "
               >
                 Reload
               </button>
             )}
           </div>
         </div>
+        <form onSubmit={handleSubmit} className="mt-5">
+          <div
+            className="
+              rounded-[28px] border border-zinc-200 bg-white px-4 py-3 shadow-sm
+              focus-within:ring-2 focus-within:ring-indigo-200 focus-within:border-indigo-300
+            "
+          >
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
+              <div className="flex items-center gap-3 md:w-[220px]">
+                <FieldLabel title="Region" subtitle="Area" />
+                <select
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                  className="
+                    h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900
+                    hover:bg-zinc-50
+                    focus:outline-none
+                  "
+                  aria-label="Region"
+                >
+                  {regionOptions.map((v, i) => (
+                    <option key={`${v || "all"}-${i}`} value={v}>
+                      {v ? v : "All"}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-        <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch]">
-          <Chip label="Category" disabled />
-          <Chip label="Region" disabled />
-          <Chip label="Country" disabled />
-          <Chip label="Endangered" disabled />
-        </div>
-        <div className="mt-3">
-          <SortSelect value={sortOption} onChange={onChangeSort} />
-        </div>
+              <Divider />
+
+              <div className="flex items-center gap-3 md:w-[260px]">
+                <FieldLabel title="Category" subtitle="Type" />
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="
+                    h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900
+                    hover:bg-zinc-50
+                    focus:outline-none
+                  "
+                  aria-label="Category"
+                >
+                  {categoryOptions.map((v, i) => (
+                    <option key={`${v || "all"}-${i}`} value={v}>
+                      {v ? v : "All"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Divider />
+
+              <div className="flex items-center gap-3 md:flex-1">
+                <FieldLabel title="Keyword" subtitle="Name / Country" />
+
+                <input
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="Search by name / country / keyword…"
+                  className="
+                    h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400
+                    hover:bg-zinc-50
+                    focus:outline-none
+                  "
+                  aria-label="Keyword"
+                />
+
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="h-10 w-10 shrink-0 rounded-full p-0 !bg-rose-600 !text-white
+                    hover:!bg-rose-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400
+                    focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                  aria-label="Search"
+                  title="Search"
+                >
+                  <SearchIcon fontSize="small" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-2 text-[11px] font-medium text-zinc-600">
+            Algolia wiring will replace this local search later.
+          </div>
+        </form>
       </div>
 
       <div className="pt-8">
         {items.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="text-sm text-zinc-500">No sites found.</p>
+            <p className="text-sm text-zinc-600">No sites found.</p>
           </div>
         ) : (
           <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
