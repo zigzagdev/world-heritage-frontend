@@ -9,8 +9,14 @@ services:
       - NODE_ENV=development
     volumes:
       - ../../client:/app
+      - node_modules:/app/node_modules
+      - npm_cache:/root/.npm
     networks:
       - appnet
+
+volumes:
+  npm_cache:
+  node_modules:
 
 networks:
   appnet:
