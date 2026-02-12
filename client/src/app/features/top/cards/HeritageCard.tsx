@@ -62,7 +62,6 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
 
   return (
     <BaseCard onClick={handleCardClick}>
-      {/* Upper: Image Section */}
       <div className="relative overflow-hidden rounded-2xl">
         {item.thumbnail ? (
           <img
