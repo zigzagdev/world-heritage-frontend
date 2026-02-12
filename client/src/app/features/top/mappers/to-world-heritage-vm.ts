@@ -43,13 +43,13 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
   const criteriaCodes = normalizeCriteria(data.criteria);
   const statePartyCodesRaw = data.state_party_codes ?? [];
   const statePartyLabelsJp = toStatePartyLabelsJp(statePartyCodesRaw);
+  const thumbnailData = data.thumbnail ?? data.image_url ?? null;
 
   let stateParty: string | null = data.state_party;
 
   if (!stateParty && statePartyLabelsJp.length > 0) {
     stateParty = statePartyLabelsJp.join(", ");
   }
-
   return {
     id: data.id,
     officialName: data.official_name,
@@ -76,15 +76,15 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     areaText: fmtHa(data.area_hectares),
     bufferText: fmtHa(data.buffer_zone_hectares),
     criteriaText: criteriaCodes.join(", "),
-    thumbnail: data.image_url
+    thumbnail: thumbnailData
       ? {
-          id: data.image_url.id,
-          url: data.image_url.url,
-          alt: data.image_url.alt ?? titleOf(data),
-          credit: data.image_url.credit,
-          width: data.image_url.width,
-          height: data.image_url.height,
-          isPrimary: data.image_url.is_primary,
+          id: thumbnailData.id,
+          url: thumbnailData.url,
+          alt: thumbnailData.alt ?? titleOf(data),
+          credit: thumbnailData.credit,
+          width: thumbnailData.width,
+          height: thumbnailData.height,
+          isPrimary: thumbnailData.is_primary,
         }
       : null,
   };

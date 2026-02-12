@@ -31,8 +31,8 @@ export type ApiWorldHeritageDto = {
   state_party_codes: string[];
   state_parties_meta: StatePartiesMetaDto;
   primary_state_party_code: string | null;
+  thumbnail?: ApiWorldHeritageImageDto | null;
   image_url?: ApiWorldHeritageImageDto | null;
-  images?: ApiWorldHeritageImageDto[];
 };
 
 export type ApiWorldHeritageImageDto = {
