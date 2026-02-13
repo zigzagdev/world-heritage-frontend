@@ -15,7 +15,10 @@ export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSel
   const preview = images.slice(0, previewCount);
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm px-5 py-5 md:px-6 md:py-6">
+    <section
+      id="gallery"
+      className="rounded-2xl border border-zinc-200 bg-white shadow-sm px-5 py-5 md:px-6 md:py-6"
+    >
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-sm font-extrabold tracking-wide text-zinc-900">GALLERY</h2>

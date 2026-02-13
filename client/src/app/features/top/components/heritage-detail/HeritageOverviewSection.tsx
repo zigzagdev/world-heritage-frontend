@@ -8,7 +8,10 @@ type Props = {
 
 export function HeritageOverviewSection({ item }: Props) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm px-5 py-5 md:px-6 md:py-6">
+    <section
+      id="overview"
+      className="rounded-2xl border border-zinc-200 bg-white shadow-sm px-5 py-5 md:px-6 md:py-6"
+    >
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-extrabold tracking-wide text-zinc-900 mt-3">OVERVIEW</h2>
 
