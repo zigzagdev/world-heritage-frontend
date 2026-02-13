@@ -1,8 +1,11 @@
 import type { WorldHeritageDetailVm } from "../../types";
 import { HeritageMetadataList } from "./HeritageMetadataList";
+import { HeritageToc } from "./HeritageToc";
+import type { Locale } from "../../../../../domain/criteria";
 
 type Props = {
   item: WorldHeritageDetailVm;
+  locale?: Locale;
 };
 
 const formatCriteriaInline = (criteria: string[] | undefined) =>
@@ -52,7 +55,12 @@ export function HeritageSidebar({ item }: Props) {
   ] as const;
 
   return (
-    <aside aria-label="Facts" className="flex flex-col gap-6">
+    <aside
+      aria-label="Status"
+      className="flex flex-col gap-6 lg:sticky lg:top-24"
+      id="heritage-data"
+    >
+      <HeritageToc />
       <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 py-4">
           <CardTitle>Heritage Data</CardTitle>
@@ -89,8 +97,8 @@ export function HeritageSidebar({ item }: Props) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-4">
-        <div className="text-sm font-bold text-zinc-900">Map</div>
+      <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-4" id="geo-map">
+        <div className="text-sm font-bold text-zinc-900">Place</div>
         <div className="mt-3 grid h-40 place-items-center rounded-xl bg-zinc-100 text-sm font-medium text-zinc-500">
           Map
         </div>
