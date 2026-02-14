@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { createTopApi } from "./top-api";
-import type { ApiWorldHeritageDto, ApiWorldHeritageImageDto, Paginated } from "../types";
+import type {
+  ApiWorldHeritageDto,
+  ApiWorldHeritageImageDto,
+  Paginated,
+} from "../../../../domain/types.ts";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
 
