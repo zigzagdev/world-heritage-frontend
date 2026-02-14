@@ -1,4 +1,4 @@
-import type { Paginated, ApiWorldHeritageDto } from "../types";
+import type { Paginated, ApiWorldHeritageDto } from "../../../../domain/types.ts";
 
 export type TopApiDeps = {
   apiBase: string;
