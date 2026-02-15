@@ -4,7 +4,7 @@ import type {
   ApiWorldHeritageDto,
   ApiWorldHeritageImageDto,
   WorldHeritageVm,
-} from "../../types.ts";
+} from "../../../../../domain/types.ts";
 
 const image: ApiWorldHeritageImageDto = {
   id: 11224,

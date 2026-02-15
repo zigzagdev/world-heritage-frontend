@@ -4,8 +4,8 @@ import type {
   WorldHeritageDetailVm,
   WorldHeritageImageVm,
   WorldHeritageVm,
-} from "../types";
-import { toWorldHeritageVm } from "./to-world-heritage-vm";
+} from "../../../../domain/types.ts";
+import { toWorldHeritageVm } from "./to-world-heritage-vm.ts";
 
 export function toWorldHeritageDetailVm(dto: ApiWorldHeritageDto): WorldHeritageDetailVm {
   const base: WorldHeritageVm = toWorldHeritageVm(dto);

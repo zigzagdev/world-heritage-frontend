@@ -1,6 +1,10 @@
-import type { ApiWorldHeritageDto, WorldHeritageVm, CriteriaCode } from "../types";
-import { statePartyLabels } from "@features/constants/state-party-labels";
-import { CRITERIA } from "../types";
+import type {
+  ApiWorldHeritageDto,
+  WorldHeritageVm,
+  CriteriaCode,
+} from "../../../../domain/types.ts";
+import { statePartyLabels } from "@features/constants/state-party-labels.ts";
+import { CRITERIA } from "../../../../domain/types.ts";
 
 const ORDER: readonly CriteriaCode[] = CRITERIA;
 
