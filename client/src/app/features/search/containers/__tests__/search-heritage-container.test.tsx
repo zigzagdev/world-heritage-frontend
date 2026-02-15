@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 
 import React from "react";
-import TestRenderer, { act } from "react-test-renderer";
+import { render, act } from "@testing-library/react";
 import { jest } from "@jest/globals";
 import * as rrd from "react-router-dom";
 import type { Location } from "react-router-dom";
@@ -39,11 +39,11 @@ type SubHeaderProps = {
   onSubmit: (q: { region?: string; category?: string; keyword?: string }) => void;
 };
 
-const subHeaderSpy = jest.fn<void, [SubHeaderProps]>();
+let lastSubHeaderProps: SubHeaderProps | null = null;
 
 jest.mock("@features/top/components/HeritageSubHeader.tsx", () => ({
   HeritageSubHeader: (props: SubHeaderProps) => {
-    subHeaderSpy(props);
+    lastSubHeaderProps = props;
     return null;
   },
 }));
@@ -61,24 +61,16 @@ const loc = (search: string): Location => ({
   key: "test",
 });
 
-const create = () => {
-  let tr: TestRenderer.ReactTestRenderer;
-  act(() => {
-    tr = TestRenderer.create(<SearchHeritageFormContainer />);
-  });
-  // ts的に初期化保証
-
-  return tr!;
-};
-
 describe("SearchHeritageFormContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    lastSubHeaderProps = null;
+
     useNavigateMock.mockReturnValue(navigateMock);
     useLocationMock.mockReturnValue(loc("?region=AFR&search_query=Kyoto"));
   });
 
-  test("location.search を parse に渡し、SubHeader に value を渡す", () => {
+  test("passes location.search to parse and passes value to SubHeader", () => {
     parseMock.mockReturnValue({
       search_query: "Kyoto",
       country: null,
@@ -90,17 +82,16 @@ describe("SearchHeritageFormContainer", () => {
       per_page: 30,
     });
 
-    create();
+    render(<SearchHeritageFormContainer />);
 
     expect(parseMock).toHaveBeenCalledTimes(1);
     expect(parseMock).toHaveBeenCalledWith("?region=AFR&search_query=Kyoto");
 
-    expect(subHeaderSpy).toHaveBeenCalledTimes(1);
-    const props = subHeaderSpy.mock.calls[0][0];
-    expect(props.value).toEqual({ region: "AFR", category: "", keyword: "Kyoto" });
+    expect(lastSubHeaderProps).not.toBeNull();
+    expect(lastSubHeaderProps!.value).toEqual({ region: "AFR", category: "", keyword: "Kyoto" });
   });
 
-  test("onSubmit で current_page を 1 にして serialize → navigate する", () => {
+  test("onSubmit sets current_page=1 then serialize -> navigate (with trimmed keyword)", () => {
     parseMock.mockReturnValue({
       search_query: "Kyoto",
       country: null,
@@ -114,20 +105,33 @@ describe("SearchHeritageFormContainer", () => {
 
     serializeMock.mockReturnValue("?region=EUR&search_query=Paris&current_page=1");
 
-    create();
+    render(<SearchHeritageFormContainer />);
 
-    const props = subHeaderSpy.mock.calls.at(-1)?.[0];
-    if (!props) throw new Error("HeritageSubHeader was not rendered");
+    expect(lastSubHeaderProps).not.toBeNull();
 
     act(() => {
-      props.onSubmit({ region: "EUR", keyword: " Paris " });
+      lastSubHeaderProps!.onSubmit({ region: "EUR", keyword: " Paris " });
     });
 
+    // next params が serialize に渡ったこと（current_page=1 & trim 済み）
     expect(serializeMock).toHaveBeenCalledTimes(1);
+    expect(serializeMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        region: "EUR",
+        search_query: "Paris",
+        current_page: 1,
+      }),
+    );
+
+    // navigate の引数まで固定（ここを曖昧にすると壊れても検知できない）
     expect(navigateMock).toHaveBeenCalledTimes(1);
+    expect(navigateMock).toHaveBeenCalledWith(
+      { pathname: "/search", search: "?region=EUR&search_query=Paris&current_page=1" },
+      { replace: false },
+    );
   });
 
-  test("search が変わったら parse が呼ばれ直し、value が更新される", () => {
+  test("re-parses when location.search changes", () => {
     useLocationMock
       .mockReturnValueOnce(loc("?region=AFR&search_query=Kyoto"))
       .mockReturnValueOnce(loc("?region=EUR&category=Cultural&search_query=Paris"));
@@ -154,17 +158,23 @@ describe("SearchHeritageFormContainer", () => {
         per_page: 30,
       });
 
-    const tr = create();
+    const { rerender } = render(<SearchHeritageFormContainer />);
 
     expect(parseMock).toHaveBeenNthCalledWith(1, "?region=AFR&search_query=Kyoto");
 
     act(() => {
-      tr.update(<SearchHeritageFormContainer />);
+      rerender(<SearchHeritageFormContainer />);
     });
 
     expect(parseMock).toHaveBeenNthCalledWith(
       2,
       "?region=EUR&category=Cultural&search_query=Paris",
     );
+    expect(lastSubHeaderProps).not.toBeNull();
+    expect(lastSubHeaderProps!.value).toEqual({
+      region: "EUR",
+      category: "Cultural",
+      keyword: "Paris",
+    });
   });
 });

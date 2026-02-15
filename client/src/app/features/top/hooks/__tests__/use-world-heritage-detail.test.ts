@@ -4,8 +4,8 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { jest, expect, test, beforeEach, describe } from "@jest/globals";
 import { useWorldHeritageDetail } from "../use-world-heritage-detail";
 import { fetchWorldHeritageDetail } from "../../apis";
-import { toWorldHeritageVm } from "../../mappers/to-world-heritage-vm";
-import type { WorldHeritageDetailVm, ApiWorldHeritageDto } from "../../types";
+import { toWorldHeritageVm } from "@features/heritages/mappers/to-world-heritage-vm";
+import type { WorldHeritageDetailVm, ApiWorldHeritageDto } from "../../../../../domain/types.ts";
 
 type MinimalAbortSignal = { aborted: boolean };
 
@@ -32,7 +32,7 @@ jest.mock("../../apis", () => ({
   fetchWorldHeritageDetail: jest.fn(),
 }));
 
-jest.mock("../../mappers/to-world-heritage-vm", () => ({
+jest.mock("@features/heritages/mappers/to-world-heritage-vm", () => ({
   toWorldHeritageVm: jest.fn(),
 }));
 
