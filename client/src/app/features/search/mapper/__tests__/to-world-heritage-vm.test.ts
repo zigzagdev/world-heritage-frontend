@@ -66,7 +66,6 @@ const makeResponse = (overrides: Partial<HeritageSearchResponse> = {}): Heritage
   return { ...base, ...overrides };
 };
 
-// typed mock helper（any不要）
 const mockedToWorldHeritageListVm = toWorldHeritageListVm as jest.MockedFunction<
   typeof toWorldHeritageListVm
 >;
@@ -83,7 +82,7 @@ describe("toHeritageSearchResultVm", () => {
     ];
     mockedToWorldHeritageListVm.mockReturnValue(mappedItems);
 
-    const res = makeResponse({
+    const response = makeResponse({
       data: {
         data: [dto1, dto2],
         pagination: {
@@ -95,19 +94,19 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const vm = toHeritageSearchResultVm(res);
+    const viewModel = toHeritageSearchResultVm(response);
 
     expect(mockedToWorldHeritageListVm).toHaveBeenCalledTimes(1);
-    expect(mockedToWorldHeritageListVm).toHaveBeenCalledWith(res.data.data);
+    expect(mockedToWorldHeritageListVm).toHaveBeenCalledWith(response.data.data);
 
-    expect(vm.items).toBe(mappedItems);
-    expect(vm.pagination).toEqual(res.data.pagination);
+    expect(viewModel.items).toBe(mappedItems);
+    expect(viewModel.pagination).toEqual(response.data.pagination);
   });
 
   it("sets isFirstPage true when current_page <= 1", () => {
     mockedToWorldHeritageListVm.mockReturnValue([]);
 
-    const res = makeResponse({
+    const response = makeResponse({
       data: {
         data: [dto1, dto2],
         pagination: {
@@ -119,16 +118,16 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const vm = toHeritageSearchResultVm(res);
+    const viewModel = toHeritageSearchResultVm(response);
 
-    expect(vm.isFirstPage).toBe(true);
-    expect(vm.isLastPage).toBe(true);
+    expect(viewModel.isFirstPage).toBe(true);
+    expect(viewModel.isLastPage).toBe(true);
   });
 
   it("sets isLastPage true when current_page >= last_page", () => {
     mockedToWorldHeritageListVm.mockReturnValue([]);
 
-    const res = makeResponse({
+    const response = makeResponse({
       data: {
         data: [dto1, dto2],
         pagination: {
@@ -140,23 +139,22 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const vm = toHeritageSearchResultVm(res);
+    const viewModel = toHeritageSearchResultVm(response);
 
-    expect(vm.isLastPage).toBe(true);
-    expect(vm.isFirstPage).toBe(false);
+    expect(viewModel.isLastPage).toBe(true);
+    expect(viewModel.isFirstPage).toBe(false);
   });
 
   it("builds rangeText correctly for non-empty result", () => {
-    // page2, per_page30, count30 => 31–60
     const mappedItems: WorldHeritageVm[] = new Array(30)
       .fill(null)
       .map((_, i) => ({ id: i + 1 }) as unknown as WorldHeritageVm);
 
     mockedToWorldHeritageListVm.mockReturnValue(mappedItems);
 
-    const res = makeResponse({
+    const response = makeResponse({
       data: {
-        data: [dto1, dto2], // mapperはmockなので中身の件数は関係ない
+        data: [dto1, dto2],
         pagination: {
           current_page: 2,
           per_page: 30,
@@ -166,15 +164,15 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const vm = toHeritageSearchResultVm(res);
+    const viewModel = toHeritageSearchResultVm(response);
 
-    expect(vm.rangeText).toBe("31–60 of 2,345");
+    expect(viewModel.rangeText).toBe("31–60 of 2,345");
   });
 
   it("builds rangeText correctly for empty result", () => {
     mockedToWorldHeritageListVm.mockReturnValue([]);
 
-    const res = makeResponse({
+    const response = makeResponse({
       data: {
         data: [dto1, dto2],
         pagination: {
@@ -186,8 +184,8 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const vm = toHeritageSearchResultVm(res);
+    const viewModel = toHeritageSearchResultVm(response);
 
-    expect(vm.rangeText).toBe("0 of 2,345");
+    expect(viewModel.rangeText).toBe("0 of 2,345");
   });
 });
