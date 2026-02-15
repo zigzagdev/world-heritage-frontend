@@ -1,6 +1,6 @@
-import { describe, it, vi, beforeEach, type MockedFunction } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import React from "react";
+import { MemoryRouter } from "react-router-dom";
 
 type CriteriaCode = "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii" | "viii" | "ix" | "x";
 
@@ -25,6 +25,7 @@ interface WorldHeritageDto {
   state_party_codes: string[];
   state_parties_meta: Record<string, { is_primary: boolean; inscription_year: number }>;
   thumbnail: string;
+  primary_state_party_code: string | null;
 }
 
 interface WorldHeritageVm {
@@ -38,12 +39,29 @@ interface WorldHeritageVm {
   thumbnail: string;
 }
 
-vi.mock("../../apis", () => ({
-  fetchTopFirstPage: vi.fn<(opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>>(),
+/**
+ * IMPORTANT:
+ * - jest.mock() are hoisted to the top of the module.
+ * - So do NOT reference variables declared later from inside the mock factory.
+ */
+
+const navigateMock = jest.fn();
+
+jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => navigateMock,
+  };
+});
+
+jest.mock("../../apis", () => ({
+  fetchTopFirstPage: jest.fn(),
 }));
 
-vi.mock("../../mappers/to-world-heritage-vm", () => {
-  const toWorldHeritageListVm = (dto: ReadonlyArray<WorldHeritageDto>): WorldHeritageVm[] =>
+jest.mock("@features/heritages/mappers/to-world-heritage-vm", () => ({
+  __esModule: true,
+  toWorldHeritageListVm: jest.fn((dto: ReadonlyArray<WorldHeritageDto>) =>
     dto.map((d) => ({
       id: d.id,
       title: d.official_name ?? d.name,
@@ -57,36 +75,43 @@ vi.mock("../../mappers/to-world-heritage-vm", () => {
           ? `${d.buffer_zone_hectares} ha`
           : "—",
       thumbnail: d.thumbnail,
-    }));
-  return { toWorldHeritageListVm };
-});
+    })),
+  ),
+}));
 
-interface TopPageProps {
-  items: ReadonlyArray<WorldHeritageVm>;
-  onReload: () => void;
-}
-vi.mock("../../components/TopPage", () => {
-  const TopPage: React.FC<TopPageProps> = ({ items, onReload }) => (
-    <div>
-      <button onClick={onReload}>Reload</button>
-      <ul>
-        {items.map((it) => (
-          <li key={it.id}>{it.title}</li>
-        ))}
-      </ul>
-    </div>
-  );
-  return { default: TopPage };
-});
+jest.mock("../../components/TopPage", () => ({
+  __esModule: true,
+  default: function MockTopPage(props: {
+    items: ReadonlyArray<WorldHeritageVm>;
+    onReload: () => void;
+    onClickItem: (id: number) => void;
+    onSearch: () => void;
+  }) {
+    return (
+      <div>
+        <button type="button" onClick={props.onReload}>
+          Reload
+        </button>
+        <button type="button" onClick={props.onSearch}>
+          Search
+        </button>
+        <ul>
+          {props.items.map((it) => (
+            <li key={it.id} onClick={() => props.onClickItem(it.id)}>
+              {it.title}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  },
+}));
 
 import { fetchTopFirstPage } from "../../apis";
 import TopPageContainer from "../top-page-container.tsx";
 
-const fetchTopFirstPageMock: MockedFunction<
-  (opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>
-> = fetchTopFirstPage as unknown as MockedFunction<
-  (opts?: { signal?: AbortSignal }) => Promise<WorldHeritageDto[]>
->;
+const fetchTopFirstPageMock = fetchTopFirstPage as jest.MockedFunction<typeof fetchTopFirstPage>;
+
 const HIMEJI: WorldHeritageDto = {
   id: 661,
   official_name: "Himeji-jo",
@@ -108,6 +133,7 @@ const HIMEJI: WorldHeritageDto = {
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   thumbnail: "http://localhost/storage/world_heritage/661/img1.jpg",
+  primary_state_party_code: "JPN",
 };
 
 const YAKUSHIMA: WorldHeritageDto = {
@@ -131,6 +157,7 @@ const YAKUSHIMA: WorldHeritageDto = {
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   thumbnail: "http://localhost/storage/world_heritage/662/img1.jpg",
+  primary_state_party_code: "JPN",
 };
 
 const SHIRAKAMI: WorldHeritageDto = {
@@ -154,17 +181,23 @@ const SHIRAKAMI: WorldHeritageDto = {
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   thumbnail: "http://localhost/storage/world_heritage/663/img1.jpg",
+  primary_state_party_code: "JPN",
 };
 
 describe("TopPageContainer", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
+    navigateMock.mockClear();
   });
 
   it("loads and shows items", async () => {
     fetchTopFirstPageMock.mockResolvedValueOnce([HIMEJI, YAKUSHIMA]);
 
-    render(<TopPageContainer />);
+    render(
+      <MemoryRouter>
+        <TopPageContainer />
+      </MemoryRouter>,
+    );
 
     screen.getByText(/Loading/i);
 
@@ -179,7 +212,11 @@ describe("TopPageContainer", () => {
       .mockRejectedValueOnce(new Error("boom"))
       .mockResolvedValueOnce([SHIRAKAMI]);
 
-    render(<TopPageContainer />);
+    render(
+      <MemoryRouter>
+        <TopPageContainer />
+      </MemoryRouter>,
+    );
 
     await waitFor(() => {
       screen.getByText(/Failed to load/i);
@@ -190,5 +227,23 @@ describe("TopPageContainer", () => {
     await waitFor(() => {
       screen.getByText("Shirakami-Sanchi");
     });
+  });
+
+  it("navigates when an item is clicked", async () => {
+    fetchTopFirstPageMock.mockResolvedValueOnce([HIMEJI]);
+
+    render(
+      <MemoryRouter>
+        <TopPageContainer />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      screen.getByText("Himeji-jo");
+    });
+
+    fireEvent.click(screen.getByText("Himeji-jo"));
+
+    expect(navigateMock).toHaveBeenCalledWith("/heritages/661");
   });
 });

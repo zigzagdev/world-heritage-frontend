@@ -45,3 +45,36 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
     per_page,
   };
 }
+
+export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
+  const sp = new URLSearchParams();
+
+  const setStr = (k: string, v: string | null, def: string | null) => {
+    if (v == null) return;
+    const s = v.trim();
+    if (!s) return;
+    if (def != null && s === def) return;
+    sp.set(k, s);
+  };
+
+  const setNum = (k: string, v: number | null, def: number | null) => {
+    if (v == null) return;
+    if (!Number.isFinite(v)) return;
+    const i = Math.floor(v);
+    if (def != null && i === def) return;
+    sp.set(k, String(i));
+  };
+
+  setStr("search_query", p.search_query, D.search_query);
+  setStr("country", p.country, D.country);
+  setStr("region", p.region, D.region);
+  setStr("category", p.category, D.category);
+
+  setNum("year_inscribed_from", p.year_inscribed_from, D.year_inscribed_from);
+  setNum("year_inscribed_to", p.year_inscribed_to, D.year_inscribed_to);
+  setNum("current_page", p.current_page, D.current_page);
+  setNum("per_page", p.per_page, D.per_page);
+
+  const qs = sp.toString();
+  return qs ? `?${qs}` : "";
+}
