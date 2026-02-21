@@ -15,8 +15,6 @@ export function WorldHeritageDetailContainer() {
   const { id } = useParams();
   const { item, isLoading, isError, error, reload } = useWorldHeritageDetail(id);
 
-  if (!id) return <p>World Heritage id is required.</p>;
-
   if (isLoading) return <p>Loading…</p>;
 
   if (isError || !item) {

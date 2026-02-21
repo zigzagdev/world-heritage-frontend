@@ -1,6 +1,6 @@
 import * as React from "react";
-import { toWorldHeritageListVm } from "../mappers/to-world-heritage-vm.ts";
-import type { WorldHeritageVm } from "../types.ts";
+import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm.ts";
+import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { fetchTopFirstPage } from "../apis";
 
 type State = {
@@ -28,6 +28,14 @@ function compareNullableNumber(a: number | null, b: number | null): number {
   return a - b;
 }
 
+const isAbortError = (err: unknown): boolean => {
+  if (err instanceof DOMException) return err.name === "AbortError";
+  if (typeof err === "object" && err !== null && "name" in err) {
+    return (err as { name?: unknown }).name === "AbortError";
+  }
+  return false;
+};
+
 export function useTopPage() {
   const [state, setState] = React.useState<State>({
     data: [],
@@ -37,32 +45,45 @@ export function useTopPage() {
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
   const [sort, setSort] = React.useState<SortOption>("default");
-
   const abortRef = React.useRef<AbortController | null>(null);
+  const mountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
+  }, []);
 
   const load = React.useCallback(() => {
     abortRef.current?.abort();
-    const ac = new AbortController();
-    abortRef.current = ac;
 
-    setState((s) => ({ ...s, loading: true, error: null }));
+    const abortController = new AbortController();
+    abortRef.current = abortController;
 
-    fetchTopFirstPage({ signal: ac.signal })
-      .then(toWorldHeritageListVm)
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+
+    fetchTopFirstPage({ signal: abortController.signal })
+      .then((dtoList) => {
+        return toWorldHeritageListVm(dtoList);
+      })
       .then((vmList) => {
+        if (!mountedRef.current) return;
+        if (abortController.signal.aborted) return;
+
         setState({ data: vmList, loading: false, error: null });
       })
       .catch((err: unknown) => {
-        if ((err as { name?: string }).name === "AbortError") return;
+        if (isAbortError(err)) return;
+        if (!mountedRef.current) return;
+
         setState({ data: [], loading: false, error: err });
       });
   }, []);
 
   React.useEffect(() => {
     load();
-    return () => {
-      abortRef.current?.abort();
-    };
   }, [load]);
 
   const reload = React.useCallback(() => {
@@ -85,21 +106,17 @@ export function useTopPage() {
 
   const categoryOptions = React.useMemo(() => {
     const set = new Set<string>();
-    for (const it of state.data) {
-      if (it.category) set.add(it.category);
-    }
+    for (const it of state.data) set.add(it.category);
     return Array.from(set).sort();
   }, [state.data]);
 
   const regionOptions = React.useMemo(() => {
     const set = new Set<string>();
-    for (const it of state.data) {
-      if (it.region) set.add(it.region);
-    }
+    for (const it of state.data) set.add(it.region);
     return Array.from(set).sort();
   }, [state.data]);
 
-  const filteredItems = React.useMemo(() => {
+  const items = React.useMemo(() => {
     const { category, region } = filters;
 
     const filtered =
@@ -111,7 +128,9 @@ export function useTopPage() {
             return true;
           });
 
-    return [...filtered].sort((a, b) => {
+    const sorted = [...filtered];
+
+    sorted.sort((a, b) => {
       if (sort === "default") return a.id - b.id;
 
       const byYear =
@@ -126,10 +145,12 @@ export function useTopPage() {
 
       return a.id - b.id;
     });
+
+    return sorted;
   }, [state.data, filters, sort]);
 
   return {
-    items: filteredItems,
+    items,
     rawItems: state.data,
     reload,
     isLoading: state.loading,
