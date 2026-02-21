@@ -1,4 +1,4 @@
-import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../types";
+import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria.ts";
 
 type Props = {

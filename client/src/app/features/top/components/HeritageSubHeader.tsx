@@ -7,7 +7,6 @@ export type SearchValues = {
 };
 
 type Props = {
-  title: string;
   value: SearchValues;
   onSubmit: (q: Partial<SearchValues>) => void;
   onChange?: (v: SearchValues) => void;
