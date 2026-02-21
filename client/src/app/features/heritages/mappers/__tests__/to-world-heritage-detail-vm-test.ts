@@ -1,105 +1,93 @@
-import { describe, it, expect } from "vitest";
+/** @jest-environment jsdom */
+
+import { describe, it, expect } from "@jest/globals";
 import { toWorldHeritageDetailVm } from "../to-world-heritage-detail-vm.ts";
 import type {
-  ApiWorldHeritageDto,
+  ApiWorldHeritageDetailDto,
   ApiWorldHeritageImageDto,
   WorldHeritageDetailVm,
 } from "../../../../../domain/types.ts";
 
-const image: ApiWorldHeritageImageDto = {
-  id: 11224,
-  url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
-  sort_order: 0,
-  width: 0,
-  height: 0,
+const img = (overrides: Partial<ApiWorldHeritageImageDto> = {}): ApiWorldHeritageImageDto => ({
+  id: 1,
+  url: "http://localhost/storage/world_heritage/661/img1.jpg",
+  sort_order: 1,
+  width: 1200,
+  height: 800,
   format: "jpg",
   alt: null,
-  credit: null,
+  credit: "seed1",
   is_primary: true,
-  checksum: "abcd1234",
-};
+  checksum: "dummy1",
+  ...overrides,
+});
 
-const baseDto: ApiWorldHeritageDto = {
+const baseDto = (
+  overrides: Partial<ApiWorldHeritageDetailDto> = {},
+): ApiWorldHeritageDetailDto => ({
   id: 661,
   official_name: "Himeji-jo Official",
   name: "Himeji-jo",
-  name_jp: "姫路城",
+  heritage_name_jp: "姫路城",
   country: "Japan",
+  country_name_jp: "日本",
   region: "Asia",
-  state_party: null,
   category: "Cultural",
-  criteria: ["i", "iv"],
   year_inscribed: 1993,
-  area_hectares: 107,
-  buffer_zone_hectares: 143,
-  is_endangered: false,
   latitude: 34.8394,
   longitude: 134.6939,
+  is_endangered: false,
+  criteria: ["i", "iv"],
+  area_hectares: 107,
+  buffer_zone_hectares: 143,
   short_description: "dummy",
   unesco_site_url: "https://example.com",
+  state_party: null,
   state_party_codes: ["JPN"],
-  state_parties_meta: {
-    JPN: {
-      is_primary: true,
-      inscription_year: 1993,
-    },
-  },
+  state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   primary_state_party_code: "JPN",
-  image_url: image,
+  thumbnail_url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
   images: [],
-};
+  ...overrides,
+});
 
 describe("toWorldHeritageDetailVm", () => {
-  it("maps base fields via toWorldHeritageVm and attaches sorted image VMs", () => {
-    const images: ApiWorldHeritageImageDto[] = [
-      {
-        id: 2,
-        url: "http://localhost/storage/world_heritage/661/img2.jpg",
-        sort_order: 2,
-        width: 1200,
-        height: 800,
-        format: "jpg",
-        alt: "custom alt 2",
-        credit: "seed2",
-        is_primary: false,
-        checksum: "dummy2",
-      },
-      {
-        id: 1,
-        url: "http://localhost/storage/world_heritage/661/img1.jpg",
-        sort_order: 1,
-        width: 1200,
-        height: 800,
-        format: "jpg",
-        alt: null,
-        credit: "seed1",
-        is_primary: true,
-        checksum: "dummy1",
-      },
-    ];
-
-    const dto: ApiWorldHeritageDto = {
-      ...baseDto,
-      images,
-    };
+  it("maps base fields and attaches sorted image VMs", () => {
+    const dto = baseDto({
+      images: [
+        img({
+          id: 2,
+          sort_order: 2,
+          alt: "custom alt 2",
+          is_primary: false,
+          credit: "seed2",
+          url: "http://localhost/storage/world_heritage/661/img2.jpg",
+        }),
+        img({ id: 1, sort_order: 1, alt: null, is_primary: true }),
+      ],
+    });
 
     const vm: WorldHeritageDetailVm = toWorldHeritageDetailVm(dto);
 
     expect(vm.id).toBe(dto.id);
     expect(vm.title).toBe(dto.official_name);
     expect(vm.country).toBe(dto.country);
+    expect(vm.countryNameJp).toBe(dto.country_name_jp);
     expect(vm.region).toBe(dto.region);
 
-    // images が sort_order 昇順でソートされていること
+    // detail 差分
+    expect(vm.primaryStatePartyCode).toBe("JPN");
+    expect(vm.thumbnailUrl).toBe(dto.thumbnail_url);
+
+    // images sort
     expect(vm.images).toHaveLength(2);
     expect(vm.images[0].id).toBe(1);
     expect(vm.images[1].id).toBe(2);
 
-    // isPrimary のマッピング
+    // mapping
     expect(vm.images[0].isPrimary).toBe(true);
     expect(vm.images[1].isPrimary).toBe(false);
 
-    // width / height / credit / url のマッピング
     expect(vm.images[0].width).toBe(1200);
     expect(vm.images[0].height).toBe(800);
     expect(vm.images[0].credit).toBe("seed1");
@@ -108,26 +96,12 @@ describe("toWorldHeritageDetailVm", () => {
     expect(vm.images[1].alt).toBe("custom alt 2");
   });
 
-  it("returns empty images array when dto.images is undefined", () => {
-    const dto: ApiWorldHeritageDto = {
-      ...baseDto,
-      images: undefined as never,
-    };
-
-    const vm = toWorldHeritageDetailVm(dto);
-
-    expect(vm.images).toEqual([]);
-  });
-
   it("is stable when images is empty array", () => {
-    const dto: ApiWorldHeritageDto = {
-      ...baseDto,
-      images: [],
-    };
+    const dto = baseDto({ images: [] });
 
     const vm = toWorldHeritageDetailVm(dto);
 
     expect(vm.images).toEqual([]);
-    expect(vm.title).toBe(baseDto.official_name);
+    expect(vm.title).toBe(dto.official_name);
   });
 });

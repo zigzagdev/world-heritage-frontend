@@ -1,17 +1,14 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { HeritageSearchParams } from "../mapper/search-heritage.types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
 } from "../mapper/search-heritages.params.ts";
-import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader.tsx";
-
-type SearchValues = {
-  region: string;
-  category: string;
-  keyword: string;
-};
+import {
+  HeritageSubHeader,
+  type SearchValues,
+} from "@features/top/components/HeritageSubHeader.tsx";
 
 export function SearchHeritageFormContainer() {
   const location = useLocation();
@@ -22,7 +19,7 @@ export function SearchHeritageFormContainer() {
     [location.search],
   );
 
-  const value: SearchValues = useMemo(
+  const valueFromUrl: SearchValues = useMemo(
     () => ({
       region: params.region ?? "",
       category: params.category ?? "",
@@ -31,22 +28,45 @@ export function SearchHeritageFormContainer() {
     [params.region, params.category, params.search_query],
   );
 
+  const [draft, setDraft] = useState<SearchValues>(valueFromUrl);
+
+  useEffect(() => {
+    setDraft(valueFromUrl);
+  }, [valueFromUrl]);
+
+  const onChange = useCallback((next: SearchValues) => {
+    setDraft(next);
+  }, []);
+
   const onSubmit = useCallback(
-    (q: { region?: string; category?: string; keyword?: string }) => {
-      const next: HeritageSearchParams = {
+    (q: Partial<SearchValues>) => {
+      // submit時は draft をベースにマージ
+      const merged: SearchValues = {
+        region: q.region ?? draft.region,
+        category: q.category ?? draft.category,
+        keyword: q.keyword ?? draft.keyword,
+      };
+
+      const nextParams: HeritageSearchParams = {
         ...params,
-        region: q.region ?? null,
-        category: q.category ?? null,
-        search_query: q.keyword?.trim() ? q.keyword.trim() : null,
+        region: merged.region || null,
+        category: merged.category || null,
+        search_query: merged.keyword.trim() ? merged.keyword.trim() : null,
         current_page: 1,
       };
 
-      const search = serializeHeritageSearchParams(next);
-
+      const search = serializeHeritageSearchParams(nextParams);
       navigate({ pathname: location.pathname, search }, { replace: false });
     },
-    [navigate, location.pathname, params],
+    [navigate, location.pathname, params, draft],
   );
 
-  return <HeritageSubHeader title={"World Heritage"} value={value} onSubmit={onSubmit} />;
+  return (
+    <HeritageSubHeader
+      title="World Heritage"
+      value={draft}
+      onChange={onChange}
+      onSubmit={onSubmit}
+    />
+  );
 }

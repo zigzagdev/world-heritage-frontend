@@ -1,4 +1,4 @@
-import type { WorldHeritageDetailVm } from "../../types";
+import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { HeritageMetadataList } from "./HeritageMetadataList";
 
 type Props = {
