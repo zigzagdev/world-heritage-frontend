@@ -1,11 +1,14 @@
 import type { ApiWorldHeritageDto } from "../../../domain/types.ts";
 
 export type HeritageSearchParams = {
-  keyword?: string;
-  region?: string;
-  category?: string;
-  page?: number;
-  perPage?: number;
+  search_query: string | null;
+  country: string | null;
+  region: string | null;
+  category: string | null;
+  year_inscribed_from: number | null;
+  year_inscribed_to: number | null;
+  current_page: number;
+  per_page: number;
 };
 
 export type HeritageSearchRequest = HeritageSearchParams;
@@ -17,7 +20,20 @@ export type Pagination = {
   last_page: number;
 };
 
-export type HeritageSearchResponse = {
+export type HeritageSearchResponse =
+  | {
+      status: "success";
+      data: {
+        items: ApiWorldHeritageDto[];
+        pagination: Pagination;
+      };
+    }
+  | {
+      status: "error";
+      data: unknown;
+    };
+
+export type SearchHeritagesApiResponse = {
   status: "success" | "error";
   data: {
     data: ApiWorldHeritageDto[];
