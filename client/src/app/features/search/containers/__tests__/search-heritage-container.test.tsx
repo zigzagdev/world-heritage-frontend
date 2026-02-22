@@ -55,7 +55,7 @@ const useLocationMock = ReactRouterDOM.useLocation as unknown as jest.MockedFunc
   typeof ReactRouterDOM.useLocation
 >;
 
-const loc = (search: string): Location =>
+const location = (search: string): Location =>
   ({
     pathname: "/search",
     search,
@@ -70,7 +70,7 @@ describe("SearchHeritageFormContainer", () => {
     lastSubHeaderProps = null;
 
     useNavigateMock.mockReturnValue(navigateMock);
-    useLocationMock.mockReturnValue(loc("?region=AFR&search_query=Kyoto"));
+    useLocationMock.mockReturnValue(location("?region=AFR&search_query=Kyoto"));
   });
 
   test("passes location.search to parse and passes value to SubHeader", async () => {
@@ -141,8 +141,8 @@ describe("SearchHeritageFormContainer", () => {
 
   test("re-parses when location.search changes (draft DOES NOT sync in current implementation)", async () => {
     useLocationMock
-      .mockReturnValueOnce(loc("?region=AFR&search_query=Kyoto"))
-      .mockReturnValueOnce(loc("?region=EUR&category=Cultural&search_query=Paris"));
+      .mockReturnValueOnce(location("?region=AFR&search_query=Kyoto"))
+      .mockReturnValueOnce(location("?region=EUR&category=Cultural&search_query=Paris"));
 
     parseMock
       .mockReturnValueOnce({
@@ -184,7 +184,7 @@ describe("SearchHeritageFormContainer", () => {
       "?region=EUR&category=Cultural&search_query=Paris",
     );
 
-    // ✅ current behaviour: value is not updated after location change
+    // current behaviour: value is not updated after location change
     await waitFor(() => {
       expect(lastSubHeaderProps).not.toBeNull();
       expect(lastSubHeaderProps!.value).toEqual({
