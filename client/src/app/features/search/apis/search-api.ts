@@ -41,31 +41,31 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
   });
 
   const buildQuery = (params: SearchParams) => {
-    const qs = new URLSearchParams();
+    const queryParams = new URLSearchParams();
 
-    if (params.keyword) qs.set("search_query", params.keyword);
-    if (params.region) qs.set("region", params.region);
-    if (params.category) qs.set("category", params.category);
-    if (params.page != null) qs.set("page", String(params.page));
-    if (params.perPage != null) qs.set("per_page", String(params.perPage));
+    if (params.keyword) queryParams.set("search_query", params.keyword);
+    if (params.region) queryParams.set("region", params.region);
+    if (params.category) queryParams.set("category", params.category);
+    if (params.page != null) queryParams.set("page", String(params.page));
+    if (params.perPage != null) queryParams.set("per_page", String(params.perPage));
 
-    return qs.toString();
+    return queryParams.toString();
   };
-
   return {
     async searchHeritages(params: SearchParams, init?: RequestInit): Promise<SearchResponse> {
-      const q = buildQuery(params);
-      const url = q ? `${ENDPOINT}?${q}` : ENDPOINT;
+      const query = buildQuery(params);
+      const url = query ? `${ENDPOINT}?${query}` : ENDPOINT;
 
-      const res = await fetchImpl(url, withCommonInit(init));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const response = await fetchImpl(url, withCommonInit(init));
 
-      const json = (await res.json()) as SearchResponse;
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
+      const json = (await response.json()) as SearchResponse;
+      console.log(json);
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }
-
+      console.log(json);
       return json;
     },
   };
