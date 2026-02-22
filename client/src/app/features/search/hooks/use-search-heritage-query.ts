@@ -1,45 +1,47 @@
-import { useEffect, useState } from "react";
-import type { HeritageSearchParams } from "../types";
+import { useEffect, useMemo, useState } from "react";
+import type { HeritageSearchParams } from "../mapper/search-heritage.types";
 import { fetchSearchHeritagesResult } from "../apis";
-import type { SearchResponse } from "../apis/search-api";
+import type { SearchParams, SearchResponse } from "../apis/search-api";
+
+const isAbortError = (e: unknown): boolean => {
+  return e instanceof DOMException && e.name === "AbortError";
+};
+
+const toSearchParams = (params: HeritageSearchParams): SearchParams => ({
+  keyword: params.search_query ?? undefined,
+  region: params.region ?? undefined,
+  category: params.category ?? undefined,
+  page: params.current_page,
+  perPage: params.per_page,
+});
 
 export function useHeritageSearchQuery(params: HeritageSearchParams) {
   const [data, setData] = useState<SearchResponse | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
+  const request: SearchParams = useMemo(() => toSearchParams(params), [params]);
+
   useEffect(() => {
     const abortController = new AbortController();
-    const run = async () => {
-      setLoading(true);
-      setError(null);
 
-      try {
-        const json = await fetchSearchHeritagesResult(
-          {
-            keyword: params.keyword,
-            region: params.region,
-            category: params.category,
-            page: params.page,
-            perPage: params.perPage,
-          },
-          { signal: abortController.signal },
-        );
+    setLoading(true);
+    setError(null);
 
+    fetchSearchHeritagesResult(request, { signal: abortController.signal })
+      .then((json) => {
         setData(json);
-      } catch (e: unknown) {
-        // Throgh this DOMException, access to element property.
-        if (e instanceof DOMException && e.name === "AbortError") return;
-
+      })
+      .catch((e: unknown) => {
+        if (isAbortError(e)) return;
         setError(e);
-      } finally {
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
+      });
 
-    run();
     return () => abortController.abort();
-  }, [params.keyword, params.region, params.category, params.page, params.perPage]);
+  }, [request]);
 
   return { data, isLoading, error };
 }
