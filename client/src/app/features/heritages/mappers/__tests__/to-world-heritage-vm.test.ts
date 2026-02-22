@@ -48,23 +48,18 @@ describe("toWorldHeritageVm", () => {
       longitude: null,
       shortDescription: "desc",
       unescoSiteUrl: "https://whc.unesco.org/en/list/663",
-
-      // ✅ actual implementation keys
       primaryStatePartyCode: null,
       criteriaText: "ix, x",
-
       title: "Shirakami-Sanchi",
       subtitle: "Japan · Asia",
       areaText: "442 ha",
       bufferText: "320 ha",
       statePartyCodes: ["日本"],
       statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
-
       thumbnailUrl: base.thumbnail,
       images: [],
     });
 
-    // derived/sorted criteria should be stable
     expect(vm.criteria).toStrictEqual(["ix", "x"]);
   });
 

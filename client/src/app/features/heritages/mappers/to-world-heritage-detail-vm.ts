@@ -29,7 +29,7 @@ export function toWorldHeritageDetailVm(dto: ApiWorldHeritageDetailDto): WorldHe
     state_party: dto.state_party,
     state_party_codes: dto.state_party_codes,
     state_parties_meta: dto.state_parties_meta,
-    thumbnail: dto.thumbnail_url, // ✅ 差分
+    thumbnail: dto.thumbnail_url,
   } satisfies import("../../../../domain/types.ts").ApiWorldHeritageDto;
 
   const base: WorldHeritageVm = toWorldHeritageVm(listDto);

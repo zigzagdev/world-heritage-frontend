@@ -145,10 +145,8 @@ describe("toHeritageSearchResultVm", () => {
 
     mockedToWorldHeritageListVm.mockReturnValue(mappedItems);
 
-    // ✅ rangeText は pagination と mappedItems.length に依存する
     const response = makeSuccessResponse({
       data: {
-        // DTOは何件でもいい（length は mapper の戻り値を見るので）
         items: [dto1, dto2],
         pagination: { current_page: 2, per_page: 30, total: 2345, last_page: 79 },
       },
