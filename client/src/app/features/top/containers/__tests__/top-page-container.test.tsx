@@ -7,7 +7,9 @@ interface WorldHeritageDto {
   id: number;
   official_name?: string | null;
   name: string;
+  heritageNameJp: string;
   country: string;
+  countryNameJp: string;
   region: string;
   category: "Cultural" | "Natural" | "Mixed" | string;
   year_inscribed: number;

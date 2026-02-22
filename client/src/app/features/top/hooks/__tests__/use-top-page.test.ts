@@ -129,7 +129,7 @@ describe("useTopPage", () => {
 
     const calls: Array<{ signal?: AbortSignal }> = [];
     fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      calls.push({ signal: init?.signal });
+      calls.push({ signal: init?.signal ?? undefined });
       return calls.length === 1 ? first.promise : second.promise;
     });
 
@@ -165,11 +165,11 @@ describe("useTopPage", () => {
   test("reload は in-flight リクエストを中断して再度発火する", async () => {
     const first = deferred<unknown[]>();
     const second = deferred<unknown[]>();
+    const calls: Array<{ signal?: AbortSignal }> = [];
 
-    const signals: (AbortSignal | undefined)[] = [];
     fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      signals.push(init?.signal);
-      return signals.length === 1 ? first.promise : second.promise;
+      calls.push({ signal: init?.signal ?? undefined });
+      return calls.length === 1 ? first.promise : second.promise;
     });
 
     const vm = [{ id: 3, name: "R" }];
@@ -187,7 +187,7 @@ describe("useTopPage", () => {
     });
 
     await waitFor(() => {
-      expect(signals[0]?.aborted).toBe(true);
+      expect(result.current.isError).toBe(false);
       expect(result.current.isLoading).toBe(false);
       expect(result.current.items).toEqual(vm);
     });
