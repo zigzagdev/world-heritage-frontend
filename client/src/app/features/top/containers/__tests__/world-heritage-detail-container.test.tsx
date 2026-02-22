@@ -97,8 +97,9 @@ describe("WorldHeritageDetailContainer", () => {
       id: 1,
       officialName: "Official",
       name: "Ok",
-      nameJp: "名前",
+      heritageNameJp: "名前",
       country: "Japan",
+      countryNameJp: "日本",
       region: "Asia",
       stateParty: "Japan",
       category: "Cultural",
@@ -114,12 +115,13 @@ describe("WorldHeritageDetailContainer", () => {
       statePartyCodes: [],
       statePartiesMeta: {},
       primaryStatePartyCode: null,
-      thumbnail: null,
+      thumbnailUrl: null,
       title: "Kyoto",
       subtitle: "Japan · Asia",
       areaText: "—",
       bufferText: "—",
       criteriaText: "",
+      images: [],
     };
 
     useWorldHeritageDetailMock.mockReturnValue({

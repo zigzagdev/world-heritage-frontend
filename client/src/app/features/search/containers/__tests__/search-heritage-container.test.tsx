@@ -1,9 +1,8 @@
 /** @jest-environment jsdom */
 
-import React from "react";
 import { render, act, waitFor } from "@testing-library/react";
 import { describe, test, expect, beforeEach, jest } from "@jest/globals";
-import type { Location } from "react-router-dom";
+import type { Location, NavigateFunction } from "react-router-dom";
 import * as ReactRouterDOM from "react-router-dom";
 
 import { SearchHeritageFormContainer } from "../search-heritage-form-container";
@@ -13,7 +12,9 @@ import {
 } from "../../mapper/search-heritages.params";
 
 jest.mock("react-router-dom", () => {
+  const actual = jest.requireActual("react-router-dom") as typeof import("react-router-dom");
   return {
+    ...actual,
     useNavigate: jest.fn(),
     useLocation: jest.fn(),
   };
@@ -47,13 +48,14 @@ const serializeMock = serializeHeritageSearchParams as jest.MockedFunction<
   typeof serializeHeritageSearchParams
 >;
 
-const navigateMock = jest.fn();
 const useNavigateMock = ReactRouterDOM.useNavigate as unknown as jest.MockedFunction<
   typeof ReactRouterDOM.useNavigate
 >;
 const useLocationMock = ReactRouterDOM.useLocation as unknown as jest.MockedFunction<
   typeof ReactRouterDOM.useLocation
 >;
+
+const navigateMock = jest.fn() as unknown as jest.MockedFunction<NavigateFunction>;
 
 const location = (search: string): Location =>
   ({
@@ -184,7 +186,6 @@ describe("SearchHeritageFormContainer", () => {
       "?region=EUR&category=Cultural&search_query=Paris",
     );
 
-    // current behaviour: value is not updated after location change
     await waitFor(() => {
       expect(lastSubHeaderProps).not.toBeNull();
       expect(lastSubHeaderProps!.value).toEqual({

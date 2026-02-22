@@ -1,6 +1,6 @@
 import { describe, it, expect } from "@jest/globals";
 import { toWorldHeritageVm, toWorldHeritageListVm } from "../to-world-heritage-vm.ts";
-import type { ApiWorldHeritageDto, WorldHeritageVm } from "../../../../../domain/types.ts";
+import type { ApiWorldHeritageDto } from "../../../../../domain/types.ts";
 
 const base: ApiWorldHeritageDto = {
   id: 663,
@@ -30,7 +30,7 @@ describe("toWorldHeritageVm", () => {
   it("maps core fields + derived values correctly (DTO shape: thumbnail string)", () => {
     const vm = toWorldHeritageVm(base);
 
-    expect(vm).toMatchObject<Partial<WorldHeritageVm>>({
+    expect(vm).toMatchObject({
       id: 663,
       officialName: "Shirakami-Sanchi",
       name: "Shirakami-Sanchi",

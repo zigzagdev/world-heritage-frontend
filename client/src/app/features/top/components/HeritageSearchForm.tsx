@@ -51,7 +51,7 @@ export function HeritageSearchForm({
 
   const set = (patch: Partial<SearchValues>) => {
     const next: SearchValues = { ...v, ...patch };
-    console.log("form set()", { patch, v, next, hasValueProp: !!value });
+
     if (!value) setInternal(next);
     onChange?.(next);
   };

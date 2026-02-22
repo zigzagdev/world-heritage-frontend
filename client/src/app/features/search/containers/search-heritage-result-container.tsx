@@ -100,12 +100,7 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
   );
 
   const header = (
-    <HeritageSubHeader
-      title="World Heritage"
-      value={draft}
-      onChange={handleChange}
-      onSubmit={handleSubmit}
-    />
+    <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />
   );
 
   if (isLoading) {

@@ -61,12 +61,5 @@ export function SearchHeritageFormContainer() {
     [navigate, location.pathname, params, draft],
   );
 
-  return (
-    <HeritageSubHeader
-      title="World Heritage"
-      value={draft}
-      onChange={onChange}
-      onSubmit={onSubmit}
-    />
-  );
+  return <HeritageSubHeader value={draft} onChange={onChange} onSubmit={onSubmit} />;
 }

@@ -5,6 +5,7 @@ import { jest, expect, test, beforeEach, describe } from "@jest/globals";
 import { useHeritageSearchQuery } from "../use-search-heritage-query.ts";
 import { fetchSearchHeritagesResult } from "../../apis";
 import type { SearchResponse } from "../../apis/search-api";
+import type { HeritageSearchParams } from "../../types.ts";
 
 type MinimalAbortSignal = { aborted: boolean };
 
@@ -27,13 +28,13 @@ if (!("AbortController" in globalThis) || typeof globalThis.AbortController !== 
   (globalThis as { AbortController: AbortControllerCtor }).AbortController = FakeAbortController;
 }
 
-// hooksは「API 関数を呼び、状態を更新する」なので、ここはAPIをMockする形で対応
+// hooksは「API 関数を呼び、状態を更新する」ので、ここはAPIをMockする形で対応
 jest.mock("../../apis", () => ({
   fetchSearchHeritagesResult: jest.fn(),
 }));
 
 type FetchFn = (
-  params: { keyword?: string; region?: string; category?: string; page?: number; perPage?: number },
+  params: HeritageSearchParams,
   init?: { signal?: AbortSignal },
 ) => Promise<SearchResponse>;
 
@@ -45,7 +46,8 @@ type Deferred<T> = {
   resolve: (v: T) => void;
   reject: (e: unknown) => void;
 };
-const deferred = <T>(): Deferred<T> => {
+
+const createDeferred = <T>(): Deferred<T> => {
   let resolve!: (v: T) => void;
   let reject!: (e: unknown) => void;
   const promise = new Promise<T>((res, rej) => {
@@ -53,14 +55,6 @@ const deferred = <T>(): Deferred<T> => {
     reject = rej;
   });
   return { promise, resolve, reject };
-};
-
-type Params = {
-  keyword?: string;
-  region?: string;
-  category?: string;
-  page?: number;
-  perPage?: number;
 };
 
 const OK: SearchResponse = {
@@ -71,8 +65,9 @@ const OK: SearchResponse = {
         id: 1,
         official_name: "Himeji-jo",
         name: "Himeji-jo",
-        name_jp: "姫路城",
+        heritage_name_jp: "姫路城",
         country: "Japan",
+        country_name_jp: "日本",
         region: "Asia",
         state_party: "JPN",
         category: "Cultural",
@@ -87,14 +82,24 @@ const OK: SearchResponse = {
         unesco_site_url: "https://whc.unesco.org/en/list/661",
         state_party_codes: ["JPN"],
         state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-        primary_state_party_code: "JPN",
-        image_url: null,
-        images: [],
+        thumbnail: null,
       },
     ],
     pagination: { current_page: 1, per_page: 30, total: 1, last_page: 1 },
   },
 };
+
+const makeParams = (overrides: Partial<HeritageSearchParams> = {}): HeritageSearchParams => ({
+  search_query: null,
+  country: null,
+  region: null,
+  category: null,
+  year_inscribed_from: null,
+  year_inscribed_to: null,
+  current_page: 1,
+  per_page: 30,
+  ...overrides,
+});
 
 describe("useHeritageSearchQuery", () => {
   beforeEach(() => {
@@ -102,11 +107,11 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("初期マウント直後: isLoading=true, data=null, error=null", () => {
-    const d = deferred<SearchResponse>();
-    fetchSearchHeritagesResultMock.mockImplementation(() => d.promise);
+    const searchRequest = createDeferred<SearchResponse>();
+    fetchSearchHeritagesResultMock.mockImplementation(() => searchRequest.promise);
 
-    const params: Params = { keyword: "Japan", page: 1, perPage: 30 };
-    const { result } = renderHook(() => useHeritageSearchQuery(params));
+    const urlParams = makeParams({ search_query: "Japan", current_page: 1, per_page: 30 });
+    const { result } = renderHook(() => useHeritageSearchQuery(urlParams));
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.data).toBe(null);
@@ -114,20 +119,21 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("成功パス: fetch -> state 反映", async () => {
-    const d = deferred<SearchResponse>();
-    fetchSearchHeritagesResultMock.mockImplementation(() => d.promise);
+    const searchRequest = createDeferred<SearchResponse>();
+    fetchSearchHeritagesResultMock.mockImplementation(() => searchRequest.promise);
 
-    const params: Params = {
-      keyword: "Japan",
+    const urlParams = makeParams({
+      search_query: "Japan",
       region: "APA",
       category: "Cultural",
-      page: 1,
-      perPage: 30,
-    };
-    const { result } = renderHook(() => useHeritageSearchQuery(params));
+      current_page: 1,
+      per_page: 30,
+    });
+
+    const { result } = renderHook(() => useHeritageSearchQuery(urlParams));
 
     await act(async () => {
-      d.resolve(OK);
+      searchRequest.resolve(OK);
       await Promise.resolve();
     });
 
@@ -140,27 +146,21 @@ describe("useHeritageSearchQuery", () => {
     expect(fetchSearchHeritagesResultMock).toHaveBeenCalledTimes(1);
 
     const [calledParams, calledInit] = fetchSearchHeritagesResultMock.mock.calls[0];
-    expect(calledParams).toEqual({
-      keyword: "Japan",
-      region: "APA",
-      category: "Cultural",
-      page: 1,
-      perPage: 30,
-    });
+    expect(calledParams).toEqual(urlParams);
     expect(calledInit?.signal).toBeDefined();
   });
 
   test("通常エラー: error が保持される / isLoading=false", async () => {
-    const d = deferred<SearchResponse>();
-    fetchSearchHeritagesResultMock.mockImplementation(() => d.promise);
+    const searchRequest = createDeferred<SearchResponse>();
+    fetchSearchHeritagesResultMock.mockImplementation(() => searchRequest.promise);
 
-    const params: Params = { keyword: "Japan", page: 1, perPage: 30 };
-    const { result } = renderHook(() => useHeritageSearchQuery(params));
+    const urlParams = makeParams({ search_query: "Japan", current_page: 1, per_page: 30 });
+    const { result } = renderHook(() => useHeritageSearchQuery(urlParams));
 
     const boom = new Error("boom");
 
     await act(async () => {
-      d.reject(boom);
+      searchRequest.reject(boom);
       await Promise.resolve();
     });
 
@@ -172,8 +172,8 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("AbortError は無視される（error にしない）", async () => {
-    const first = deferred<SearchResponse>();
-    const second = deferred<SearchResponse>();
+    const first = createDeferred<SearchResponse>();
+    const second = createDeferred<SearchResponse>();
 
     const calls: Array<{ signal?: AbortSignal }> = [];
 
@@ -182,12 +182,16 @@ describe("useHeritageSearchQuery", () => {
       return calls.length === 1 ? first.promise : second.promise;
     });
 
-    const initialParams: Params = { keyword: "Japan", page: 1, perPage: 30 };
-    const { result, rerender } = renderHook((p: Params) => useHeritageSearchQuery(p), {
-      initialProps: initialParams,
-    });
+    const initialUrlParams = makeParams({ search_query: "Japan", current_page: 1, per_page: 30 });
 
-    rerender({ keyword: "Japan", page: 2, perPage: 30 });
+    const { result, rerender } = renderHook(
+      (p: HeritageSearchParams) => useHeritageSearchQuery(p),
+      {
+        initialProps: initialUrlParams,
+      },
+    );
+
+    rerender(makeParams({ search_query: "Japan", current_page: 2, per_page: 30 }));
 
     await act(async () => {
       first.reject(new DOMException("Aborted", "AbortError"));
@@ -210,8 +214,8 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("params 変更で in-flight を abort して再度発火する", async () => {
-    const first = deferred<SearchResponse>();
-    const second = deferred<SearchResponse>();
+    const first = createDeferred<SearchResponse>();
+    const second = createDeferred<SearchResponse>();
 
     const signals: (AbortSignal | undefined)[] = [];
 
@@ -220,11 +224,14 @@ describe("useHeritageSearchQuery", () => {
       return signals.length === 1 ? first.promise : second.promise;
     });
 
-    const { result, rerender } = renderHook((p: Params) => useHeritageSearchQuery(p), {
-      initialProps: { keyword: "Japan", page: 1, perPage: 30 },
-    });
+    const { result, rerender } = renderHook(
+      (p: HeritageSearchParams) => useHeritageSearchQuery(p),
+      {
+        initialProps: makeParams({ search_query: "Japan", current_page: 1, per_page: 30 }),
+      },
+    );
 
-    rerender({ keyword: "Japan", page: 2, perPage: 30 });
+    rerender(makeParams({ search_query: "Japan", current_page: 2, per_page: 30 }));
 
     await act(async () => {
       second.resolve(OK);
@@ -241,16 +248,16 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
-    const d = deferred<SearchResponse>();
+    const searchRequest = createDeferred<SearchResponse>();
 
     const captured: (AbortSignal | undefined)[] = [];
     fetchSearchHeritagesResultMock.mockImplementation((_params, init) => {
       captured.push(init?.signal);
-      return d.promise;
+      return searchRequest.promise;
     });
 
     const { unmount } = renderHook(() =>
-      useHeritageSearchQuery({ keyword: "Japan", page: 1, perPage: 30 }),
+      useHeritageSearchQuery(makeParams({ search_query: "Japan", current_page: 1, per_page: 30 })),
     );
 
     unmount();

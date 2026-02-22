@@ -54,12 +54,7 @@ export default function TopPageContainer(): React.ReactElement {
   if (isLoading) {
     return (
       <>
-        <HeritageSubHeader
-          title="World Heritage"
-          value={draft}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-        />
+        <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />
         <main className="p-6">
           <div>Loading…</div>
         </main>
@@ -70,12 +65,7 @@ export default function TopPageContainer(): React.ReactElement {
   if (isError) {
     return (
       <>
-        <HeritageSubHeader
-          title="World Heritage"
-          value={draft}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-        />
+        <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />
         <main className="p-6 space-y-3">
           <div className="text-red-700">Failed to load.</div>
           <button type="button" onClick={reload} className="underline">
@@ -88,14 +78,7 @@ export default function TopPageContainer(): React.ReactElement {
 
   return (
     <TopPage
-      header={
-        <HeritageSubHeader
-          title="World Heritage"
-          value={draft}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-        />
-      }
+      header={<HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />}
       items={items}
       onClickItem={handleClickItem}
       onReload={reload}

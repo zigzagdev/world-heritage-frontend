@@ -61,11 +61,10 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const json = (await response.json()) as SearchResponse;
-      console.log(json);
+
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }
-      console.log(json);
       return json;
     },
   };

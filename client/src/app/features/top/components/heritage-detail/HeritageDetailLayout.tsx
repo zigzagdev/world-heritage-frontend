@@ -24,8 +24,6 @@ export function HeritageDetailLayout({ item, locale }: Props) {
   const handleSubmit = (q: Partial<SearchValues>) => {
     const next = { ...search, ...q };
     setSearch(next);
-
-    console.log("search:", next);
   };
 
   return (

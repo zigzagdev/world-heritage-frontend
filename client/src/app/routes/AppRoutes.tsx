@@ -4,13 +4,6 @@ import { WorldHeritageDetailContainer } from "@features/top/containers/world-her
 import { SearchHeritageResultsContainer } from "@features/search/containers/search-heritage-result-container.tsx";
 
 export function AppRoutes() {
-  console.log(
-    "MOUNT <ComponentName>",
-    import.meta.url,
-    window.location.pathname,
-    window.location.search,
-  );
-
   return (
     <Routes>
       <Route path="/" element={<TopPageContainer />} />
