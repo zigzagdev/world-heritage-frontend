@@ -54,12 +54,16 @@ const deferred = <T>(): Deferred<T> => {
   return { promise, resolve, reject };
 };
 
-// fetchTopFirstPage は RequestInit を受ける想定（createTopApi と整合）
 type FetchFn = (init?: RequestInit) => Promise<unknown[]>;
 const fetchTopFirstPageMock = fetchTopFirstPage as unknown as jest.MockedFunction<FetchFn>;
 
 type MapFn = (dtoList: unknown[]) => unknown[];
 const toWorldHeritageListVmMock = toWorldHeritageListVm as unknown as jest.MockedFunction<MapFn>;
+
+const toAbortSignal = (init?: RequestInit): AbortSignal | undefined => {
+  const signal = init?.signal;
+  return signal === null || signal === undefined ? undefined : signal;
+};
 
 describe("useTopPage", () => {
   beforeEach(() => {
@@ -67,8 +71,8 @@ describe("useTopPage", () => {
   });
 
   test("初期マウント直後: isLoading=true, items=[], isError=false", () => {
-    const d = deferred<unknown[]>();
-    fetchTopFirstPageMock.mockImplementation(() => d.promise);
+    const searchRequest = deferred<unknown[]>();
+    fetchTopFirstPageMock.mockImplementation(() => searchRequest.promise);
 
     const { result } = renderHook(() => useTopPage());
 
@@ -80,15 +84,15 @@ describe("useTopPage", () => {
   test("成功パス: fetch -> map -> state 反映", async () => {
     const raw = [{ id: 1 }];
     const vm = [{ id: 1, name: "Site" }];
-    const d = deferred<unknown[]>();
+    const searchRequest = deferred<unknown[]>();
 
-    fetchTopFirstPageMock.mockImplementation(() => d.promise);
+    fetchTopFirstPageMock.mockImplementation(() => searchRequest.promise);
     toWorldHeritageListVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
     await act(async () => {
-      d.resolve(raw);
+      searchRequest.resolve(raw);
       await Promise.resolve();
     });
 
@@ -104,14 +108,14 @@ describe("useTopPage", () => {
   });
 
   test("通常エラー: isError=true, items=[], isLoading=false, error が保持される", async () => {
-    const d = deferred<unknown[]>();
-    fetchTopFirstPageMock.mockImplementation(() => d.promise);
+    const searchRequest = deferred<unknown[]>();
+    fetchTopFirstPageMock.mockImplementation(() => searchRequest.promise);
 
     const { result } = renderHook(() => useTopPage());
 
     const boom = new Error("boom");
     await act(async () => {
-      d.reject(boom);
+      searchRequest.reject(boom);
       await Promise.resolve();
     });
 
@@ -127,9 +131,9 @@ describe("useTopPage", () => {
     const first = deferred<unknown[]>();
     const second = deferred<unknown[]>();
 
-    const calls: Array<{ signal?: AbortSignal }> = [];
+    const calls: Array<{ signal: AbortSignal | undefined }> = [];
     fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      calls.push({ signal: init?.signal ?? undefined });
+      calls.push({ signal: toAbortSignal(init) });
       return calls.length === 1 ? first.promise : second.promise;
     });
 
@@ -165,10 +169,10 @@ describe("useTopPage", () => {
   test("reload は in-flight リクエストを中断して再度発火する", async () => {
     const first = deferred<unknown[]>();
     const second = deferred<unknown[]>();
-    const calls: Array<{ signal?: AbortSignal }> = [];
+    const calls: Array<{ signal: AbortSignal | undefined }> = [];
 
     fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      calls.push({ signal: init?.signal ?? undefined });
+      calls.push({ signal: toAbortSignal(init) });
       return calls.length === 1 ? first.promise : second.promise;
     });
 
@@ -194,12 +198,12 @@ describe("useTopPage", () => {
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
-    const d = deferred<unknown[]>();
-    const captured: (AbortSignal | undefined)[] = [];
+    const searchRequest = deferred<unknown[]>();
+    const captured: Array<AbortSignal | undefined> = [];
 
     fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      captured.push(init?.signal);
-      return d.promise;
+      captured.push(toAbortSignal(init));
+      return searchRequest.promise;
     });
 
     const { unmount } = renderHook(() => useTopPage());

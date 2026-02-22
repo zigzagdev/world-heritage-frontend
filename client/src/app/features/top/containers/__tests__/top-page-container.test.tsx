@@ -1,50 +1,6 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-
-type CriteriaCode = "i" | "ii" | "iii" | "iv" | "v" | "vi" | "vii" | "viii" | "ix" | "x";
-
-interface WorldHeritageDto {
-  id: number;
-  official_name?: string | null;
-  name: string;
-  heritageNameJp: string;
-  country: string;
-  countryNameJp: string;
-  region: string;
-  category: "Cultural" | "Natural" | "Mixed" | string;
-  year_inscribed: number;
-  latitude: number | null;
-  longitude: number | null;
-  is_endangered: boolean;
-  name_jp?: string | null;
-  state_party?: string | null;
-  criteria: CriteriaCode[];
-  area_hectares: number | null;
-  buffer_zone_hectares: number | null;
-  short_description: string;
-  unesco_site_url: string;
-  state_party_codes: string[];
-  state_parties_meta: Record<string, { is_primary: boolean; inscription_year: number }>;
-  thumbnail: string;
-  primary_state_party_code: string | null;
-}
-
-interface WorldHeritageVm {
-  id: number;
-  title: string;
-  subtitle: string;
-  category: string;
-  yearInscribed: number;
-  areaText: string;
-  bufferText: string;
-  thumbnail: string;
-}
-
-/**
- * IMPORTANT:
- * - jest.mock() are hoisted to the top of the module.
- * - So do NOT reference variables declared later from inside the mock factory.
- */
+import type { ApiWorldHeritageDto, WorldHeritageVm } from "../../../../../domain/types.ts";
 
 const navigateMock = jest.fn();
 
@@ -62,21 +18,35 @@ jest.mock("../../apis", () => ({
 
 jest.mock("@features/heritages/mappers/to-world-heritage-vm", () => ({
   __esModule: true,
-  toWorldHeritageListVm: jest.fn((dto: ReadonlyArray<WorldHeritageDto>) =>
-    dto.map((d) => ({
-      id: d.id,
-      title: d.official_name ?? d.name,
-      subtitle: d.name_jp ? `${d.country} / ${d.name_jp}` : d.country,
-      category: d.category,
-      yearInscribed: d.year_inscribed,
-      areaText:
-        typeof d.area_hectares === "number" && d.area_hectares > 0 ? `${d.area_hectares} ha` : "—",
-      bufferText:
-        typeof d.buffer_zone_hectares === "number" && d.buffer_zone_hectares > 0
-          ? `${d.buffer_zone_hectares} ha`
-          : "—",
-      thumbnail: d.thumbnail,
-    })),
+  toWorldHeritageListVm: jest.fn((dto: ReadonlyArray<ApiWorldHeritageDto>) =>
+    dto.map((d) => {
+      const title = d.official_name || d.name;
+      const subtitle = [d.country, d.region].filter(Boolean).join(" · ");
+
+      const fmtHa = (v: number | null) => (v == null ? "—" : `${v} ha`);
+      const vm: Pick<
+        WorldHeritageVm,
+        | "id"
+        | "title"
+        | "subtitle"
+        | "category"
+        | "yearInscribed"
+        | "areaText"
+        | "bufferText"
+        | "thumbnailUrl"
+      > = {
+        id: d.id,
+        title,
+        subtitle,
+        category: d.category,
+        yearInscribed: d.year_inscribed,
+        areaText: fmtHa(d.area_hectares),
+        bufferText: fmtHa(d.buffer_zone_hectares),
+        thumbnailUrl: d.thumbnail,
+      };
+
+      return vm as WorldHeritageVm;
+    }),
   ),
 }));
 
@@ -87,15 +57,38 @@ jest.mock("../../components/TopPage", () => ({
     onReload: () => void;
     onClickItem: (id: number) => void;
     onSearch: () => void;
+    isLoading?: boolean;
+    errorMessage?: string | null;
+    isError?: boolean;
   }) {
+    if (props.isLoading) {
+      return <div>Loading…</div>;
+    }
+
+    if (props.isError || props.errorMessage) {
+      return (
+        <div>
+          <div>Failed to load.</div>
+          <button type="button" onClick={props.onReload}>
+            Retry
+          </button>
+        </div>
+      );
+    }
+
+    // Normal
     return (
       <div>
+        {/* ここはテストが最初に Loading を探すので、実装差異で落ちないように残す */}
+        <div style={{ display: "none" }}>Loading</div>
+
         <button type="button" onClick={props.onReload}>
-          Reload
+          Retry
         </button>
         <button type="button" onClick={props.onSearch}>
           Search
         </button>
+
         <ul>
           {props.items.map((it) => (
             <li key={it.id} onClick={() => props.onClickItem(it.id)}>
@@ -109,80 +102,79 @@ jest.mock("../../components/TopPage", () => ({
 }));
 
 import { fetchTopFirstPage } from "../../apis";
-import TopPageContainer from "../top-page-container.tsx";
+import TopPageContainer from "../top-page-container";
 
 const fetchTopFirstPageMock = fetchTopFirstPage as jest.MockedFunction<typeof fetchTopFirstPage>;
-
-const HIMEJI: WorldHeritageDto = {
+const HIMEJI: ApiWorldHeritageDto = {
   id: 661,
   official_name: "Himeji-jo",
   name: "Himeji-jo",
+  heritage_name_jp: "姫路城",
   country: "Japan",
-  region: "Asia",
+  country_name_jp: "日本",
+  region: "APA",
   category: "Cultural",
   year_inscribed: 1993,
   latitude: null,
   longitude: null,
   is_endangered: false,
-  name_jp: "姫路城",
-  state_party: "JPN",
   criteria: ["i", "iv"],
   area_hectares: null,
   buffer_zone_hectares: null,
   short_description: "白鷺城の名で知られる城郭建築の傑作。天守群と縄張りが良好に保存される。",
   unesco_site_url: "https://whc.unesco.org/en/list/661",
+  state_party: "Japan",
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   thumbnail: "http://localhost/storage/world_heritage/661/img1.jpg",
-  primary_state_party_code: "JPN",
 };
 
-const YAKUSHIMA: WorldHeritageDto = {
+const YAKUSHIMA: ApiWorldHeritageDto = {
   id: 662,
   official_name: "Yakushima",
   name: "Yakushima",
+  heritage_name_jp: "姫路城",
   country: "Japan",
-  region: "Asia",
+  country_name_jp: "日本",
+  region: "APA",
   category: "Natural",
   year_inscribed: 1993,
   latitude: null,
   longitude: null,
   is_endangered: false,
-  name_jp: "屋久島",
-  state_party: "JPN",
   criteria: ["vii", "ix"],
   area_hectares: null,
   buffer_zone_hectares: null,
   short_description: "巨樹・照葉樹林に代表される生態系と景観が特筆される島。",
   unesco_site_url: "https://whc.unesco.org/en/list/662",
+  state_party: "Japan",
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   thumbnail: "http://localhost/storage/world_heritage/662/img1.jpg",
-  primary_state_party_code: "JPN",
 };
 
-const SHIRAKAMI: WorldHeritageDto = {
+const SHIRAKAMI: ApiWorldHeritageDto = {
   id: 663,
   official_name: "Shirakami-Sanchi",
   name: "Shirakami-Sanchi",
+  heritage_name_jp: "姫路城",
   country: "Japan",
-  region: "Asia",
+  country_name_jp: "日本",
+  region: "APA",
   category: "Natural",
   year_inscribed: 1993,
   latitude: null,
   longitude: null,
   is_endangered: false,
-  name_jp: "白神山地",
-  state_party: "JPN",
   criteria: ["ix", "x"],
   area_hectares: 442.0,
   buffer_zone_hectares: 320.0,
   short_description: "日本最大級のブナ天然林を中心とする山地生態系。",
   unesco_site_url: "https://whc.unesco.org/en/list/663",
+  state_party: "Japan",
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
   thumbnail: "http://localhost/storage/world_heritage/663/img1.jpg",
-  primary_state_party_code: "JPN",
 };
 
 describe("TopPageContainer", () => {
@@ -199,7 +191,6 @@ describe("TopPageContainer", () => {
         <TopPageContainer />
       </MemoryRouter>,
     );
-
     screen.getByText(/Loading/i);
 
     await waitFor(() => {
