@@ -1,5 +1,5 @@
 import type { ReactNode, MouseEvent } from "react";
-import type { WorldHeritageVm, CriteriaCode } from "../types";
+import type { WorldHeritageVm, CriteriaCode } from "../../../../domain/types.ts";
 import { BaseCard } from "@shared/uis/BaseCard.tsx";
 
 function MetaChip({ children }: { children: ReactNode }) {
@@ -53,21 +53,19 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
     goDetail();
   };
 
-  const title = item.nameJp || item.title || "World Heritage";
+  const title = item.heritageNameJp || "World Heritage";
   const subtitle = item.subtitle ?? "";
   const desc = (item.shortDescription ?? "").trim();
 
   const criteria = (item.criteria ?? []).slice(0, CRITERIA_MAX);
   const hasMoreCriteria = (item.criteria?.length ?? 0) > CRITERIA_MAX;
-
   return (
     <BaseCard onClick={handleCardClick}>
-      {/* Upper: Image Section */}
       <div className="relative overflow-hidden rounded-2xl">
-        {item.thumbnail ? (
+        {item.thumbnailUrl ? (
           <img
-            src={item.thumbnail.url}
-            alt={item.thumbnail.alt ?? title}
+            src={item.thumbnailUrl}
+            alt={item.thumbnailUrl ?? title}
             loading="lazy"
             className="h-56 w-full object-cover sm:h-64 lg:h-72"
           />
@@ -124,7 +122,7 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
         {desc ? (
           <p
             className="text-sm leading-6 text-zinc-700 dark:text-zinc-200 line-clamp-2"
-            style={{ WebkitLineClamp: DESC_CLAMP } as React.CSSProperties}
+            style={{ WebkitLineClamp: DESC_CLAMP }}
           >
             {desc}
           </p>

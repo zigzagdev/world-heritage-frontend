@@ -1,6 +1,10 @@
-import type { ApiWorldHeritageDto, WorldHeritageVm, CriteriaCode } from "../types";
-import { statePartyLabels } from "@features/constants/state-party-labels";
-import { CRITERIA } from "../types";
+import type {
+  ApiWorldHeritageDto,
+  WorldHeritageVm,
+  CriteriaCode,
+} from "../../../../domain/types.ts";
+import { statePartyLabels } from "@features/constants/state-party-labels.ts";
+import { CRITERIA } from "../../../../domain/types.ts";
 
 const ORDER: readonly CriteriaCode[] = CRITERIA;
 
@@ -24,9 +28,7 @@ const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
 const normalizeStatePartiesMeta = (
   meta: ApiWorldHeritageDto["state_parties_meta"],
 ): WorldHeritageVm["statePartiesMeta"] => {
-  if (Array.isArray(meta)) {
-    return {};
-  }
+  if (Array.isArray(meta)) return {};
 
   return Object.fromEntries(
     Object.entries(meta).map(([k, v]) => [
@@ -54,10 +56,12 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     id: data.id,
     officialName: data.official_name,
     name: data.name,
-    nameJp: data.name_jp,
+    heritageNameJp: data.heritage_name_jp,
     country: data.country,
+    countryNameJp: data.country_name_jp,
     region: data.region,
     stateParty,
+
     category: data.category,
     criteria: criteriaCodes,
     yearInscribed: data.year_inscribed,
@@ -70,23 +74,16 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     unescoSiteUrl: data.unesco_site_url,
     statePartyCodes: statePartyLabelsJp,
     statePartiesMeta: normalizeStatePartiesMeta(data.state_parties_meta),
-    primaryStatePartyCode: data.primary_state_party_code ?? null,
+    primaryStatePartyCode: null,
+
     title: titleOf(data),
     subtitle: subtitleOf(data),
     areaText: fmtHa(data.area_hectares),
     bufferText: fmtHa(data.buffer_zone_hectares),
     criteriaText: criteriaCodes.join(", "),
-    thumbnail: data.image_url
-      ? {
-          id: data.image_url.id,
-          url: data.image_url.url,
-          alt: data.image_url.alt ?? titleOf(data),
-          credit: data.image_url.credit,
-          width: data.image_url.width,
-          height: data.image_url.height,
-          isPrimary: data.image_url.is_primary,
-        }
-      : null,
+
+    thumbnailUrl: data.thumbnail,
+    images: [],
   };
 }
 

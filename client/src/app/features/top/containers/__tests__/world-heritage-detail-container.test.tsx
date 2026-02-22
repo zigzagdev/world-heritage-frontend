@@ -10,7 +10,7 @@ jest.mock("../../apis", () => ({
 
 import { WorldHeritageDetailContainer } from "../world-heritage-detail-container";
 import { useWorldHeritageDetail } from "../../hooks/use-world-heritage-detail";
-import type { WorldHeritageVm } from "../../types";
+import type { WorldHeritageVm } from "../../../../../domain/types.ts";
 
 jest.mock("../../hooks/use-world-heritage-detail");
 jest.mock("../../components/heritage-detail/HeritageDetailLayout.tsx", () => ({
@@ -52,7 +52,7 @@ describe("WorldHeritageDetailContainer", () => {
 
   test("id が無い場合 ...", () => {
     renderWithRoute("/heritages", "/heritages");
-    expect(useWorldHeritageDetailMock).not.toHaveBeenCalled();
+    expect(useWorldHeritageDetailMock).toHaveBeenCalled();
   });
 
   test("loading の場合 'Loading…' を表示する", () => {
@@ -97,8 +97,9 @@ describe("WorldHeritageDetailContainer", () => {
       id: 1,
       officialName: "Official",
       name: "Ok",
-      nameJp: "名前",
+      heritageNameJp: "名前",
       country: "Japan",
+      countryNameJp: "日本",
       region: "Asia",
       stateParty: "Japan",
       category: "Cultural",
@@ -114,12 +115,13 @@ describe("WorldHeritageDetailContainer", () => {
       statePartyCodes: [],
       statePartiesMeta: {},
       primaryStatePartyCode: null,
-      thumbnail: null,
+      thumbnailUrl: null,
       title: "Kyoto",
       subtitle: "Japan · Asia",
       areaText: "—",
       bufferText: "—",
       criteriaText: "",
+      images: [],
     };
 
     useWorldHeritageDetailMock.mockReturnValue({

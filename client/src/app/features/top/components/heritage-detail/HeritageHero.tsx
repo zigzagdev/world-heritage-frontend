@@ -1,7 +1,4 @@
-import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../types";
-import { HeroImage } from "./HeroImage";
-import "./heritage-detail.css";
-import { CriteriaTags } from "@shared/uis/CriteriaTags.tsx";
+import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria.ts";
 
 type Props = {
@@ -9,49 +6,62 @@ type Props = {
   locale: Locale;
 };
 
-export function HeritageHero({ item, locale }: Props) {
+export function HeritageHero({ item }: Props) {
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
   return (
-    <header className="heritage-detail__header">
-      <div className="heritage-detail__title-block">
-        <h1 className="heritage-detail__title">
+    <header className="mx-auto w-full max-w-6xl px-4 pt-10 pb-6">
+      <div>
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
           {item.title}
-          {item.nameJp && <span className="heritage-detail__subtitle-jp">（{item.nameJp}）</span>}
-        </h1>
-        <p className="heritage-detail__subtitle">{item.subtitle}</p>
-
-        <div className="heritage-detail__meta-chips">
-          <CriteriaTags criteria={item.criteria} locale={locale} />
-          {item.stateParty && <span className="chip chip--country">{item.stateParty}</span>}
-          {item.yearInscribed && (
-            <span className="chip chip--year">Inscribed: {item.yearInscribed}</span>
+          {item.heritageNameJp && (
+            <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
+              （{item.heritageNameJp}）
+            </span>
           )}
-          {item.isEndangered && <span className="chip chip--danger">Endangered</span>}
-        </div>
+        </h1>
+
+        {item.subtitle && <p className="mt-2 text-sm font-medium text-zinc-700">{item.subtitle}</p>}
       </div>
 
-      {primaryImage && (
-        <figure className="heritage-detail__hero">
-          <HeroImage src={primaryImage.url} alt={primaryImage.alt} />
-          {(primaryImage.credit || item.unescoSiteUrl) && (
-            <figcaption className="heritage-detail__hero-caption">
-              {primaryImage.credit && <span>© {primaryImage.credit}</span>}
-              {item.unescoSiteUrl && (
-                <a
-                  href={item.unescoSiteUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="heritage-detail__link"
-                >
-                  View on UNESCO
-                </a>
-              )}
-            </figcaption>
-          )}
-        </figure>
-      )}
+      <div className="mt-6">
+        {primaryImage ? (
+          <figure>
+            <div className="overflow-hidden flex items-center">
+              <img
+                src={primaryImage.url}
+                alt={primaryImage.alt ?? ""}
+                loading="lazy"
+                className="h-64 w-auto object-contain transform origin-bottom-right scale-[1.06] md:h-[600px]"
+              />
+            </div>
+
+            {(primaryImage.credit || item.unescoSiteUrl) && (
+              <figcaption className="mt-2 flex items-center justify-between gap-3 text-[11px] text-zinc-500">
+                <span className="truncate">
+                  {primaryImage.credit ? `© ${primaryImage.credit}` : ""}
+                </span>
+
+                {item.unescoSiteUrl && (
+                  <a
+                    href={item.unescoSiteUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 font-semibold text-indigo-700 hover:underline"
+                  >
+                    View on UNESCO
+                  </a>
+                )}
+              </figcaption>
+            )}
+          </figure>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+            No image available.
+          </div>
+        )}
+      </div>
     </header>
   );
 }

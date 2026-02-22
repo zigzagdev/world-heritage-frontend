@@ -1,6 +1,6 @@
 import * as React from "react";
-import { toWorldHeritageDetailVm } from "../mappers/to-world-heritage-detail-vm";
-import type { WorldHeritageDetailVm } from "../types";
+import { toWorldHeritageDetailVm } from "@features/heritages/mappers/to-world-heritage-detail-vm";
+import type { WorldHeritageDetailVm } from "../../../../domain/types.ts";
 import { fetchWorldHeritageDetail } from "../apis";
 
 type State = {
@@ -12,12 +12,11 @@ type State = {
 export function useWorldHeritageDetail(id: string | null | undefined) {
   const [state, setState] = React.useState<State>({
     data: null,
-    loading: false, // ← 初期は false が自然
+    loading: false,
     error: null,
   });
 
   const abortRef = React.useRef<AbortController | null>(null);
-
   const load = React.useCallback(() => {
     if (!id) {
       setState({ data: null, loading: false, error: null });
@@ -25,12 +24,12 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
     }
 
     abortRef.current?.abort();
-    const ac = new AbortController();
-    abortRef.current = ac;
+    const Aborting = new AbortController();
+    abortRef.current = Aborting;
 
     setState((s) => ({ ...s, loading: true, error: null }));
 
-    fetchWorldHeritageDetail(id, { signal: ac.signal })
+    fetchWorldHeritageDetail(id, { signal: Aborting.signal })
       .then(toWorldHeritageDetailVm)
       .then((vm) => setState({ data: vm, loading: false, error: null }))
       .catch((err: unknown) => {
@@ -40,9 +39,10 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
   }, [id]);
 
   React.useEffect(() => {
+    if (!id) return;
     load();
     return () => abortRef.current?.abort();
-  }, [load]);
+  }, [id, load]);
 
   return {
     item: state.data,

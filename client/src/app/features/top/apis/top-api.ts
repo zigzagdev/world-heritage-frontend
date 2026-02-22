@@ -1,4 +1,8 @@
-import type { Paginated, ApiWorldHeritageDto } from "../types";
+import type {
+  ApiWorldHeritageDto,
+  ApiWorldHeritageDetailDto,
+  ListResult,
+} from "../../../../domain/types.ts";
 
 export type TopApiDeps = {
   apiBase: string;
@@ -8,6 +12,11 @@ export type TopApiDeps = {
 type DetailResponse<T> = {
   status: string;
   data: T;
+};
+
+type ListResponse<T> = {
+  status: string;
+  data: ListResult<T>;
 };
 
 export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
@@ -27,30 +36,25 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
   return {
     async fetchTopFirstPage(init?: RequestInit): Promise<ApiWorldHeritageDto[]> {
       const res = await fetchImpl(ENDPOINT, withCommonInit(init));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as ListResponse<ApiWorldHeritageDto>;
+      if (json.status !== "success") {
+        throw new Error(`API status is not success: ${json.status}`);
       }
 
-      const json = (await res.json()) as Paginated<ApiWorldHeritageDto> | ApiWorldHeritageDto[];
-      if (Array.isArray(json)) {
-        return json;
-      }
-
-      return json.data;
+      return json.data.items;
     },
 
-    async fetchWorldHeritageDetail(id: string, init?: RequestInit): Promise<ApiWorldHeritageDto> {
+    async fetchWorldHeritageDetail(
+      id: string,
+      init?: RequestInit,
+    ): Promise<ApiWorldHeritageDetailDto> {
       const url = `${ENDPOINT}/${encodeURIComponent(id)}`;
-
       const res = await fetchImpl(url, withCommonInit(init));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-
-      const json = (await res.json()) as DetailResponse<ApiWorldHeritageDto>;
-
+      const json = (await res.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }

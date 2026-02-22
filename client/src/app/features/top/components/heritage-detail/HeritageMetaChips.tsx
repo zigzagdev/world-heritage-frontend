@@ -1,4 +1,4 @@
-import type { WorldHeritageVm } from "../../types.ts";
+import type { WorldHeritageVm } from "../../../../../domain/types.ts";
 
 type Props = {
   item: WorldHeritageVm;
