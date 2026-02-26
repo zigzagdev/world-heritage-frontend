@@ -34,27 +34,32 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
   });
 
   return {
-    async fetchTopFirstPage(init?: RequestInit): Promise<ApiWorldHeritageDto[]> {
-      const res = await fetchImpl(ENDPOINT, withCommonInit(init));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    async fetchTopFirstPage(params: {
+      currentPage: number;
+      perPage: number;
+      signal?: AbortSignal;
+    }): Promise<ListResult<ApiWorldHeritageDto>> {
+      const url = new URL(ENDPOINT);
+      url.searchParams.set("current_page", String(params.currentPage));
+      url.searchParams.set("per_page", String(params.perPage));
 
-      const json = (await res.json()) as ListResponse<ApiWorldHeritageDto>;
-      if (json.status !== "success") {
-        throw new Error(`API status is not success: ${json.status}`);
-      }
+      const response = await fetchImpl(url.toString(), withCommonInit({ signal: params.signal }));
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      return json.data.items;
+      const json = (await response.json()) as ListResponse<ApiWorldHeritageDto>;
+      if (json.status !== "success") throw new Error(`API status is not success: ${json.status}`);
+
+      return json.data;
     },
-
     async fetchWorldHeritageDetail(
       id: string,
       init?: RequestInit,
     ): Promise<ApiWorldHeritageDetailDto> {
       const url = `${ENDPOINT}/${encodeURIComponent(id)}`;
-      const res = await fetchImpl(url, withCommonInit(init));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const response = await fetchImpl(url, withCommonInit(init));
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      const json = (await res.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
+      const json = (await response.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }
