@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -39,8 +39,8 @@ export function HeritageSearchForm({
   onSubmit,
   expandKeywordOnFocus = true,
 }: Props) {
-  const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
-  const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
+  // const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
+  // const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
   const [internal, setInternal] = useState<SearchValues>({
     region: value?.region ?? "",
     category: value?.category ?? "",
@@ -79,43 +79,43 @@ export function HeritageSearchForm({
       "
     >
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-        <div
-          className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[180px]`}
-        >
-          <FieldLabel title="Region" subtitle="Area" />
-          <select
-            value={v.region}
-            onChange={(e) => set({ region: e.target.value })}
-            className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
-            aria-label="Region"
-          >
-            {regionOptions.map((opt, i) => (
-              <option key={`${opt || "all"}-${i}`} value={opt}>
-                {opt ? opt : "All"}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/*  <div*/}
+        {/*    className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[180px]`}*/}
+        {/*  >*/}
+        {/*    <FieldLabel title="Region" subtitle="Area" />*/}
+        {/*    <select*/}
+        {/*      value={v.region}*/}
+        {/*      onChange={(e) => set({ region: e.target.value })}*/}
+        {/*      className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"*/}
+        {/*      aria-label="Region"*/}
+        {/*    >*/}
+        {/*      {regionOptions.map((opt, i) => (*/}
+        {/*        <option key={`${opt || "all"}-${i}`} value={opt}>*/}
+        {/*          {opt ? opt : "All"}*/}
+        {/*        </option>*/}
+        {/*      ))}*/}
+        {/*    </select>*/}
+        {/*  </div>*/}
 
-        <Divider hidden={compactKeywordOnly} />
+        {/*  <Divider hidden={compactKeywordOnly} />*/}
 
-        <div
-          className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[220px]`}
-        >
-          <FieldLabel title="Category" subtitle="Type" />
-          <select
-            value={v.category}
-            onChange={(e) => set({ category: e.target.value })}
-            className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
-            aria-label="Category"
-          >
-            {categoryOptions.map((opt, i) => (
-              <option key={`${opt || "all"}-${i}`} value={opt}>
-                {opt ? opt : "All"}
-              </option>
-            ))}
-          </select>
-        </div>
+        {/*  <div*/}
+        {/*    className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[220px]`}*/}
+        {/*  >*/}
+        {/*    <FieldLabel title="Category" subtitle="Type" />*/}
+        {/*    <select*/}
+        {/*      value={v.category}*/}
+        {/*      onChange={(e) => set({ category: e.target.value })}*/}
+        {/*      className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"*/}
+        {/*      aria-label="Category"*/}
+        {/*    >*/}
+        {/*      {categoryOptions.map((opt, i) => (*/}
+        {/*        <option key={`${opt || "all"}-${i}`} value={opt}>*/}
+        {/*          {opt ? opt : "All"}*/}
+        {/*        </option>*/}
+        {/*      ))}*/}
+        {/*    </select>*/}
+        {/*  </div>*/}
 
         <Divider hidden={compactKeywordOnly} />
         <div

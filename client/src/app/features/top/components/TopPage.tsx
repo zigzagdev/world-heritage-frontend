@@ -1,6 +1,7 @@
 import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { HeritageCard } from "../cards/HeritageCard";
 import type { ReactNode } from "react";
+import { Pagination } from "@features/top/components/Pagination.tsx";
 
 export type SortOption = "default" | "year_desc" | "year_asc";
 
@@ -11,6 +12,10 @@ export type TopPageProps = {
   sortOption?: SortOption;
   onChangeSort?: (option: SortOption) => void;
   header?: ReactNode;
+  currentPage?: number;
+  lastPage?: number;
+  onChangePage?: (page: number) => void;
+  paginationDisabled?: boolean;
 };
 
 function SortSelect({
@@ -45,7 +50,17 @@ export default function TopPage({
   sortOption,
   onChangeSort,
   header,
+  currentPage,
+  lastPage,
+  onChangePage,
+  paginationDisabled,
 }: TopPageProps) {
+  const showPagination =
+    typeof currentPage === "number" &&
+    typeof lastPage === "number" &&
+    typeof onChangePage === "function" &&
+    lastPage > 1;
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 pb-4 pt-4 backdrop-blur">
@@ -77,7 +92,9 @@ export default function TopPage({
           </div>
         </div>
       </div>
+
       <div>{header}</div>
+
       <div className="pt-8">
         {items.length === 0 ? (
           <div className="py-20 text-center">
@@ -91,6 +108,17 @@ export default function TopPage({
               </li>
             ))}
           </ul>
+        )}
+
+        {showPagination && (
+          <div className="mt-10 flex justify-center">
+            <Pagination
+              currentPage={currentPage}
+              lastPage={lastPage}
+              onChange={onChangePage}
+              disabled={paginationDisabled}
+            />
+          </div>
         )}
       </div>
     </main>

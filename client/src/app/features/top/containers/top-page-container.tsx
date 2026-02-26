@@ -9,7 +9,7 @@ import { serializeHeritageSearchParams } from "@features/search/mapper/search-he
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "@features/search/mapper/search-heritage.types";
 
 export default function TopPageContainer(): React.ReactElement {
-  const { items, reload, isLoading, isError } = useTopPage();
+  const { items, pagination, setPage, reload, isLoading, isError } = useTopPage();
   const navigate = useNavigate();
 
   const handleClickItem = React.useCallback(
@@ -82,6 +82,10 @@ export default function TopPageContainer(): React.ReactElement {
       items={items}
       onClickItem={handleClickItem}
       onReload={reload}
+      currentPage={pagination.current_page}
+      lastPage={pagination.last_page}
+      onChangePage={setPage}
+      paginationDisabled={isLoading}
     />
   );
 }

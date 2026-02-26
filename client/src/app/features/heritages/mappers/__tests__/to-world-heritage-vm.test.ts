@@ -63,9 +63,9 @@ describe("toWorldHeritageVm", () => {
     expect(vm.criteria).toStrictEqual(["ix", "x"]);
   });
 
-  it("if official_name is empty, uses name as title (when heritage_name_jp is empty)", () => {
-    const vm = toWorldHeritageVm({ ...base, heritage_name_jp: "", official_name: "" });
-    expect(vm.title).toBe("Shirakami-Sanchi");
+  it("if official_name is empty, uses name as title", () => {
+    const vm = toWorldHeritageVm({ ...base, official_name: "" });
+    expect(vm.title).toBe("白神山地");
   });
 
   it("when area/buffer are null, text becomes —", () => {

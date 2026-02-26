@@ -34,20 +34,23 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
   });
 
   return {
-    async fetchTopFirstPage(params: {
+    async fetchTopPage(args: {
       currentPage: number;
       perPage: number;
       signal?: AbortSignal;
     }): Promise<ListResult<ApiWorldHeritageDto>> {
       const url = new URL(ENDPOINT);
-      url.searchParams.set("current_page", String(params.currentPage));
-      url.searchParams.set("per_page", String(params.perPage));
+      url.searchParams.set("current_page", String(args.currentPage));
+      url.searchParams.set("per_page", String(args.perPage));
 
-      const response = await fetchImpl(url.toString(), withCommonInit({ signal: params.signal }));
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await fetchImpl(url.toString(), withCommonInit({ signal: args.signal }));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const json = (await response.json()) as ListResponse<ApiWorldHeritageDto>;
+      const json = (await res.json()) as ListResponse<ApiWorldHeritageDto>;
       if (json.status !== "success") throw new Error(`API status is not success: ${json.status}`);
+
+      return json.data;
+    },
 
       return json.data;
     },

@@ -46,6 +46,14 @@ const makeDto = (overrides: Partial<ApiWorldHeritageDto> = {}): ApiWorldHeritage
   ...overrides,
 });
 
+const makePagination = (overrides: Partial<Pagination> = {}): Pagination => ({
+  current_page: 1,
+  per_page: 30,
+  total: 1,
+  last_page: 1,
+  ...overrides,
+});
+
 const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination) => ({
   status: "success",
   data: {
@@ -54,7 +62,7 @@ const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination) 
   } satisfies ListResult<ApiWorldHeritageDto>,
 });
 
-describe("fetchTopFirstPage (createTopApi)", () => {
+describe("fetchTopPage (createTopApi)", () => {
   let api: ReturnType<typeof createTopApi>;
 
   beforeEach(() => {
@@ -62,17 +70,15 @@ describe("fetchTopFirstPage (createTopApi)", () => {
     api = createTopApi({ apiBase: API_BASE, fetchImpl: fetchSpy });
   });
 
-  it("returns json.data when status is success", async () => {
+  it("returns json.data (items + pagination) when status is success", async () => {
     const items = [makeDto({ id: 1 })];
-    const pagination: Pagination = { current_page: 1, per_page: 30, total: 1, last_page: 1 };
+    const pagination = makePagination({ total: 1, last_page: 1 });
 
     fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    const out = await api.fetchTopFirstPage({ currentPage: 1, perPage: 30 });
+    const out = await api.fetchTopPage({ currentPage: 1, perPage: 30 });
 
-    // URL should include paging params now
-    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
-
+    const expectedUrl = `${EXPECTED_URL}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
       expectedUrl,
       expect.objectContaining({
@@ -81,25 +87,25 @@ describe("fetchTopFirstPage (createTopApi)", () => {
       }),
     );
 
-    // New API returns ListResult
     expect(out).toEqual({ items, pagination });
   });
 
-  it("passes AbortSignal to fetch", async () => {
-    const items = [makeDto({ id: 1 })];
-    const pagination: Pagination = { current_page: 1, per_page: 30, total: 1, last_page: 1 };
+  it("passes signal when provided", async () => {
+    const items: ApiWorldHeritageDto[] = [];
+    const pagination = makePagination({ total: 0, last_page: 1 });
 
     fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    const ac = new AbortController();
-    await api.fetchTopFirstPage({ currentPage: 1, perPage: 30, signal: ac.signal });
+    const abortController = new AbortController();
+    await api.fetchTopPage({ currentPage: 1, perPage: 30, signal: abortController.signal });
 
-    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
-
+    const expectedUrl = `${EXPECTED_URL}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
       expectedUrl,
       expect.objectContaining({
-        signal: ac.signal,
+        headers: expect.objectContaining({ Accept: "application/json" }),
+        credentials: "omit",
+        signal: abortController.signal,
       }),
     );
   });
@@ -107,21 +113,18 @@ describe("fetchTopFirstPage (createTopApi)", () => {
   it("throws on HTTP error", async () => {
     fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
-    await expect(api.fetchTopFirstPage({ currentPage: 1, perPage: 30 })).rejects.toThrow(
-      "HTTP 500",
-    );
+    await expect(
+      api.fetchTopPage({ currentPage: 1, perPage: 30, signal: new AbortController().signal }),
+    ).rejects.toThrow("HTTP 500");
   });
 
   it("throws when API status is not success", async () => {
     fetchSpy.mockResolvedValue(
-      makeOkResponse({
-        status: "error",
-        data: { items: [], pagination: null },
-      }) as Response,
+      makeOkResponse({ status: "error", data: { items: [], pagination: null } }) as Response,
     );
 
-    await expect(api.fetchTopFirstPage({ currentPage: 1, perPage: 30 })).rejects.toThrow(
-      "API status is not success: error",
-    );
+    await expect(
+      api.fetchTopPage({ currentPage: 1, perPage: 30, signal: new AbortController().signal }),
+    ).rejects.toThrow("API status is not success: error");
   });
 });
