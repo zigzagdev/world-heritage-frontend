@@ -50,8 +50,8 @@ describe("toWorldHeritageVm", () => {
       unescoSiteUrl: "https://whc.unesco.org/en/list/663",
       primaryStatePartyCode: null,
       criteriaText: "ix, x",
-      title: "Shirakami-Sanchi",
-      subtitle: "Japan · Asia",
+      title: "白神山地",
+      subtitle: "日本 · Asia",
       areaText: "442 ha",
       bufferText: "320 ha",
       statePartyCodes: ["日本"],
@@ -65,7 +65,7 @@ describe("toWorldHeritageVm", () => {
 
   it("if official_name is empty, uses name as title", () => {
     const vm = toWorldHeritageVm({ ...base, official_name: "" });
-    expect(vm.title).toBe("Shirakami-Sanchi");
+    expect(vm.title).toBe("白神山地");
   });
 
   it("when area/buffer are null, text becomes —", () => {
