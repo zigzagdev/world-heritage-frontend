@@ -41,7 +41,7 @@ export function Pagination({
   lastPage,
   onChange,
   disabled = false,
-  windowSize = 2,
+  windowSize = 1,
   simple = false,
 }: PaginationProps) {
   const last = Math.max(1, lastPage);
@@ -61,25 +61,41 @@ export function Pagination({
 
   const pageItems = simple ? [] : buildPageItems(current, last, windowSize);
 
+  const navBtn =
+    "inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-sm " +
+    "text-zinc-700 hover:bg-zinc-100 active:bg-zinc-200 " +
+    "disabled:cursor-not-allowed disabled:opacity-40 " +
+    "dark:text-zinc-200 dark:hover:bg-zinc-800 dark:active:bg-zinc-700";
+
+  const pageBtnBase =
+    "inline-flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm " +
+    "text-zinc-700 hover:bg-zinc-100 active:bg-zinc-200 " +
+    "dark:text-zinc-200 dark:hover:bg-zinc-800 dark:active:bg-zinc-700";
+
+  const pageBtnActive =
+    "bg-zinc-100 text-zinc-900 ring-1 ring-zinc-200 " +
+    "dark:bg-zinc-800 dark:text-zinc-100 dark:ring-zinc-700";
+
   return (
-    <nav className="flex flex-wrap items-center gap-2" aria-label="Pagination">
+    <nav className="flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
       <button
         type="button"
         disabled={disabled || current <= 1}
         onClick={() => go(current - 1)}
-        className="inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className={navBtn}
         aria-label="Previous page"
       >
-        Prev
+        <span aria-hidden="true">←</span>
+        <span>Previous</span>
       </button>
 
       {!simple && (
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="mx-1 flex flex-wrap items-center gap-1">
           {pageItems.map((it, idx) =>
             it === "…" ? (
               <span
                 key={`ellipsis-${idx}`}
-                className="px-2 text-sm text-zinc-500 dark:text-zinc-400"
+                className="px-2 text-sm text-zinc-400 dark:text-zinc-500"
                 aria-hidden="true"
               >
                 …
@@ -90,11 +106,7 @@ export function Pagination({
                 type="button"
                 disabled={disabled || it === current}
                 onClick={onClickNumber(it)}
-                className={`inline-flex h-9 min-w-9 items-center justify-center rounded-md border px-2 text-sm ${
-                  it === current
-                    ? "border-zinc-300 bg-zinc-100 font-bold text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
-                    : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                } disabled:cursor-not-allowed disabled:opacity-60`}
+                className={`${pageBtnBase} ${it === current ? pageBtnActive : ""} disabled:opacity-100`}
                 aria-current={it === current ? "page" : undefined}
                 aria-label={`Page ${it}`}
               >
@@ -109,14 +121,15 @@ export function Pagination({
         type="button"
         disabled={disabled || current >= last}
         onClick={() => go(current + 1)}
-        className="inline-flex items-center justify-center rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className={navBtn}
         aria-label="Next page"
       >
-        Next
+        <span>Next</span>
+        <span aria-hidden="true">→</span>
       </button>
 
-      <span className="ml-1 text-xs text-zinc-500 dark:text-zinc-400">
-        Page {current} / {last}
+      <span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
+        Page <span className="text-zinc-600 dark:text-zinc-300">{current}</span> / {last}
       </span>
     </nav>
   );
