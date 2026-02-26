@@ -53,12 +53,9 @@ const mkResult = <T>(items: T[], pagination?: Partial<Pagination>): ListResult<T
 });
 
 type FetchArgs = { currentPage: number; perPage: number; signal?: AbortSignal };
-
-// ✅ fetchTopPage は args を受けて ListResult を返す
 const fetchTopPageMock = fetchTopPage as unknown as jest.MockedFunction<
   (args: FetchArgs) => Promise<ListResult<unknown>>
 >;
-
 const toWorldHeritageListVmMock = toWorldHeritageListVm as unknown as jest.MockedFunction<
   (dtoList: unknown[]) => unknown[]
 >;
@@ -104,6 +101,7 @@ describe("useTopPage", () => {
 
     // currentPage=1, perPage=50 は hook の初期値
     const call = fetchTopPageMock.mock.calls[0]?.[0];
+    
     expect(call.currentPage).toBe(1);
     expect(call.perPage).toBe(50);
     expect(call.signal).toBeDefined();
@@ -133,7 +131,7 @@ describe("useTopPage", () => {
       await Promise.resolve();
     });
 
-    // 2本目を成功させる
+    // 2本目
     await act(async () => {
       second.resolve(mkResult([{ id: 2 }]));
       await Promise.resolve();
@@ -151,12 +149,12 @@ describe("useTopPage", () => {
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
-    const req = deferred<ListResult<unknown>>();
+    const request = deferred<ListResult<unknown>>();
     const captured: AbortSignal[] = [];
 
     fetchTopPageMock.mockImplementation((args: FetchArgs) => {
       if (args.signal) captured.push(args.signal);
-      return req.promise; // pending
+      return request.promise; // pending
     });
 
     const { unmount } = renderHook(() => useTopPage());

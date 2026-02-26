@@ -68,12 +68,12 @@ describe("searchHeritages (createSearchApi)", () => {
       keyword: "Japan",
       region: "APA",
       category: "Cultural",
-      page: 2,
+      currentPage: 2,
       perPage: 10,
     });
 
     const expectedUrl =
-      `${ENDPOINT}?` + `search_query=Japan&region=APA&category=Cultural&page=2&per_page=10`;
+      `${ENDPOINT}?` + `search_query=Japan&region=APA&category=Cultural&current_page=2&per_page=10`;
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expectedUrl,

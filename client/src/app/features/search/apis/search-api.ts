@@ -9,7 +9,7 @@ export type SearchParams = {
   keyword?: string;
   region?: string;
   category?: string;
-  page?: number;
+  currentPage?: number;
   perPage?: number;
 };
 
@@ -46,7 +46,7 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
     if (params.keyword) queryParams.set("search_query", params.keyword);
     if (params.region) queryParams.set("region", params.region);
     if (params.category) queryParams.set("category", params.category);
-    if (params.page != null) queryParams.set("page", String(params.page));
+    if (params.currentPage != null) queryParams.set("current_page", String(params.currentPage));
     if (params.perPage != null) queryParams.set("per_page", String(params.perPage));
 
     return queryParams.toString();

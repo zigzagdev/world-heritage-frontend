@@ -24,7 +24,6 @@ jest.mock("../../components/HeritageSubHeader", () => ({
   },
 }));
 
-// ✅ TopPage をモックして title を表示＆クリック可能にする（UI実装に依存しない）
 jest.mock("../../components/TopPage", () => ({
   __esModule: true,
   default: function MockTopPage(props: {
@@ -92,6 +91,16 @@ const mkHookState = (overrides: Partial<UseTopPageResult> = {}): UseTopPageResul
   return { ...base, ...overrides };
 };
 
+const makeOk = (items: ApiWorldHeritageDto[]) => ({
+  items,
+  pagination: {
+    current_page: 1,
+    per_page: 50,
+    total: items.length,
+    last_page: 1,
+  },
+});
+
 describe("TopPageContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -111,7 +120,7 @@ describe("TopPageContainer", () => {
         <TopPageContainer />
       </MemoryRouter>,
     );
-
+    
     expect(screen.getByText("Loading…")).toBeInTheDocument();
     expect(screen.getByTestId("subheader")).toBeInTheDocument();
   });
