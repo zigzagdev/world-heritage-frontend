@@ -16,12 +16,14 @@ jest.mock("../../apis", () => ({
   fetchTopFirstPage: jest.fn(),
 }));
 
+// ✅ mapper mockを「新仕様（JP優先）」に合わせる
 jest.mock("@features/heritages/mappers/to-world-heritage-vm", () => ({
   __esModule: true,
   toWorldHeritageListVm: jest.fn((dto: ReadonlyArray<ApiWorldHeritageDto>) =>
     dto.map((d) => {
-      const title = d.official_name || d.name;
-      const subtitle = [d.country, d.region].filter(Boolean).join(" · ");
+      const title = d.heritage_name_jp || d.official_name || d.name;
+      const countryLabel = d.country_name_jp || d.country || null;
+      const subtitle = [countryLabel, d.region].filter(Boolean).join(" · ");
 
       const fmtHa = (v: number | null) => (v == null ? "—" : `${v} ha`);
       const vm: Pick<
@@ -50,6 +52,7 @@ jest.mock("@features/heritages/mappers/to-world-heritage-vm", () => ({
   ),
 }));
 
+// ✅ TopPage mockのprops型を「新pagination props込み」に合わせる
 jest.mock("../../components/TopPage", () => ({
   __esModule: true,
   default: function MockTopPage(props: {
@@ -60,10 +63,13 @@ jest.mock("../../components/TopPage", () => ({
     isLoading?: boolean;
     errorMessage?: string | null;
     isError?: boolean;
+
+    currentPage?: number;
+    lastPage?: number;
+    onChangePage?: (page: number) => void;
+    paginationDisabled?: boolean;
   }) {
-    if (props.isLoading) {
-      return <div>Loading…</div>;
-    }
+    if (props.isLoading) return <div>Loading…</div>;
 
     if (props.isError || props.errorMessage) {
       return (
@@ -76,10 +82,9 @@ jest.mock("../../components/TopPage", () => ({
       );
     }
 
-    // Normal
     return (
       <div>
-        {/* ここはテストが最初に Loading を探すので、実装差異で落ちないように残す */}
+        {/* 初期で Loading を探すテストがあるので残す */}
         <div style={{ display: "none" }}>Loading</div>
 
         <button type="button" onClick={props.onReload}>
@@ -105,6 +110,7 @@ import { fetchTopFirstPage } from "../../apis";
 import TopPageContainer from "../top-page-container";
 
 const fetchTopFirstPageMock = fetchTopFirstPage as jest.MockedFunction<typeof fetchTopFirstPage>;
+
 const HIMEJI: ApiWorldHeritageDto = {
   id: 661,
   official_name: "Himeji-jo",
@@ -133,7 +139,7 @@ const YAKUSHIMA: ApiWorldHeritageDto = {
   id: 662,
   official_name: "Yakushima",
   name: "Yakushima",
-  heritage_name_jp: "姫路城",
+  heritage_name_jp: "屋久島",
   country: "Japan",
   country_name_jp: "日本",
   region: "APA",
@@ -157,7 +163,7 @@ const SHIRAKAMI: ApiWorldHeritageDto = {
   id: 663,
   official_name: "Shirakami-Sanchi",
   name: "Shirakami-Sanchi",
-  heritage_name_jp: "姫路城",
+  heritage_name_jp: "白神山地",
   country: "Japan",
   country_name_jp: "日本",
   region: "APA",
@@ -177,6 +183,16 @@ const SHIRAKAMI: ApiWorldHeritageDto = {
   thumbnail: "http://localhost/storage/world_heritage/663/img1.jpg",
 };
 
+const makeOk = (items: ApiWorldHeritageDto[]) => ({
+  items,
+  pagination: {
+    current_page: 1,
+    per_page: 50,
+    total: items.length,
+    last_page: 1,
+  },
+});
+
 describe("TopPageContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -184,25 +200,28 @@ describe("TopPageContainer", () => {
   });
 
   it("loads and shows items", async () => {
-    fetchTopFirstPageMock.mockResolvedValueOnce([HIMEJI, YAKUSHIMA]);
+    // ✅ 実装の返却型に合わせる（配列じゃない）
+    fetchTopFirstPageMock.mockResolvedValueOnce(makeOk([HIMEJI, YAKUSHIMA]));
 
     render(
       <MemoryRouter>
         <TopPageContainer />
       </MemoryRouter>,
     );
+
     screen.getByText(/Loading/i);
 
     await waitFor(() => {
-      screen.getByText("Himeji-jo");
-      screen.getByText("Yakushima");
+      // ✅ JP優先タイトルに合わせる
+      screen.getByText("姫路城");
+      screen.getByText("屋久島");
     });
   });
 
   it("shows error then reload works", async () => {
     fetchTopFirstPageMock
       .mockRejectedValueOnce(new Error("boom"))
-      .mockResolvedValueOnce([SHIRAKAMI]);
+      .mockResolvedValueOnce(makeOk([SHIRAKAMI]));
 
     render(
       <MemoryRouter>
@@ -217,12 +236,12 @@ describe("TopPageContainer", () => {
     fireEvent.click(screen.getByText(/Retry/i));
 
     await waitFor(() => {
-      screen.getByText("Shirakami-Sanchi");
+      screen.getByText("白神山地");
     });
   });
 
   it("navigates when an item is clicked", async () => {
-    fetchTopFirstPageMock.mockResolvedValueOnce([HIMEJI]);
+    fetchTopFirstPageMock.mockResolvedValueOnce(makeOk([HIMEJI]));
 
     render(
       <MemoryRouter>
@@ -231,10 +250,10 @@ describe("TopPageContainer", () => {
     );
 
     await waitFor(() => {
-      screen.getByText("Himeji-jo");
+      screen.getByText("姫路城");
     });
 
-    fireEvent.click(screen.getByText("Himeji-jo"));
+    fireEvent.click(screen.getByText("姫路城"));
 
     expect(navigateMock).toHaveBeenCalledWith("/heritages/661");
   });
