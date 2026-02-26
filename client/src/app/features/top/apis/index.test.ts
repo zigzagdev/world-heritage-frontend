@@ -7,7 +7,7 @@ type MockResponse = Pick<Response, "ok" | "status" | "json">;
 let fetchSpy: jest.MockedFunction<typeof fetch>;
 
 const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
-const EXPECTED_URL = `${API_BASE.replace(/\/+$/, "")}/api/v1/heritages`;
+const ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/heritages`;
 
 const makeOkResponse = (body: unknown): MockResponse => ({
   ok: true,
@@ -46,7 +46,7 @@ const makeDto = (overrides: Partial<ApiWorldHeritageDto> = {}): ApiWorldHeritage
   ...overrides,
 });
 
-const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination | null = null) => ({
+const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination) => ({
   status: "success",
   data: {
     items,
@@ -62,42 +62,43 @@ describe("fetchTopFirstPage (createTopApi)", () => {
     api = createTopApi({ apiBase: API_BASE, fetchImpl: fetchSpy });
   });
 
-  it("returns json.data.items when status is success", async () => {
+  it("returns json.data when status is success", async () => {
     const items = [makeDto({ id: 1 })];
+    const pagination: Pagination = { current_page: 1, per_page: 30, total: 1, last_page: 1 };
 
-    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items)) as Response);
+    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    const out = await api.fetchTopFirstPage();
+    const out = await api.fetchTopFirstPage({ currentPage: 1, perPage: 30 });
+
+    // URL should include paging params now
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      EXPECTED_URL,
+      expectedUrl,
       expect.objectContaining({
         headers: expect.objectContaining({ Accept: "application/json" }),
         credentials: "omit",
       }),
     );
-    expect(out).toEqual(items);
+
+    // New API returns ListResult
+    expect(out).toEqual({ items, pagination });
   });
 
-  it("allows overriding headers/credentials/signal", async () => {
-    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse([])) as Response);
+  it("passes AbortSignal to fetch", async () => {
+    const items = [makeDto({ id: 1 })];
+    const pagination: Pagination = { current_page: 1, per_page: 30, total: 1, last_page: 1 };
+
+    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
     const ac = new AbortController();
+    await api.fetchTopFirstPage({ currentPage: 1, perPage: 30, signal: ac.signal });
 
-    await api.fetchTopFirstPage({
-      headers: { "X-Trace": "t" },
-      credentials: "include",
-      signal: ac.signal,
-    });
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
 
     expect(fetchSpy).toHaveBeenCalledWith(
-      EXPECTED_URL,
+      expectedUrl,
       expect.objectContaining({
-        headers: expect.objectContaining({
-          Accept: "application/json",
-          "X-Trace": "t",
-        }),
-        credentials: "include",
         signal: ac.signal,
       }),
     );
@@ -106,7 +107,9 @@ describe("fetchTopFirstPage (createTopApi)", () => {
   it("throws on HTTP error", async () => {
     fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
-    await expect(api.fetchTopFirstPage()).rejects.toThrow("HTTP 500");
+    await expect(api.fetchTopFirstPage({ currentPage: 1, perPage: 30 })).rejects.toThrow(
+      "HTTP 500",
+    );
   });
 
   it("throws when API status is not success", async () => {
@@ -117,6 +120,8 @@ describe("fetchTopFirstPage (createTopApi)", () => {
       }) as Response,
     );
 
-    await expect(api.fetchTopFirstPage()).rejects.toThrow("API status is not success: error");
+    await expect(api.fetchTopFirstPage({ currentPage: 1, perPage: 30 })).rejects.toThrow(
+      "API status is not success: error",
+    );
   });
 });

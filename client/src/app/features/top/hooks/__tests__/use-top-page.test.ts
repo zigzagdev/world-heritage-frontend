@@ -54,16 +54,39 @@ const deferred = <T>(): Deferred<T> => {
   return { promise, resolve, reject };
 };
 
-type FetchFn = (init?: RequestInit) => Promise<unknown[]>;
+// ---- New API shape ----
+type PaginationDto = {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+};
+
+type ListResult<T> = {
+  items: T[];
+  pagination: PaginationDto;
+};
+
+// fetchTopFirstPage({ page, perPage, signal })
+type FetchParams = {
+  page: number;
+  perPage: number;
+  signal?: AbortSignal;
+};
+
+type FetchFn = (params: FetchParams) => Promise<ListResult<unknown>>;
 const fetchTopFirstPageMock = fetchTopFirstPage as unknown as jest.MockedFunction<FetchFn>;
 
 type MapFn = (dtoList: unknown[]) => unknown[];
 const toWorldHeritageListVmMock = toWorldHeritageListVm as unknown as jest.MockedFunction<MapFn>;
 
-const toAbortSignal = (init?: RequestInit): AbortSignal | undefined => {
-  const signal = init?.signal;
-  return signal === null || signal === undefined ? undefined : signal;
-};
+const defaultPagination = (overrides?: Partial<PaginationDto>): PaginationDto => ({
+  current_page: 1,
+  per_page: 50,
+  total: 0,
+  last_page: 1,
+  ...overrides,
+});
 
 describe("useTopPage", () => {
   beforeEach(() => {
@@ -71,8 +94,8 @@ describe("useTopPage", () => {
   });
 
   test("初期マウント直後: isLoading=true, items=[], isError=false", () => {
-    const searchRequest = deferred<unknown[]>();
-    fetchTopFirstPageMock.mockImplementation(() => searchRequest.promise);
+    const req = deferred<ListResult<unknown>>();
+    fetchTopFirstPageMock.mockImplementation(() => req.promise);
 
     const { result } = renderHook(() => useTopPage());
 
@@ -82,17 +105,17 @@ describe("useTopPage", () => {
   });
 
   test("成功パス: fetch -> map -> state 反映", async () => {
-    const raw = [{ id: 1 }];
+    const rawItems = [{ id: 1 }];
     const vm = [{ id: 1, name: "Site" }];
-    const searchRequest = deferred<unknown[]>();
+    const req = deferred<ListResult<unknown>>();
 
-    fetchTopFirstPageMock.mockImplementation(() => searchRequest.promise);
+    fetchTopFirstPageMock.mockImplementation(() => req.promise);
     toWorldHeritageListVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useTopPage());
 
     await act(async () => {
-      searchRequest.resolve(raw);
+      req.resolve({ items: rawItems, pagination: defaultPagination({ total: 1, last_page: 1 }) });
       await Promise.resolve();
     });
 
@@ -103,19 +126,27 @@ describe("useTopPage", () => {
     });
 
     expect(fetchTopFirstPageMock).toHaveBeenCalledTimes(1);
+    // New signature: params object
+    expect(fetchTopFirstPageMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        page: 1,
+        perPage: 50,
+      }),
+    );
+
     expect(toWorldHeritageListVmMock).toHaveBeenCalledTimes(1);
-    expect(toWorldHeritageListVmMock).toHaveBeenCalledWith(raw);
+    expect(toWorldHeritageListVmMock).toHaveBeenCalledWith(rawItems);
   });
 
   test("通常エラー: isError=true, items=[], isLoading=false, error が保持される", async () => {
-    const searchRequest = deferred<unknown[]>();
-    fetchTopFirstPageMock.mockImplementation(() => searchRequest.promise);
+    const req = deferred<ListResult<unknown>>();
+    fetchTopFirstPageMock.mockImplementation(() => req.promise);
 
     const { result } = renderHook(() => useTopPage());
 
     const boom = new Error("boom");
     await act(async () => {
-      searchRequest.reject(boom);
+      req.reject(boom);
       await Promise.resolve();
     });
 
@@ -128,12 +159,12 @@ describe("useTopPage", () => {
   });
 
   test("AbortError は無視される（エラー状態にしない）", async () => {
-    const first = deferred<unknown[]>();
-    const second = deferred<unknown[]>();
+    const first = deferred<ListResult<unknown>>();
+    const second = deferred<ListResult<unknown>>();
 
-    const calls: Array<{ signal: AbortSignal | undefined }> = [];
-    fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      calls.push({ signal: toAbortSignal(init) });
+    const calls: Array<{ signal?: AbortSignal }> = [];
+    fetchTopFirstPageMock.mockImplementation((params: FetchParams) => {
+      calls.push({ signal: params.signal });
       return calls.length === 1 ? first.promise : second.promise;
     });
 
@@ -152,7 +183,10 @@ describe("useTopPage", () => {
     });
 
     await act(async () => {
-      second.resolve([{ id: 2 }]);
+      second.resolve({
+        items: [{ id: 2 }],
+        pagination: defaultPagination({ total: 1, last_page: 1 }),
+      });
       await Promise.resolve();
     });
 
@@ -167,12 +201,12 @@ describe("useTopPage", () => {
   });
 
   test("reload は in-flight リクエストを中断して再度発火する", async () => {
-    const first = deferred<unknown[]>();
-    const second = deferred<unknown[]>();
-    const calls: Array<{ signal: AbortSignal | undefined }> = [];
+    const first = deferred<ListResult<unknown>>();
+    const second = deferred<ListResult<unknown>>();
+    const calls: Array<{ signal?: AbortSignal }> = [];
 
-    fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      calls.push({ signal: toAbortSignal(init) });
+    fetchTopFirstPageMock.mockImplementation((params: FetchParams) => {
+      calls.push({ signal: params.signal });
       return calls.length === 1 ? first.promise : second.promise;
     });
 
@@ -186,7 +220,10 @@ describe("useTopPage", () => {
     });
 
     await act(async () => {
-      second.resolve([{ id: 3 }]);
+      second.resolve({
+        items: [{ id: 3 }],
+        pagination: defaultPagination({ total: 1, last_page: 1 }),
+      });
       await Promise.resolve();
     });
 
@@ -195,15 +232,18 @@ describe("useTopPage", () => {
       expect(result.current.isLoading).toBe(false);
       expect(result.current.items).toEqual(vm);
     });
+
+    expect(calls.length).toBe(2);
+    expect(calls[0].signal?.aborted).toBe(true);
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
-    const searchRequest = deferred<unknown[]>();
+    const req = deferred<ListResult<unknown>>();
     const captured: Array<AbortSignal | undefined> = [];
 
-    fetchTopFirstPageMock.mockImplementation((init?: RequestInit) => {
-      captured.push(toAbortSignal(init));
-      return searchRequest.promise;
+    fetchTopFirstPageMock.mockImplementation((params: FetchParams) => {
+      captured.push(params.signal);
+      return req.promise;
     });
 
     const { unmount } = renderHook(() => useTopPage());
