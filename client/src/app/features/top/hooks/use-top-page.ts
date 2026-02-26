@@ -1,7 +1,7 @@
 import * as React from "react";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm.ts";
-import type { WorldHeritageVm } from "../../../../domain/types.ts";
-import { fetchTopFirstPage } from "../apis";
+import type { ApiWorldHeritageDto, ListResult, WorldHeritageVm } from "../../../../domain/types";
+import { fetchTopPage } from "@features/top/apis";
 
 type Pagination = {
   current_page: number;
@@ -45,14 +45,6 @@ function compareNullableNumber(a: number | null, b: number | null): number {
   return a - b;
 }
 
-const isAbortError = (err: unknown): boolean => {
-  if (err instanceof DOMException) return err.name === "AbortError";
-  if (typeof err === "object" && err !== null && "name" in err) {
-    return (err as { name?: unknown }).name === "AbortError";
-  }
-  return false;
-};
-
 export function useTopPage() {
   const [state, setState] = React.useState<State>({
     data: [],
@@ -87,32 +79,12 @@ export function useTopPage() {
 
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      fetchTopFirstPage({ page: targetPage, perPage, signal: abortController.signal })
-        .then((res) =>
-          Promise.all([toWorldHeritageListVm(res.items), Promise.resolve(res.pagination)]),
-        )
-        .then(([vmList, pagination]) => {
-          if (!mountedRef.current) return;
-          if (abortController.signal.aborted) return;
-
-          setState({
-            data: vmList,
-            pagination,
-            loading: false,
-            error: null,
-          });
-        })
-        .catch((err: unknown) => {
-          if (isAbortError(err)) return;
-          if (!mountedRef.current) return;
-
-          setState((prev) => ({
-            ...prev,
-            data: [],
-            loading: false,
-            error: err,
-          }));
-        });
+      fetchTopPage({ currentPage: targetPage, perPage, signal: abortController.signal }).then(
+        (res: ListResult<ApiWorldHeritageDto>) => {
+          const vmList = toWorldHeritageListVm(res.items);
+          setState({ data: vmList, pagination: res.pagination, loading: false, error: null });
+        },
+      );
     },
     [perPage],
   );
@@ -127,7 +99,7 @@ export function useTopPage() {
 
   const setCategory = React.useCallback((category: string | null) => {
     setFilters((f) => ({ ...f, category }));
-    setPage(1); // ページングと合わせるならリセット必須
+    setPage(1);
   }, []);
 
   const setRegion = React.useCallback((region: string | null) => {

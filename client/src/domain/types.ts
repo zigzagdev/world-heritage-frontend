@@ -162,13 +162,11 @@ export type Pagination = {
   per_page: number;
   total: number;
   last_page: number;
-  from?: number | null;
-  to?: number | null;
 };
 
 export type ListResult<T> = {
   items: T[];
-  pagination: Pagination | null;
+  pagination: Pagination;
 };
 
 export type WorldHeritageDetailVm = WorldHeritageVm;
