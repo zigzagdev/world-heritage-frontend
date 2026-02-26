@@ -17,10 +17,13 @@ const normalizeCriteria = (arr: readonly (string | CriteriaCode)[]): CriteriaCod
 
 const fmtHa = (v: number | null) => (v == null ? "—" : `${Number(v).toLocaleString("en-CA")} ha`);
 
-const titleOf = (data: ApiWorldHeritageDto) => data.official_name || data.name;
+const titleOf = (data: ApiWorldHeritageDto) =>
+  data.heritage_name_jp || data.official_name || data.name;
+
+const countryLabelOf = (data: ApiWorldHeritageDto) => data.country_name_jp || data.country || null;
 
 const subtitleOf = (data: ApiWorldHeritageDto) =>
-  [data.country, data.region].filter(Boolean).join(" · ");
+  [countryLabelOf(data), data.region].filter(Boolean).join(" · ");
 
 const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
   codes.map((code) => statePartyLabels[code]).filter((label): label is string => Boolean(label));
@@ -57,6 +60,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     officialName: data.official_name,
     name: data.name,
     heritageNameJp: data.heritage_name_jp,
+
     country: data.country,
     countryNameJp: data.country_name_jp,
     region: data.region,

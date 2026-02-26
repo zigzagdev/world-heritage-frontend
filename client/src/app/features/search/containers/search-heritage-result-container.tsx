@@ -149,12 +149,7 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
       pagination={pagination}
       rangeText={rangeText}
       onClickItem={handleClickItem}
-      onPrev={pagination.current_page > 1 ? () => goToPage(pagination.current_page - 1) : undefined}
-      onNext={
-        pagination.current_page < pagination.last_page
-          ? () => goToPage(pagination.current_page + 1)
-          : undefined
-      }
+      onPageChange={goToPage}
     />
   );
 }

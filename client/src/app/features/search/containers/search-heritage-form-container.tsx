@@ -40,7 +40,6 @@ export function SearchHeritageFormContainer() {
 
   const onSubmit = useCallback(
     (q: Partial<SearchValues>) => {
-      // submit時は draft をベースにマージ
       const merged: SearchValues = {
         region: q.region ?? draft.region,
         category: q.category ?? draft.category,
