@@ -47,22 +47,22 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
       const json = (await res.json()) as ListResponse<ApiWorldHeritageDto>;
-      if (json.status !== "success") throw new Error(`API status is not success: ${json.status}`);
+      if (json.status !== "success") {
+        throw new Error(`API status is not success: ${json.status}`);
+      }
 
       return json.data;
     },
 
-      return json.data;
-    },
     async fetchWorldHeritageDetail(
       id: string,
       init?: RequestInit,
     ): Promise<ApiWorldHeritageDetailDto> {
       const url = `${ENDPOINT}/${encodeURIComponent(id)}`;
-      const response = await fetchImpl(url, withCommonInit(init));
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await fetchImpl(url, withCommonInit(init));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const json = (await response.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
+      const json = (await res.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }

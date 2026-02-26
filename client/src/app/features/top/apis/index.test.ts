@@ -78,7 +78,7 @@ describe("fetchTopPage (createTopApi)", () => {
 
     const out = await api.fetchTopPage({ currentPage: 1, perPage: 30 });
 
-    const expectedUrl = `${EXPECTED_URL}?current_page=1&per_page=30`;
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
       expectedUrl,
       expect.objectContaining({
@@ -99,7 +99,7 @@ describe("fetchTopPage (createTopApi)", () => {
     const abortController = new AbortController();
     await api.fetchTopPage({ currentPage: 1, perPage: 30, signal: abortController.signal });
 
-    const expectedUrl = `${EXPECTED_URL}?current_page=1&per_page=30`;
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
       expectedUrl,
       expect.objectContaining({
