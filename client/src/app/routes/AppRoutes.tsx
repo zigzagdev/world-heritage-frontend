@@ -6,7 +6,7 @@ import { SearchHeritageResultsContainer } from "@features/search/containers/sear
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<TopPageContainer />} />
+      <Route path="/heritages" element={<TopPageContainer />} />
       <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
       <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
     </Routes>
