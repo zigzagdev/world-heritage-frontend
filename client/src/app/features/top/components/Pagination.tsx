@@ -2,6 +2,7 @@ import type { MouseEvent } from "react";
 
 type PaginationProps = {
   currentPage: number;
+  perPage: number;
   lastPage: number;
   onChange: (page: number) => void;
   disabled?: boolean;
@@ -13,13 +14,23 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
 
-function buildPageItems(current: number, last: number, windowSize: number): Array<number | "…"> {
+function buildPageItems(
+  current: number,
+  last: number,
+  windowSize: number,
+  edgeCount: number = 4, //先頭/末尾で必ず出す個数
+): Array<number | "…"> {
   if (last <= 1) return [1];
 
   const pages = new Set<number>();
-  pages.add(1);
-  pages.add(last);
 
+  // 先頭ページ
+  for (let p = 1; p <= Math.min(edgeCount, last); p++) pages.add(p);
+
+  // 末尾ページ
+  for (let p = Math.max(1, last - edgeCount + 1); p <= last; p++) pages.add(p);
+
+  // 現在ページ
   for (let p = current - windowSize; p <= current + windowSize; p++) {
     if (p >= 1 && p <= last) pages.add(p);
   }
@@ -38,6 +49,7 @@ function buildPageItems(current: number, last: number, windowSize: number): Arra
 
 export function Pagination({
   currentPage,
+  perPage,
   lastPage,
   onChange,
   disabled = false,
@@ -130,6 +142,8 @@ export function Pagination({
 
       <span className="ml-2 text-xs text-zinc-400 dark:text-zinc-500">
         Page <span className="text-zinc-600 dark:text-zinc-300">{current}</span> / {last}
+        <span className="ml-2">·</span>
+        <span className="ml-2">per {perPage}</span>
       </span>
     </nav>
   );

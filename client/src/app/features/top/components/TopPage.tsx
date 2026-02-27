@@ -13,8 +13,11 @@ export type TopPageProps = {
   onChangeSort?: (option: SortOption) => void;
   header?: ReactNode;
   currentPage?: number;
+  perPage?: number;
   lastPage?: number;
   onChangePage?: (page: number) => void;
+  onChangePerPage?: (perPage: number) => void;
+  perPageOptions?: readonly number[];
   paginationDisabled?: boolean;
 };
 
@@ -51,15 +54,24 @@ export default function TopPage({
   onChangeSort,
   header,
   currentPage,
+  perPage,
   lastPage,
   onChangePage,
+  onChangePerPage,
+  perPageOptions,
   paginationDisabled,
 }: TopPageProps) {
+  const options = (perPageOptions ?? [10, 30, 50, 70]) as readonly number[];
+
   const showPagination =
     typeof currentPage === "number" &&
+    typeof perPage === "number" &&
     typeof lastPage === "number" &&
     typeof onChangePage === "function" &&
     lastPage > 1;
+
+  const showPerPageSelect =
+    showPagination && typeof onChangePerPage === "function" && options.length > 0;
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
@@ -110,9 +122,29 @@ export default function TopPage({
           </ul>
         )}
 
-        {showPagination && (
-          <div className="mt-10 flex justify-center">
+        {showPagination && typeof perPage === "number" && (
+          <div className="mt-10 flex flex-col items-center gap-3">
+            {showPerPageSelect && (
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-zinc-500">Per page</label>
+                <select
+                  value={perPage}
+                  onChange={(e) => onChangePerPage?.(Number(e.target.value))}
+                  disabled={paginationDisabled}
+                  className="h-9 rounded-full border border-zinc-200 bg-white px-3 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                  aria-label="Per page"
+                >
+                  {options.map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <Pagination
+              perPage={perPage}
               currentPage={currentPage}
               lastPage={lastPage}
               onChange={onChangePage}
