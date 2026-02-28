@@ -13,7 +13,7 @@ export type SearchParams = {
   perPage?: number;
 };
 
-type ApiSearchResponse = {
+export type ApiSearchResponse = {
   status: "success" | "error";
   data: {
     data: ApiWorldHeritageDto[];

@@ -70,6 +70,7 @@ export default function SearchResultsPage({
           <div className="mt-10 flex justify-center">
             <Pagination
               currentPage={pagination.current_page}
+              perPage={pagination.per_page}
               lastPage={pagination.last_page}
               onChange={onPageChange ?? (() => {})}
               disabled={false}

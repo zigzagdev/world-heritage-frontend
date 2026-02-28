@@ -66,16 +66,11 @@ const mkHookState = (overrides: Partial<UseTopPageResult> = {}): UseTopPageResul
   const base: UseTopPageResult = {
     items: [],
     rawItems: [],
-
     pagination: { current_page: 1, per_page: 50, total: 0, last_page: 1 },
-    page: 1,
-    setPage: jest.fn(),
-
     reload: jest.fn(),
     isLoading: false,
     isError: false,
     error: null,
-
     filters: { category: null, region: null },
     setCategory: jest.fn(),
     setRegion: jest.fn(),
@@ -83,7 +78,6 @@ const mkHookState = (overrides: Partial<UseTopPageResult> = {}): UseTopPageResul
     hasActiveFilters: false,
     categoryOptions: [],
     regionOptions: [],
-
     sort: "default",
     setSort: jest.fn(),
   };

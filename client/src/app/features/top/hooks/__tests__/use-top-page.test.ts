@@ -69,7 +69,12 @@ describe("useTopPage", () => {
     const req = deferred<ListResult<unknown>>();
     fetchTopPageMock.mockImplementation(() => req.promise);
 
-    const { result } = renderHook(() => useTopPage());
+    const { result } = renderHook(() =>
+      useTopPage({
+        currentPage: 1,
+        perPage: 50,
+      }),
+    );
 
     expect(result.current.isLoading).toBe(true);
     expect(result.current.items).toEqual([]);
@@ -84,7 +89,12 @@ describe("useTopPage", () => {
     fetchTopPageMock.mockImplementation(() => req.promise);
     toWorldHeritageListVmMock.mockReturnValue(vm);
 
-    const { result } = renderHook(() => useTopPage());
+    const { result } = renderHook(() =>
+      useTopPage({
+        currentPage: 1,
+        perPage: 50,
+      }),
+    );
 
     await act(async () => {
       req.resolve(mkResult(rawItems));
@@ -101,7 +111,7 @@ describe("useTopPage", () => {
 
     // currentPage=1, perPage=50 は hook の初期値
     const call = fetchTopPageMock.mock.calls[0]?.[0];
-    
+
     expect(call.currentPage).toBe(1);
     expect(call.perPage).toBe(50);
     expect(call.signal).toBeDefined();
@@ -123,15 +133,20 @@ describe("useTopPage", () => {
     const vm = [{ id: 2, name: "Ok" }];
     toWorldHeritageListVmMock.mockReturnValue(vm);
 
-    const { result } = renderHook(() => useTopPage());
+    const { result } = renderHook(() =>
+      useTopPage({
+        currentPage: 1,
+        perPage: 50,
+      }),
+    );
 
-    // 1本目が発火してる状態で reload
+    // 1本目のイベントが発火してる状態で reload
     await act(async () => {
       result.current.reload();
       await Promise.resolve();
     });
 
-    // 2本目
+    // 2本目も同様に reload
     await act(async () => {
       second.resolve(mkResult([{ id: 2 }]));
       await Promise.resolve();
@@ -154,10 +169,15 @@ describe("useTopPage", () => {
 
     fetchTopPageMock.mockImplementation((args: FetchArgs) => {
       if (args.signal) captured.push(args.signal);
-      return request.promise; // pending
+      return request.promise;
     });
 
-    const { unmount } = renderHook(() => useTopPage());
+    const { unmount } = renderHook(() =>
+      useTopPage({
+        currentPage: 1,
+        perPage: 50,
+      }),
+    );
     unmount();
 
     expect(captured[0]).toBeDefined();

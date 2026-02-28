@@ -4,7 +4,7 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { jest, expect, test, beforeEach, describe } from "@jest/globals";
 import { useHeritageSearchQuery } from "../use-search-heritage-query.ts";
 import { fetchSearchHeritagesResult } from "../../apis";
-import type { SearchResponse } from "../../apis/search-api";
+import type { ApiSearchResponse } from "../../apis/search-api";
 import type { HeritageSearchParams } from "../../types.ts";
 
 type MinimalAbortSignal = { aborted: boolean };
@@ -36,7 +36,7 @@ jest.mock("../../apis", () => ({
 type FetchFn = (
   params: HeritageSearchParams,
   init?: { signal?: AbortSignal },
-) => Promise<SearchResponse>;
+) => Promise<ApiSearchResponse>;
 
 const fetchSearchHeritagesResultMock =
   fetchSearchHeritagesResult as unknown as jest.MockedFunction<FetchFn>;
@@ -57,7 +57,7 @@ const createDeferred = <T>(): Deferred<T> => {
   return { promise, resolve, reject };
 };
 
-const OK: SearchResponse = {
+const OK: ApiSearchResponse = {
   status: "success",
   data: {
     data: [
@@ -107,7 +107,7 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("初期マウント直後: isLoading=true, data=null, error=null", () => {
-    const searchRequest = createDeferred<SearchResponse>();
+    const searchRequest = createDeferred<ApiSearchResponse>();
     fetchSearchHeritagesResultMock.mockImplementation(() => searchRequest.promise);
 
     const urlParams = makeParams({ search_query: "Japan", current_page: 1, per_page: 30 });
@@ -119,7 +119,7 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("成功パス: fetch -> state 反映", async () => {
-    const searchRequest = createDeferred<SearchResponse>();
+    const searchRequest = createDeferred<ApiSearchResponse>();
     fetchSearchHeritagesResultMock.mockImplementation(() => searchRequest.promise);
 
     const urlParams = makeParams({
@@ -151,7 +151,7 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("通常エラー: error が保持される / isLoading=false", async () => {
-    const searchRequest = createDeferred<SearchResponse>();
+    const searchRequest = createDeferred<ApiSearchResponse>();
     fetchSearchHeritagesResultMock.mockImplementation(() => searchRequest.promise);
 
     const urlParams = makeParams({ search_query: "Japan", current_page: 1, per_page: 30 });
@@ -172,8 +172,8 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("AbortError は無視される（error にしない）", async () => {
-    const first = createDeferred<SearchResponse>();
-    const second = createDeferred<SearchResponse>();
+    const first = createDeferred<ApiSearchResponse>();
+    const second = createDeferred<ApiSearchResponse>();
 
     const calls: Array<{ signal?: AbortSignal }> = [];
 
@@ -214,8 +214,8 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("params 変更で in-flight を abort して再度発火する", async () => {
-    const first = createDeferred<SearchResponse>();
-    const second = createDeferred<SearchResponse>();
+    const first = createDeferred<ApiSearchResponse>();
+    const second = createDeferred<ApiSearchResponse>();
 
     const signals: (AbortSignal | undefined)[] = [];
 
@@ -248,7 +248,7 @@ describe("useHeritageSearchQuery", () => {
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
-    const searchRequest = createDeferred<SearchResponse>();
+    const searchRequest = createDeferred<ApiSearchResponse>();
 
     const captured: (AbortSignal | undefined)[] = [];
     fetchSearchHeritagesResultMock.mockImplementation((_params, init) => {
