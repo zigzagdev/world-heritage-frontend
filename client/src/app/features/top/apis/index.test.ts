@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { createTopApi } from "./top-api";
-import type { ApiWorldHeritageDto, ApiWorldHeritageImageDto, Paginated } from "../types";
+import type { ApiWorldHeritageDto, ListResult, Pagination } from "../../../../domain/types.ts";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
 
 let fetchSpy: jest.MockedFunction<typeof fetch>;
 
 const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
-const EXPECTED_URL = `${API_BASE}/api/v1/heritages`;
+const ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/heritages`;
 
 const makeOkResponse = (body: unknown): MockResponse => ({
   ok: true,
@@ -21,7 +21,48 @@ const makeNgResponse = (status: number): MockResponse => ({
   json: async () => ({}),
 });
 
-describe("fetchTopFirstPage (createTopApi)", () => {
+const makeDto = (overrides: Partial<ApiWorldHeritageDto> = {}): ApiWorldHeritageDto => ({
+  id: 1,
+  official_name: "Official",
+  name: "Name",
+  heritage_name_jp: "名称",
+  country: "Japan",
+  country_name_jp: "日本",
+  region: "Asia",
+  category: "Cultural",
+  year_inscribed: 1993,
+  latitude: null,
+  longitude: null,
+  is_endangered: false,
+  criteria: ["i"],
+  area_hectares: null,
+  buffer_zone_hectares: null,
+  short_description: "",
+  unesco_site_url: "https://ex.com/1",
+  state_party: null,
+  state_party_codes: ["JPN"],
+  state_parties_meta: [],
+  thumbnail: null,
+  ...overrides,
+});
+
+const makePagination = (overrides: Partial<Pagination> = {}): Pagination => ({
+  current_page: 1,
+  per_page: 30,
+  total: 1,
+  last_page: 1,
+  ...overrides,
+});
+
+const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination) => ({
+  status: "success",
+  data: {
+    items,
+    pagination,
+  } satisfies ListResult<ApiWorldHeritageDto>,
+});
+
+describe("fetchTopPage (createTopApi)", () => {
   let api: ReturnType<typeof createTopApi>;
 
   beforeEach(() => {
@@ -29,99 +70,61 @@ describe("fetchTopFirstPage (createTopApi)", () => {
     api = createTopApi({ apiBase: API_BASE, fetchImpl: fetchSpy });
   });
 
-  it("配列レスポンスをそのまま返す", async () => {
-    const image: ApiWorldHeritageImageDto = {
-      id: 11224,
-      url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
-      sort_order: 0,
-      width: 0,
-      height: 0,
-      format: "jpg",
-      alt: null,
-      credit: null,
-      is_primary: true,
-      checksum: "abcd1234",
-    };
+  it("returns json.data (items + pagination) when status is success", async () => {
+    const items = [makeDto({ id: 1 })];
+    const pagination = makePagination({ total: 1, last_page: 1 });
 
-    const data: ApiWorldHeritageDto[] = [
-      {
-        id: 1,
-        official_name: "A",
-        name: "A",
-        name_jp: "A",
-        country: "X",
-        region: "Y",
-        state_party: "JPN",
-        category: "Cultural",
-        criteria: ["i"],
-        year_inscribed: 1993,
-        area_hectares: null,
-        buffer_zone_hectares: null,
-        is_endangered: false,
-        latitude: null,
-        longitude: null,
-        short_description: "",
-        unesco_site_url: "https://ex.com/1",
-        state_party_codes: ["JPN"],
-        state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-        primary_state_party_code: "JPN",
-        image_url: image,
-        images: [image],
-      },
-    ];
+    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    fetchSpy.mockResolvedValue(makeOkResponse(data) as Response);
+    const out = await api.fetchTopPage({ currentPage: 1, perPage: 30 });
 
-    const out = await api.fetchTopFirstPage();
-
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
-      EXPECTED_URL,
+      expectedUrl,
       expect.objectContaining({
         headers: expect.objectContaining({ Accept: "application/json" }),
         credentials: "omit",
       }),
     );
-    expect(out).toEqual(data);
+
+    expect(out).toEqual({ items, pagination });
   });
 
-  it("{data: ...} レスポンスも配列に正規化して返す", async () => {
-    const paginated: Paginated<ApiWorldHeritageDto> = { data: [] };
-    fetchSpy.mockResolvedValue(makeOkResponse(paginated) as Response);
+  it("passes signal when provided", async () => {
+    const items: ApiWorldHeritageDto[] = [];
+    const pagination = makePagination({ total: 0, last_page: 1 });
 
-    const out = await api.fetchTopFirstPage();
+    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    expect(Array.isArray(out)).toBe(true);
-    expect(out).toEqual([]);
-  });
+    const abortController = new AbortController();
+    await api.fetchTopPage({ currentPage: 1, perPage: 30, signal: abortController.signal });
 
-  it("headers/credentials/signal が引数で上書きされる", async () => {
-    const paginated: Paginated<ApiWorldHeritageDto> = { data: [] };
-    fetchSpy.mockResolvedValue(makeOkResponse(paginated) as Response);
-
-    const ac = new AbortController();
-
-    await api.fetchTopFirstPage({
-      headers: { "X-Trace": "t" },
-      credentials: "include",
-      signal: ac.signal,
-    });
-
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
-      EXPECTED_URL,
+      expectedUrl,
       expect.objectContaining({
-        headers: expect.objectContaining({
-          Accept: "application/json",
-          "X-Trace": "t",
-        }),
-        credentials: "include",
-        signal: ac.signal,
+        headers: expect.objectContaining({ Accept: "application/json" }),
+        credentials: "omit",
+        signal: abortController.signal,
       }),
     );
   });
 
-  it("HTTP エラー時は例外を投げる", async () => {
+  it("throws on HTTP error", async () => {
     fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
-    await expect(api.fetchTopFirstPage()).rejects.toThrow("HTTP 500");
+    await expect(
+      api.fetchTopPage({ currentPage: 1, perPage: 30, signal: new AbortController().signal }),
+    ).rejects.toThrow("HTTP 500");
+  });
+
+  it("throws when API status is not success", async () => {
+    fetchSpy.mockResolvedValue(
+      makeOkResponse({ status: "error", data: { items: [], pagination: null } }) as Response,
+    );
+
+    await expect(
+      api.fetchTopPage({ currentPage: 1, perPage: 30, signal: new AbortController().signal }),
+    ).rejects.toThrow("API status is not success: error");
   });
 });

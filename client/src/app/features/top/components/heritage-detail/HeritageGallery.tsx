@@ -1,4 +1,4 @@
-import type { WorldHeritageImageVm } from "../../types";
+import type { WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import { Button } from "@shared/uis/Button.tsx";
 
 type Props = {

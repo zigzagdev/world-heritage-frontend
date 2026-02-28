@@ -1,14 +1,26 @@
 /** @jest-environment jsdom */
 
+import { jest } from "@jest/globals";
+
+jest.mock("../../apis", () => ({
+  fetchWorldHeritageDetail: jest.fn(),
+}));
+
+jest.mock("@features/heritages/mappers/to-world-heritage-detail-vm", () => ({
+  toWorldHeritageDetailVm: jest.fn(),
+}));
+
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { jest, expect, test, beforeEach, describe } from "@jest/globals";
+import { describe, test, expect, beforeEach } from "@jest/globals";
 import { useWorldHeritageDetail } from "../use-world-heritage-detail";
 import { fetchWorldHeritageDetail } from "../../apis";
-import { toWorldHeritageVm } from "../../mappers/to-world-heritage-vm";
-import type { WorldHeritageDetailVm, ApiWorldHeritageDto } from "../../types";
+import { toWorldHeritageDetailVm } from "@features/heritages/mappers/to-world-heritage-detail-vm";
+import type {
+  WorldHeritageDetailVm,
+  ApiWorldHeritageDetailDto,
+} from "../../../../../domain/types.ts";
 
 type MinimalAbortSignal = { aborted: boolean };
-
 interface MinimalAbortController {
   readonly signal: MinimalAbortSignal;
   abort(): void;
@@ -28,22 +40,13 @@ if (!("AbortController" in globalThis) || typeof globalThis.AbortController !== 
   (globalThis as { AbortController: AbortControllerCtor }).AbortController = FakeAbortController;
 }
 
-jest.mock("../../apis", () => ({
-  fetchWorldHeritageDetail: jest.fn(),
-}));
-
-jest.mock("../../mappers/to-world-heritage-vm", () => ({
-  toWorldHeritageVm: jest.fn(),
-}));
-
 type FetchFn = (id: string, opts?: { signal?: AbortSignal }) => Promise<unknown>;
 const fetchWorldHeritageDetailMock =
   fetchWorldHeritageDetail as unknown as jest.MockedFunction<FetchFn>;
 
-type MapFn = (dto: unknown) => unknown;
-const toWorldHeritageVmMock = toWorldHeritageVm as unknown as jest.MockedFunction<MapFn>;
-
-// ---- deferred ヘルパ ----
+type MapFn = (dto: unknown) => WorldHeritageDetailVm;
+const toWorldHeritageDetailVmMock =
+  toWorldHeritageDetailVm as unknown as jest.MockedFunction<MapFn>;
 
 type Deferred<T> = {
   promise: Promise<T>;
@@ -70,73 +73,78 @@ describe("useWorldHeritageDetail", () => {
     fetchWorldHeritageDetailMock.mockImplementation(() => d.promise);
 
     const { result } = renderHook(() => useWorldHeritageDetail("1"));
+
     expect(result.current.isLoading).toBe(true);
     expect(result.current.item).toBeNull();
     expect(result.current.isError).toBe(false);
   });
 
   test("成功パス: fetch -> map -> state 反映", async () => {
-    const raw: ApiWorldHeritageDto = {
+    const raw: ApiWorldHeritageDetailDto = {
       id: 1,
       official_name: "Historic Monuments of Ancient Kyoto",
       name: "Historic Monuments of Ancient Kyoto",
-      name_jp: "古都京都の文化財",
+      heritage_name_jp: "古都京都の文化財",
       country: "Japan",
+      country_name_jp: "日本",
       region: "Asia",
-      state_party: "Japan",
       category: "Cultural",
-      criteria: ["ii", "iv"],
       year_inscribed: 1994,
-      area_hectares: null,
-      buffer_zone_hectares: null,
-      is_endangered: false,
       latitude: 35.0116,
       longitude: 135.7681,
+      is_endangered: false,
+      criteria: ["ii", "iv"],
+      area_hectares: null,
+      buffer_zone_hectares: null,
       short_description: "A group of historic sites in Kyoto.",
       unesco_site_url: "https://example.com/kyoto",
+      state_party: "Japan",
       state_party_codes: ["JPN"],
       state_parties_meta: [],
       primary_state_party_code: "JPN",
+      thumbnail_url: null,
+      images: [],
     };
 
     const vm: WorldHeritageDetailVm = {
       id: 1,
-      officialName: "Historic Monuments of Ancient Kyoto",
-      name: "Historic Monuments of Ancient Kyoto",
-      nameJp: "古都京都の文化財",
-      country: "Japan",
-      region: "Asia",
-      stateParty: "Japan",
-      category: "Cultural",
+      officialName: raw.official_name,
+      name: raw.name,
+      heritageNameJp: raw.heritage_name_jp,
+      country: raw.country,
+      countryNameJp: raw.country_name_jp,
+      region: raw.region,
+      category: raw.category,
+      yearInscribed: raw.year_inscribed,
+      latitude: raw.latitude,
+      longitude: raw.longitude,
+      isEndangered: raw.is_endangered,
       criteria: ["ii", "iv"],
-      yearInscribed: 1994,
       areaHectares: null,
       bufferZoneHectares: null,
-      isEndangered: false,
-      latitude: 35.0116,
-      longitude: 135.7681,
-      shortDescription: "A group of historic sites in Kyoto.",
-      unescoSiteUrl: "https://example.com/kyoto",
+      shortDescription: raw.short_description,
+      unescoSiteUrl: raw.unesco_site_url,
+      stateParty: raw.state_party,
       statePartyCodes: ["JPN"],
       statePartiesMeta: {},
       primaryStatePartyCode: "JPN",
-      thumbnail: null,
-      title: "Historic Monuments of Ancient Kyoto",
+      thumbnailUrl: null,
+      images: [],
+      title: raw.official_name,
       subtitle: "Japan · Asia",
       areaText: "—",
       bufferText: "—",
       criteriaText: "ii, iv",
-      images: [],
     };
 
-    const d = deferred<unknown>();
-    fetchWorldHeritageDetailMock.mockImplementation(() => d.promise);
-    toWorldHeritageVmMock.mockReturnValue(vm);
+    const Deferred = deferred<unknown>();
+    fetchWorldHeritageDetailMock.mockImplementation(() => Deferred.promise);
+    toWorldHeritageDetailVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useWorldHeritageDetail("1"));
 
     await act(async () => {
-      d.resolve(raw);
+      Deferred.resolve(raw);
       await Promise.resolve();
     });
 
@@ -154,7 +162,8 @@ describe("useWorldHeritageDetail", () => {
         signal: expect.any(Object),
       }),
     );
-    expect(toWorldHeritageVmMock).toHaveBeenCalledWith(raw);
+    expect(toWorldHeritageDetailVmMock).toHaveBeenCalledTimes(1);
+    expect(toWorldHeritageDetailVmMock).toHaveBeenCalledWith(raw);
   });
 
   test("id が null の場合: errorにせず、API は呼ばれない", async () => {
@@ -168,17 +177,18 @@ describe("useWorldHeritageDetail", () => {
     });
 
     expect(fetchWorldHeritageDetailMock).not.toHaveBeenCalled();
+    expect(toWorldHeritageDetailVmMock).not.toHaveBeenCalled();
   });
 
   test("通常エラー: isError=true, item=null, isLoading=false, error が保持される", async () => {
-    const d = deferred<unknown>();
-    fetchWorldHeritageDetailMock.mockImplementation(() => d.promise);
+    const Deferred = deferred<unknown>();
+    fetchWorldHeritageDetailMock.mockImplementation(() => Deferred.promise);
 
     const { result } = renderHook(() => useWorldHeritageDetail("1"));
 
     const boom = new Error("boom");
     await act(async () => {
-      d.reject(boom);
+      Deferred.reject(boom);
       await Promise.resolve();
     });
 
@@ -204,36 +214,36 @@ describe("useWorldHeritageDetail", () => {
       id: 2,
       officialName: "Official",
       name: "Ok",
-      nameJp: "名前",
+      heritageNameJp: "名前",
       country: "Japan",
+      countryNameJp: "日本",
       region: "Asia",
-      stateParty: "Japan",
       category: "Cultural",
-      criteria: [],
       yearInscribed: 2000,
-      areaHectares: null,
-      bufferZoneHectares: null,
-      isEndangered: false,
       latitude: null,
       longitude: null,
+      isEndangered: false,
+      criteria: [],
+      areaHectares: null,
+      bufferZoneHectares: null,
       shortDescription: "dummy",
       unescoSiteUrl: "https://example.com",
+      stateParty: "Japan",
       statePartyCodes: [],
       statePartiesMeta: {},
       primaryStatePartyCode: null,
-      thumbnail: null,
+      thumbnailUrl: null,
+      images: [],
       title: "Ok",
       subtitle: "Japan · Asia",
       areaText: "—",
       bufferText: "—",
       criteriaText: "",
-      images: [],
     };
 
-    toWorldHeritageVmMock.mockReturnValue(vm);
+    toWorldHeritageDetailVmMock.mockReturnValue(vm);
 
     const { result } = renderHook(() => useWorldHeritageDetail("2"));
-
     await act(async () => {
       result.current.reload();
     });
@@ -254,17 +264,17 @@ describe("useWorldHeritageDetail", () => {
       expect(result.current.item).toEqual(vm);
     });
 
-    expect(calls.length).toBe(2);
+    expect(calls).toHaveLength(2);
     expect(calls[0].signal?.aborted).toBe(true);
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
-    const d = deferred<unknown>();
+    const Deferred = deferred<unknown>();
     const captured: Array<{ id: string; signal?: AbortSignal }> = [];
 
     fetchWorldHeritageDetailMock.mockImplementation((id, opts) => {
       captured.push({ id, signal: opts?.signal });
-      return d.promise;
+      return Deferred.promise;
     });
 
     const { unmount } = renderHook(() => useWorldHeritageDetail("1"));

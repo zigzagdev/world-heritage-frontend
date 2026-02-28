@@ -1,27 +1,34 @@
 import { useState } from "react";
-import type { WorldHeritageDetailVm } from "../../types";
+import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
+import type { Locale } from "../../../../../domain/criteria";
+import { HeritageSubHeader, type SearchValues } from "../HeritageSubHeader.tsx";
 import { HeritageHero } from "./HeritageHero";
 import { HeritageOverviewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
-import type { Locale } from "../../../../../domain/criteria";
-import { HeritageSubHeader } from "./HeritageSubHeader";
 
 type Props = {
   item: WorldHeritageDetailVm;
   locale: Locale;
 };
 
-export function HeritageDetailLayout({ item, locale }: Props) {
-  const [keyword, setKeyword] = useState("");
+const DEFAULT_SEARCH: SearchValues = {
+  region: "",
+  category: "",
+  keyword: "",
+};
 
-  const handleSubmit = () => {
-    console.log("search:", keyword);
+export function HeritageDetailLayout({ item, locale }: Props) {
+  const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
+
+  const handleSubmit = (q: Partial<SearchValues>) => {
+    const next = { ...search, ...q };
+    setSearch(next);
   };
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <HeritageSubHeader title={item.title} onKeywordChange={setKeyword} onSearch={handleSubmit} />
+      <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
       <HeritageHero item={item} locale={locale} />
 
@@ -32,7 +39,7 @@ export function HeritageDetailLayout({ item, locale }: Props) {
             <HeritageGallery images={item.images} />
           </div>
           <div className="lg:sticky lg:top-5">
-            <HeritageSidebar item={item} locale={locale} />
+            <HeritageSidebar item={item} />
           </div>
         </div>
       </main>

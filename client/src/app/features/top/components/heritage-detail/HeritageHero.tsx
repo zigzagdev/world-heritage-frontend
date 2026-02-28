@@ -1,4 +1,4 @@
-import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../types";
+import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria.ts";
 
 type Props = {
@@ -14,10 +14,10 @@ export function HeritageHero({ item }: Props) {
     <header className="mx-auto w-full max-w-6xl px-4 pt-10 pb-6">
       <div>
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
-          {item.title}
-          {item.nameJp && (
+          {item.heritageNameJp}
+          {item.title && (
             <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
-              （{item.nameJp}）
+              （{item.title}）
             </span>
           )}
         </h1>

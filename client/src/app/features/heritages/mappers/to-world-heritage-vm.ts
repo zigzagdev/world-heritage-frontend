@@ -1,6 +1,10 @@
-import type { ApiWorldHeritageDto, WorldHeritageVm, CriteriaCode } from "../types";
-import { statePartyLabels } from "@features/constants/state-party-labels";
-import { CRITERIA } from "../types";
+import type {
+  ApiWorldHeritageDto,
+  WorldHeritageVm,
+  CriteriaCode,
+} from "../../../../domain/types.ts";
+import { statePartyLabels } from "@features/constants/state-party-labels.ts";
+import { CRITERIA } from "../../../../domain/types.ts";
 
 const ORDER: readonly CriteriaCode[] = CRITERIA;
 
@@ -13,10 +17,13 @@ const normalizeCriteria = (arr: readonly (string | CriteriaCode)[]): CriteriaCod
 
 const fmtHa = (v: number | null) => (v == null ? "—" : `${Number(v).toLocaleString("en-CA")} ha`);
 
-const titleOf = (data: ApiWorldHeritageDto) => data.official_name || data.name;
+const titleOf = (data: ApiWorldHeritageDto) =>
+  data.heritage_name_jp || data.official_name || data.name;
+
+const countryLabelOf = (data: ApiWorldHeritageDto) => data.country_name_jp || data.country || null;
 
 const subtitleOf = (data: ApiWorldHeritageDto) =>
-  [data.country, data.region].filter(Boolean).join(" · ");
+  [countryLabelOf(data), data.region].filter(Boolean).join(" · ");
 
 const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
   codes.map((code) => statePartyLabels[code]).filter((label): label is string => Boolean(label));
@@ -24,9 +31,7 @@ const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
 const normalizeStatePartiesMeta = (
   meta: ApiWorldHeritageDto["state_parties_meta"],
 ): WorldHeritageVm["statePartiesMeta"] => {
-  if (Array.isArray(meta)) {
-    return {};
-  }
+  if (Array.isArray(meta)) return {};
 
   return Object.fromEntries(
     Object.entries(meta).map(([k, v]) => [
@@ -43,21 +48,24 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
   const criteriaCodes = normalizeCriteria(data.criteria);
   const statePartyCodesRaw = data.state_party_codes ?? [];
   const statePartyLabelsJp = toStatePartyLabelsJp(statePartyCodesRaw);
-  const thumbnailData = data.thumbnail ?? data.image_url ?? null;
 
   let stateParty: string | null = data.state_party;
 
   if (!stateParty && statePartyLabelsJp.length > 0) {
     stateParty = statePartyLabelsJp.join(", ");
   }
+
   return {
     id: data.id,
     officialName: data.official_name,
     name: data.name,
-    nameJp: data.name_jp,
+    heritageNameJp: data.heritage_name_jp,
+
     country: data.country,
+    countryNameJp: data.country_name_jp,
     region: data.region,
     stateParty,
+
     category: data.category,
     criteria: criteriaCodes,
     yearInscribed: data.year_inscribed,
@@ -70,23 +78,16 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     unescoSiteUrl: data.unesco_site_url,
     statePartyCodes: statePartyLabelsJp,
     statePartiesMeta: normalizeStatePartiesMeta(data.state_parties_meta),
-    primaryStatePartyCode: data.primary_state_party_code ?? null,
+    primaryStatePartyCode: null,
+
     title: titleOf(data),
     subtitle: subtitleOf(data),
     areaText: fmtHa(data.area_hectares),
     bufferText: fmtHa(data.buffer_zone_hectares),
     criteriaText: criteriaCodes.join(", "),
-    thumbnail: thumbnailData
-      ? {
-          id: thumbnailData.id,
-          url: thumbnailData.url,
-          alt: thumbnailData.alt ?? titleOf(data),
-          credit: thumbnailData.credit,
-          width: thumbnailData.width,
-          height: thumbnailData.height,
-          isPrimary: thumbnailData.is_primary,
-        }
-      : null,
+
+    thumbnailUrl: data.thumbnail,
+    images: [],
   };
 }
 
