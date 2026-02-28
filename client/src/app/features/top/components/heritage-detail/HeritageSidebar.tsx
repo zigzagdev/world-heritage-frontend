@@ -1,6 +1,5 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { HeritageMetadataList } from "./HeritageMetadataList";
-import { HeritageToc } from "./HeritageToc";
 import type { Locale } from "../../../../../domain/criteria";
 
 type Props = {
@@ -60,7 +59,6 @@ export function HeritageSidebar({ item }: Props) {
       className="flex flex-col gap-6 lg:sticky lg:top-24"
       id="heritage-data"
     >
-      <HeritageToc />
       <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 py-4">
           <CardTitle>Heritage Data</CardTitle>
