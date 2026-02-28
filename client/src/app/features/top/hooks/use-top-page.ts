@@ -22,6 +22,8 @@ type Filters = {
   region: string | null;
 };
 
+type SortOption = "default" | "year_desc" | "year_asc";
+
 const initialFilters: Filters = {
   category: null,
   region: null,
@@ -51,6 +53,7 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
   });
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
+  const [sort, setSort] = React.useState<SortOption>("default");
 
   const abortRef = React.useRef<AbortController | null>(null);
   const mountedRef = React.useRef(true);
@@ -68,7 +71,6 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
 
     const abortController = new AbortController();
     abortRef.current = abortController;
-
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     fetchTopPage({
@@ -106,7 +108,6 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
     load(currentPage, perPage);
   }, [load, currentPage, perPage]);
 
-  // --- controlled filter actions ---
   const setCategory = React.useCallback((category: string | null) => {
     setFilters((f) => ({ ...f, category }));
   }, []);
@@ -121,7 +122,6 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
 
   const hasActiveFilters = Boolean(filters.category || filters.region);
 
-  // --- filter options derived from already-loaded data ---
   const categoryOptions = React.useMemo(() => {
     const set = new Set<string>();
     for (const it of state.data) set.add(it.category);
@@ -133,7 +133,6 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
     for (const it of state.data) set.add(it.region);
     return Array.from(set).sort();
   }, [state.data]);
-  
   const items = React.useMemo(() => {
     const { category, region } = filters;
 
@@ -156,10 +155,12 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
           ? b.yearInscribed - a.yearInscribed
           : a.yearInscribed - b.yearInscribed;
 
-    return state.data.filter((it) => {
-      if (category && it.category !== category) return false;
-      if (region && it.region !== region) return false;
-      return true;
+      if (byYear !== 0) return byYear;
+
+      const byArea = compareNullableNumber(a.areaHectares, b.areaHectares);
+      if (byArea !== 0) return byArea;
+
+      return a.id - b.id;
     });
       
     return sorted;
@@ -170,17 +171,17 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
     rawItems: state.data,
 
     pagination: state.pagination,
+
     reload,
     isLoading: state.loading,
     isError: state.error != null,
     error: state.error,
+
     filters,
     setCategory,
     setRegion,
     clearFilters,
     hasActiveFilters,
-
-    // UI options
     categoryOptions,
     regionOptions,
 

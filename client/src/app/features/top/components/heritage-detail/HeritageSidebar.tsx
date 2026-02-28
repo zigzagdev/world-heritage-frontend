@@ -52,6 +52,7 @@ export function HeritageSidebar({ item }: Props) {
   ] as const;
 
   return (
+    
     <aside aria-label="Facts" className="flex flex-col gap-6">
       <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 py-4">
