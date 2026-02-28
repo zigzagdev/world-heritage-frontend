@@ -29,11 +29,9 @@ const initialFilters: Filters = {
   region: null,
 };
 
-const DEFAULT_PER_PAGE = 50;
-
 const initialPagination: Pagination = {
   current_page: 1,
-  per_page: DEFAULT_PER_PAGE,
+  per_page: 30,
   total: 0,
   last_page: 1,
 };
@@ -45,7 +43,9 @@ function compareNullableNumber(a: number | null, b: number | null): number {
   return a - b;
 }
 
-export function useTopPage() {
+export function useTopPage(args: { currentPage: number; perPage: number }) {
+  const { currentPage, perPage } = args;
+
   const [state, setState] = React.useState<State>({
     data: [],
     pagination: initialPagination,
@@ -55,9 +55,6 @@ export function useTopPage() {
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
   const [sort, setSort] = React.useState<SortOption>("default");
-
-  const [page, setPage] = React.useState<number>(1);
-  const perPage = state.pagination.per_page;
 
   const abortRef = React.useRef<AbortController | null>(null);
   const mountedRef = React.useRef(true);
@@ -70,46 +67,59 @@ export function useTopPage() {
     };
   }, []);
 
-  const load = React.useCallback(
-    (targetPage: number) => {
-      abortRef.current?.abort();
+  const load = React.useCallback((targetPage: number, targetPerPage: number) => {
+    abortRef.current?.abort();
 
-      const abortController = new AbortController();
-      abortRef.current = abortController;
+    const abortController = new AbortController();
+    abortRef.current = abortController;
 
-      setState((prev) => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      fetchTopPage({ currentPage: targetPage, perPage, signal: abortController.signal }).then(
-        (res: ListResult<ApiWorldHeritageDto>) => {
-          const vmList = toWorldHeritageListVm(res.items);
-          setState({ data: vmList, pagination: res.pagination, loading: false, error: null });
-        },
-      );
-    },
-    [perPage],
-  );
+    fetchTopPage({
+      currentPage: targetPage,
+      perPage: targetPerPage,
+      signal: abortController.signal,
+    })
+      .then((res: ListResult<ApiWorldHeritageDto>) => {
+        if (!mountedRef.current) return;
+
+        const vmList = toWorldHeritageListVm(res.items);
+        setState({ data: vmList, pagination: res.pagination, loading: false, error: null });
+      })
+      .catch((e: unknown) => {
+        if (!mountedRef.current) return;
+
+        if (
+          typeof e === "object" &&
+          e !== null &&
+          "name" in e &&
+          (e as { name: unknown }).name === "AbortError"
+        ) {
+          return;
+        }
+
+        setState((prev) => ({ ...prev, loading: false, error: e }));
+      });
+  }, []);
 
   React.useEffect(() => {
-    load(page);
-  }, [load, page]);
+    load(currentPage, perPage);
+  }, [load, currentPage, perPage]);
 
   const reload = React.useCallback(() => {
-    load(page);
-  }, [load, page]);
+    load(currentPage, perPage);
+  }, [load, currentPage, perPage]);
 
   const setCategory = React.useCallback((category: string | null) => {
     setFilters((f) => ({ ...f, category }));
-    setPage(1);
   }, []);
 
   const setRegion = React.useCallback((region: string | null) => {
     setFilters((f) => ({ ...f, region }));
-    setPage(1);
   }, []);
 
   const clearFilters = React.useCallback(() => {
     setFilters(initialFilters);
-    setPage(1);
   }, []);
 
   const hasActiveFilters = Boolean(filters.category || filters.region);
@@ -164,8 +174,6 @@ export function useTopPage() {
     rawItems: state.data,
 
     pagination: state.pagination,
-    page,
-    setPage,
 
     reload,
     isLoading: state.loading,
