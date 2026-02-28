@@ -6,6 +6,7 @@ import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
+import { textType } from "@shared/styles/typography";
 
 type Props = {
   item: WorldHeritageDetailVm;
@@ -35,13 +36,13 @@ function HeritageDetailTabs({ items }: { items: readonly TabItem[] }) {
     <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8">
       <nav
         aria-label="Heritage sections"
-        className="flex gap-6 overflow-x-auto border-b text-sm font-semibold"
+        className={`flex gap-6 overflow-x-auto border-b border-sky-200 ${textType.body} font-semibold`}
       >
         {items.map((t) => (
           <a
             key={t.href}
             href={t.href}
-            className="whitespace-nowrap py-3 text-sky-700 hover:text-sky-900 hover:border-b-2 hover:border-sky-500"
+            className="whitespace-nowrap py-3 text-sky-700 border-b-2 border-transparent hover:text-sky-900 hover:border-sky-500"
           >
             {t.label}
           </a>
@@ -60,10 +61,9 @@ export function HeritageDetailLayout({ item, locale }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
-      {/* Tabs (photo/top section navigation) */}
       <HeritageDetailTabs items={TABS} />
 
       <HeritageHero item={item} locale={locale} />
