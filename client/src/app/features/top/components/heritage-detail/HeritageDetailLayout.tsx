@@ -3,7 +3,7 @@ import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria";
 import { HeritageSubHeader, type SearchValues } from "../HeritageSubHeader.tsx";
 import { HeritageHero } from "./HeritageHero";
-import { HeritageOverviewSection } from "./HeritageOverviewSection";
+import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
 
@@ -71,7 +71,7 @@ export function HeritageDetailLayout({ item, locale }: Props) {
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 md:pt-12">
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="space-y-10 md:space-y-12">
-            <HeritageOverviewSection item={item} locale={locale} />
+            <HeritageOverViewSection item={item} />
             <HeritageGallery images={item.images} />
           </div>
 
