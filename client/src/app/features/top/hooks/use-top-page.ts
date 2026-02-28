@@ -45,7 +45,6 @@ function compareNullableNumber(a: number | null, b: number | null): number {
 
 export function useTopPage(args: { currentPage: number; perPage: number }) {
   const { currentPage, perPage } = args;
-
   const [state, setState] = React.useState<State>({
     data: [],
     pagination: initialPagination,
@@ -72,7 +71,6 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
 
     const abortController = new AbortController();
     abortRef.current = abortController;
-
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
     fetchTopPage({
@@ -135,7 +133,6 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
     for (const it of state.data) set.add(it.region);
     return Array.from(set).sort();
   }, [state.data]);
-
   const items = React.useMemo(() => {
     const { category, region } = filters;
 
@@ -165,7 +162,7 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
 
       return a.id - b.id;
     });
-
+      
     return sorted;
   }, [state.data, filters, sort]);
 
