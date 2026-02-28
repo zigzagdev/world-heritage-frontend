@@ -22,7 +22,7 @@ function GroupTitle({ children }: { children: React.ReactNode }) {
 }
 
 function CardTitle({ children }: { children: React.ReactNode }) {
-  return <div className="text-sm font-extrabold tracking-wide text-zinc-900">{children}</div>;
+  return <div className="text-base font-extrabold tracking-tight text-zinc-900">{children}</div>;
 }
 
 export function HeritageSidebar({ item }: Props) {
@@ -52,14 +52,13 @@ export function HeritageSidebar({ item }: Props) {
   ] as const;
 
   return (
-    
     <aside aria-label="Facts" className="flex flex-col gap-6">
-      <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-3xl border border-zinc-200 bg-white/80 shadow-sm backdrop-blur overflow-hidden">
         <div className="px-5 py-4">
           <CardTitle>Heritage Data</CardTitle>
         </div>
 
-        <div className="border-t border-zinc-100 p-5 space-y-5">
+        <div className="border-t border-zinc-100 p-5 space-y-6">
           <div className="space-y-2">
             <GroupTitle>IDENTITY</GroupTitle>
             <HeritageMetadataList items={identity} />
@@ -74,24 +73,26 @@ export function HeritageSidebar({ item }: Props) {
             <GroupTitle>INSCRIPTION</GroupTitle>
             <HeritageMetadataList items={inscription} />
           </div>
+
           {item.unescoSiteUrl && (
             <a
               href={item.unescoSiteUrl}
               target="_blank"
               rel="noreferrer noopener"
               aria-label="View on UNESCO"
-              className="mt-2 inline-flex w-full items-center justify-center rounded-xl
-               border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold
-               text-zinc-800 hover:bg-zinc-50"
+              className="mt-1 inline-flex w-full items-center justify-center rounded-xl
+               border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold
+               text-sky-900 hover:bg-sky-100"
             >
               View on UNESCO
             </a>
           )}
         </div>
       </div>
-      <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm p-4">
-        <div className="text-sm font-bold text-zinc-900">Map</div>
-        <div className="mt-3 grid h-40 place-items-center rounded-xl bg-zinc-100 text-sm font-medium text-zinc-500">
+
+      <div className="rounded-3xl border border-zinc-200 bg-white/80 shadow-sm backdrop-blur p-4">
+        <div className="text-base font-extrabold tracking-tight text-zinc-900">Map</div>
+        <div className="mt-3 grid h-40 place-items-center rounded-2xl bg-zinc-100 text-sm font-medium text-zinc-500">
           Map
         </div>
       </div>
