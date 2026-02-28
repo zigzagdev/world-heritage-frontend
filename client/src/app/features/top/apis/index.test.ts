@@ -7,7 +7,7 @@ type MockResponse = Pick<Response, "ok" | "status" | "json">;
 let fetchSpy: jest.MockedFunction<typeof fetch>;
 
 const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
-const EXPECTED_URL = `${API_BASE.replace(/\/+$/, "")}/api/v1/heritages`;
+const ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/heritages`;
 
 const makeOkResponse = (body: unknown): MockResponse => ({
   ok: true,
@@ -46,7 +46,15 @@ const makeDto = (overrides: Partial<ApiWorldHeritageDto> = {}): ApiWorldHeritage
   ...overrides,
 });
 
-const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination | null = null) => ({
+const makePagination = (overrides: Partial<Pagination> = {}): Pagination => ({
+  current_page: 1,
+  per_page: 30,
+  total: 1,
+  last_page: 1,
+  ...overrides,
+});
+
+const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination) => ({
   status: "success",
   data: {
     items,
@@ -54,7 +62,7 @@ const makeListResponse = (items: ApiWorldHeritageDto[], pagination: Pagination |
   } satisfies ListResult<ApiWorldHeritageDto>,
 });
 
-describe("fetchTopFirstPage (createTopApi)", () => {
+describe("fetchTopPage (createTopApi)", () => {
   let api: ReturnType<typeof createTopApi>;
 
   beforeEach(() => {
@@ -62,43 +70,42 @@ describe("fetchTopFirstPage (createTopApi)", () => {
     api = createTopApi({ apiBase: API_BASE, fetchImpl: fetchSpy });
   });
 
-  it("returns json.data.items when status is success", async () => {
+  it("returns json.data (items + pagination) when status is success", async () => {
     const items = [makeDto({ id: 1 })];
+    const pagination = makePagination({ total: 1, last_page: 1 });
 
-    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items)) as Response);
+    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    const out = await api.fetchTopFirstPage();
+    const out = await api.fetchTopPage({ currentPage: 1, perPage: 30 });
 
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
-      EXPECTED_URL,
+      expectedUrl,
       expect.objectContaining({
         headers: expect.objectContaining({ Accept: "application/json" }),
         credentials: "omit",
       }),
     );
-    expect(out).toEqual(items);
+
+    expect(out).toEqual({ items, pagination });
   });
 
-  it("allows overriding headers/credentials/signal", async () => {
-    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse([])) as Response);
+  it("passes signal when provided", async () => {
+    const items: ApiWorldHeritageDto[] = [];
+    const pagination = makePagination({ total: 0, last_page: 1 });
 
-    const ac = new AbortController();
+    fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-    await api.fetchTopFirstPage({
-      headers: { "X-Trace": "t" },
-      credentials: "include",
-      signal: ac.signal,
-    });
+    const abortController = new AbortController();
+    await api.fetchTopPage({ currentPage: 1, perPage: 30, signal: abortController.signal });
 
+    const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
     expect(fetchSpy).toHaveBeenCalledWith(
-      EXPECTED_URL,
+      expectedUrl,
       expect.objectContaining({
-        headers: expect.objectContaining({
-          Accept: "application/json",
-          "X-Trace": "t",
-        }),
-        credentials: "include",
-        signal: ac.signal,
+        headers: expect.objectContaining({ Accept: "application/json" }),
+        credentials: "omit",
+        signal: abortController.signal,
       }),
     );
   });
@@ -106,17 +113,18 @@ describe("fetchTopFirstPage (createTopApi)", () => {
   it("throws on HTTP error", async () => {
     fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
-    await expect(api.fetchTopFirstPage()).rejects.toThrow("HTTP 500");
+    await expect(
+      api.fetchTopPage({ currentPage: 1, perPage: 30, signal: new AbortController().signal }),
+    ).rejects.toThrow("HTTP 500");
   });
 
   it("throws when API status is not success", async () => {
     fetchSpy.mockResolvedValue(
-      makeOkResponse({
-        status: "error",
-        data: { items: [], pagination: null },
-      }) as Response,
+      makeOkResponse({ status: "error", data: { items: [], pagination: null } }) as Response,
     );
 
-    await expect(api.fetchTopFirstPage()).rejects.toThrow("API status is not success: error");
+    await expect(
+      api.fetchTopPage({ currentPage: 1, perPage: 30, signal: new AbortController().signal }),
+    ).rejects.toThrow("API status is not success: error");
   });
 });

@@ -14,10 +14,10 @@ export function HeritageHero({ item }: Props) {
     <header className="mx-auto w-full max-w-6xl px-4 pt-10 pb-6">
       <div>
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
-          {item.title}
-          {item.heritageNameJp && (
+          {item.heritageNameJp}
+          {item.title && (
             <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
-              （{item.heritageNameJp}）
+              （{item.title}）
             </span>
           )}
         </h1>

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { createSearchApi } from "./search-api";
-import type { ApiWorldHeritageDto } from "../../../../domain/types";
+import type { ApiWorldHeritageDto, ListResult } from "../../../../domain/types";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
 
@@ -9,7 +9,20 @@ let fetchSpy: jest.MockedFunction<typeof fetch>;
 const API_BASE = process.env.VITE_API_BASE_URL ?? "http://localhost:8700";
 const ENDPOINT = `${API_BASE}/api/v1/heritages/search`;
 
-const makeOkResponse = (body: unknown): MockResponse => ({
+type ApiSearchResponse = {
+  status: "success" | "error";
+  data: {
+    data: ApiWorldHeritageDto[];
+    pagination: {
+      current_page: number;
+      per_page: number;
+      total: number;
+      last_page: number;
+    };
+  };
+};
+
+const makeOkResponse = (body: ApiSearchResponse): MockResponse => ({
   ok: true,
   status: 200,
   json: async () => body,
@@ -30,17 +43,17 @@ describe("searchHeritages (createSearchApi)", () => {
   });
 
   it("params無しならクエリ無しで叩く", async () => {
-    const body = {
+    const body: ApiSearchResponse = {
       status: "success",
       data: {
-        data: [] as ApiWorldHeritageDto[],
+        data: [],
         pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
       },
-    } as const;
+    };
 
     fetchSpy.mockResolvedValue(makeOkResponse(body) as Response);
 
-    const out = await api.searchHeritages({});
+    const out: ListResult<ApiWorldHeritageDto> = await api.searchHeritages({});
 
     expect(fetchSpy).toHaveBeenCalledWith(
       ENDPOINT,
@@ -50,17 +63,20 @@ describe("searchHeritages (createSearchApi)", () => {
       }),
     );
 
-    expect(out).toEqual(body);
+    expect(out).toEqual({
+      items: [],
+      pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
+    });
   });
 
   it("paramsがある場合はクエリを組み立てて叩く", async () => {
-    const body = {
+    const body: ApiSearchResponse = {
       status: "success",
       data: {
-        data: [] as ApiWorldHeritageDto[],
+        data: [],
         pagination: { current_page: 2, per_page: 10, total: 123, last_page: 13 },
       },
-    } as const;
+    };
 
     fetchSpy.mockResolvedValue(makeOkResponse(body) as Response);
 
@@ -68,12 +84,12 @@ describe("searchHeritages (createSearchApi)", () => {
       keyword: "Japan",
       region: "APA",
       category: "Cultural",
-      page: 2,
+      currentPage: 2,
       perPage: 10,
     });
 
     const expectedUrl =
-      `${ENDPOINT}?` + `search_query=Japan&region=APA&category=Cultural&page=2&per_page=10`;
+      `${ENDPOINT}?` + `search_query=Japan&region=APA&category=Cultural&current_page=2&per_page=10`;
 
     expect(fetchSpy).toHaveBeenCalledWith(
       expectedUrl,
@@ -83,17 +99,20 @@ describe("searchHeritages (createSearchApi)", () => {
       }),
     );
 
-    expect(out).toEqual(body);
+    expect(out).toEqual({
+      items: [],
+      pagination: { current_page: 2, per_page: 10, total: 123, last_page: 13 },
+    });
   });
 
   it("headers/credentials/signal が引数で上書きされる", async () => {
-    const body = {
+    const body: ApiSearchResponse = {
       status: "success",
       data: {
-        data: [] as ApiWorldHeritageDto[],
+        data: [],
         pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
       },
-    } as const;
+    };
 
     fetchSpy.mockResolvedValue(makeOkResponse(body) as Response);
 
@@ -125,18 +144,17 @@ describe("searchHeritages (createSearchApi)", () => {
 
   it("HTTP エラー時は例外を投げる", async () => {
     fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
-
     await expect(api.searchHeritages({ keyword: "Japan" })).rejects.toThrow("HTTP 500");
   });
 
   it("status !== success の場合は例外を投げる", async () => {
-    const body = {
+    const body: ApiSearchResponse = {
       status: "error",
       data: {
-        data: [] as ApiWorldHeritageDto[],
+        data: [],
         pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
       },
-    } as const;
+    };
 
     fetchSpy.mockResolvedValue(makeOkResponse(body) as Response);
 

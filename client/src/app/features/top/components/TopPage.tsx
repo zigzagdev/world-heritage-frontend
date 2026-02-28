@@ -1,6 +1,7 @@
 import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { HeritageCard } from "../cards/HeritageCard";
 import type { ReactNode } from "react";
+import { Pagination } from "@features/top/components/Pagination.tsx";
 
 export type SortOption = "default" | "year_desc" | "year_asc";
 
@@ -11,6 +12,13 @@ export type TopPageProps = {
   sortOption?: SortOption;
   onChangeSort?: (option: SortOption) => void;
   header?: ReactNode;
+  currentPage?: number;
+  perPage?: number;
+  lastPage?: number;
+  onChangePage?: (page: number) => void;
+  onChangePerPage?: (perPage: number) => void;
+  perPageOptions?: readonly number[];
+  paginationDisabled?: boolean;
 };
 
 function SortSelect({
@@ -45,7 +53,26 @@ export default function TopPage({
   sortOption,
   onChangeSort,
   header,
+  currentPage,
+  perPage,
+  lastPage,
+  onChangePage,
+  onChangePerPage,
+  perPageOptions,
+  paginationDisabled,
 }: TopPageProps) {
+  const options = (perPageOptions ?? [10, 30, 50, 70]) as readonly number[];
+
+  const showPagination =
+    typeof currentPage === "number" &&
+    typeof perPage === "number" &&
+    typeof lastPage === "number" &&
+    typeof onChangePage === "function" &&
+    lastPage > 1;
+
+  const showPerPageSelect =
+    showPagination && typeof onChangePerPage === "function" && options.length > 0;
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 pb-4 pt-4 backdrop-blur">
@@ -77,7 +104,9 @@ export default function TopPage({
           </div>
         </div>
       </div>
+
       <div>{header}</div>
+
       <div className="pt-8">
         {items.length === 0 ? (
           <div className="py-20 text-center">
@@ -91,6 +120,37 @@ export default function TopPage({
               </li>
             ))}
           </ul>
+        )}
+
+        {showPagination && typeof perPage === "number" && (
+          <div className="mt-10 flex flex-col items-center gap-3">
+            {showPerPageSelect && (
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-zinc-500">Per page</label>
+                <select
+                  value={perPage}
+                  onChange={(e) => onChangePerPage?.(Number(e.target.value))}
+                  disabled={paginationDisabled}
+                  className="h-9 rounded-full border border-zinc-200 bg-white px-3 text-sm text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+                  aria-label="Per page"
+                >
+                  {options.map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <Pagination
+              perPage={perPage}
+              currentPage={currentPage}
+              lastPage={lastPage}
+              onChange={onChangePage}
+              disabled={paginationDisabled}
+            />
+          </div>
         )}
       </div>
     </main>

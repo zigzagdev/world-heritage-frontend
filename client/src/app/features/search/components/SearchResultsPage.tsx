@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { WorldHeritageVm } from "../../../../domain/types";
 import { HeritageCard } from "@features/top/cards/HeritageCard";
+import { Pagination } from "@features/top/components/Pagination.tsx";
 
 type Pagination = {
   current_page: number;
@@ -18,48 +19,8 @@ export type SearchResultsPageProps = {
   onPrev?: () => void;
   onNext?: () => void;
   errorMessage?: string;
+  onPageChange?: (page: number) => void;
 };
-
-function Pager({
-  canPrev,
-  canNext,
-  onPrev,
-  onNext,
-}: {
-  canPrev: boolean;
-  canNext: boolean;
-  onPrev?: () => void;
-  onNext?: () => void;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        type="button"
-        disabled={!canPrev}
-        onClick={onPrev}
-        className="
-          h-10 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-800
-          shadow-sm hover:bg-zinc-50 disabled:opacity-40
-          focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
-        "
-      >
-        Prev
-      </button>
-      <button
-        type="button"
-        disabled={!canNext}
-        onClick={onNext}
-        className="
-          h-10 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-800
-          shadow-sm hover:bg-zinc-50 disabled:opacity-40
-          focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
-        "
-      >
-        Next
-      </button>
-    </div>
-  );
-}
 
 export default function SearchResultsPage({
   header,
@@ -67,14 +28,9 @@ export default function SearchResultsPage({
   pagination,
   rangeText,
   onClickItem,
-  onPrev,
-  onNext,
   errorMessage,
+  onPageChange,
 }: SearchResultsPageProps) {
-  const canPrev = Boolean(pagination && pagination.current_page > 1);
-  const canNext = Boolean(pagination && pagination.current_page < pagination.last_page);
-  const showPager = Boolean(pagination && pagination.last_page > 1);
-
   return (
     <>
       {header ?? null}
@@ -84,17 +40,13 @@ export default function SearchResultsPage({
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <h1 className="text-3xl font-extrabold tracking-tight text-indigo-700">
-                Search results
+                World Heritage Sites
               </h1>
               <p className="mt-1 text-sm font-medium text-zinc-700">{rangeText}</p>
               {errorMessage ? (
                 <p className="mt-1 text-xs font-medium text-red-700">{errorMessage}</p>
               ) : null}
             </div>
-
-            {showPager ? (
-              <Pager canPrev={canPrev} canNext={canNext} onPrev={onPrev} onNext={onNext} />
-            ) : null}
           </div>
         </div>
 
@@ -114,19 +66,17 @@ export default function SearchResultsPage({
           )}
         </div>
 
-        {showPager ? (
-          <div className="pt-10">
-            <div className="mx-auto max-w-7xl">
-              <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-4 py-3">
-                <div className="text-xs text-zinc-600">
-                  Page {pagination?.current_page} / {pagination?.last_page} · Total{" "}
-                  {pagination?.total.toLocaleString("en-CA")}
-                </div>
-                <Pager canPrev={canPrev} canNext={canNext} onPrev={onPrev} onNext={onNext} />
-              </div>
-            </div>
+        {pagination && (
+          <div className="mt-10 flex justify-center">
+            <Pagination
+              currentPage={pagination.current_page}
+              perPage={pagination.per_page}
+              lastPage={pagination.last_page}
+              onChange={onPageChange ?? (() => {})}
+              disabled={false}
+            />
           </div>
-        ) : null}
+        )}
       </main>
     </>
   );

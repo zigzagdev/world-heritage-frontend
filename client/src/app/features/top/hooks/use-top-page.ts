@@ -1,10 +1,18 @@
 import * as React from "react";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm.ts";
-import type { WorldHeritageVm } from "../../../../domain/types.ts";
-import { fetchTopFirstPage } from "../apis";
+import type { ApiWorldHeritageDto, ListResult, WorldHeritageVm } from "../../../../domain/types";
+import { fetchTopPage } from "@features/top/apis";
+
+type Pagination = {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+};
 
 type State = {
   data: WorldHeritageVm[];
+  pagination: Pagination;
   loading: boolean;
   error: unknown | null;
 };
@@ -21,6 +29,13 @@ const initialFilters: Filters = {
   region: null,
 };
 
+const initialPagination: Pagination = {
+  current_page: 1,
+  per_page: 30,
+  total: 0,
+  last_page: 1,
+};
+
 function compareNullableNumber(a: number | null, b: number | null): number {
   if (a === null && b === null) return 0;
   if (a === null) return 1;
@@ -28,23 +43,19 @@ function compareNullableNumber(a: number | null, b: number | null): number {
   return a - b;
 }
 
-const isAbortError = (err: unknown): boolean => {
-  if (err instanceof DOMException) return err.name === "AbortError";
-  if (typeof err === "object" && err !== null && "name" in err) {
-    return (err as { name?: unknown }).name === "AbortError";
-  }
-  return false;
-};
+export function useTopPage(args: { currentPage: number; perPage: number }) {
+  const { currentPage, perPage } = args;
 
-export function useTopPage() {
   const [state, setState] = React.useState<State>({
     data: [],
+    pagination: initialPagination,
     loading: true,
     error: null,
   });
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
   const [sort, setSort] = React.useState<SortOption>("default");
+
   const abortRef = React.useRef<AbortController | null>(null);
   const mountedRef = React.useRef(true);
 
@@ -56,7 +67,7 @@ export function useTopPage() {
     };
   }, []);
 
-  const load = React.useCallback(() => {
+  const load = React.useCallback((targetPage: number, targetPerPage: number) => {
     abortRef.current?.abort();
 
     const abortController = new AbortController();
@@ -64,31 +75,40 @@ export function useTopPage() {
 
     setState((prev) => ({ ...prev, loading: true, error: null }));
 
-    fetchTopFirstPage({ signal: abortController.signal })
-      .then((dtoList) => {
-        return toWorldHeritageListVm(dtoList);
-      })
-      .then((vmList) => {
-        if (!mountedRef.current) return;
-        if (abortController.signal.aborted) return;
-
-        setState({ data: vmList, loading: false, error: null });
-      })
-      .catch((err: unknown) => {
-        if (isAbortError(err)) return;
+    fetchTopPage({
+      currentPage: targetPage,
+      perPage: targetPerPage,
+      signal: abortController.signal,
+    })
+      .then((res: ListResult<ApiWorldHeritageDto>) => {
         if (!mountedRef.current) return;
 
-        setState({ data: [], loading: false, error: err });
+        const vmList = toWorldHeritageListVm(res.items);
+        setState({ data: vmList, pagination: res.pagination, loading: false, error: null });
+      })
+      .catch((e: unknown) => {
+        if (!mountedRef.current) return;
+
+        if (
+          typeof e === "object" &&
+          e !== null &&
+          "name" in e &&
+          (e as { name: unknown }).name === "AbortError"
+        ) {
+          return;
+        }
+
+        setState((prev) => ({ ...prev, loading: false, error: e }));
       });
   }, []);
 
   React.useEffect(() => {
-    load();
-  }, [load]);
+    load(currentPage, perPage);
+  }, [load, currentPage, perPage]);
 
   const reload = React.useCallback(() => {
-    load();
-  }, [load]);
+    load(currentPage, perPage);
+  }, [load, currentPage, perPage]);
 
   const setCategory = React.useCallback((category: string | null) => {
     setFilters((f) => ({ ...f, category }));
@@ -152,10 +172,14 @@ export function useTopPage() {
   return {
     items,
     rawItems: state.data,
+
+    pagination: state.pagination,
+
     reload,
     isLoading: state.loading,
     isError: state.error != null,
     error: state.error,
+
     filters,
     setCategory,
     setRegion,
@@ -163,6 +187,7 @@ export function useTopPage() {
     hasActiveFilters,
     categoryOptions,
     regionOptions,
+
     sort,
     setSort,
   };

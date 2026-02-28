@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -47,10 +47,10 @@ export function HeritageSearchForm({
     keyword: value?.keyword ?? "",
   });
 
-  const v = value ?? internal;
+  const searchValues = value ?? internal;
 
   const set = (patch: Partial<SearchValues>) => {
-    const next: SearchValues = { ...v, ...patch };
+    const next: SearchValues = { ...searchValues, ...patch };
 
     if (!value) setInternal(next);
     onChange?.(next);
@@ -58,9 +58,9 @@ export function HeritageSearchForm({
 
   const submit = () => {
     onSubmit?.({
-      region: v.region || undefined,
-      category: v.category || undefined,
-      keyword: v.keyword.trim() || undefined,
+      region: searchValues.region || undefined,
+      category: searchValues.category || undefined,
+      keyword: searchValues.keyword.trim() || undefined,
     });
   };
 
@@ -84,7 +84,7 @@ export function HeritageSearchForm({
         >
           <FieldLabel title="Region" subtitle="Area" />
           <select
-            value={v.region}
+            value={searchValues.region}
             onChange={(e) => set({ region: e.target.value })}
             className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
             aria-label="Region"
@@ -104,7 +104,7 @@ export function HeritageSearchForm({
         >
           <FieldLabel title="Category" subtitle="Type" />
           <select
-            value={v.category}
+            value={searchValues.category}
             onChange={(e) => set({ category: e.target.value })}
             className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
             aria-label="Category"
@@ -123,7 +123,7 @@ export function HeritageSearchForm({
         >
           <FieldLabel title="Keyword" subtitle="Name / Country" />
           <input
-            value={v.keyword}
+            value={searchValues.keyword}
             onChange={(e) => set({ keyword: e.target.value })}
             onFocus={() => setKeywordFocused(true)}
             onBlur={() => setKeywordFocused(false)}

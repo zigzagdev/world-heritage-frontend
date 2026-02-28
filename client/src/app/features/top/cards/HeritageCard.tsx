@@ -84,7 +84,9 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
         )}
 
         <div className="absolute inset-x-0 bottom-0 p-4">
-          <h3 className="text-base font-semibold text-white sm:text-lg">{title}</h3>
+          <h3 className="text-white text-lg font-semibold break-words leading-snug line-clamp-2">
+            {title}
+          </h3>
           {subtitle && <p className="mt-0.5 text-sm text-white/80">{subtitle}</p>}
         </div>
       </div>
