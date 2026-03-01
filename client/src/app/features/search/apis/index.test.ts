@@ -12,7 +12,7 @@ const ENDPOINT = `${API_BASE}/api/v1/heritages/search`;
 type ApiSearchResponse = {
   status: "success" | "error";
   data: {
-    data: ApiWorldHeritageDto[];
+    items: ApiWorldHeritageDto[];
     pagination: {
       current_page: number;
       per_page: number;
@@ -46,7 +46,7 @@ describe("searchHeritages (createSearchApi)", () => {
     const body: ApiSearchResponse = {
       status: "success",
       data: {
-        data: [],
+        items: [],
         pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
       },
     };
@@ -73,7 +73,7 @@ describe("searchHeritages (createSearchApi)", () => {
     const body: ApiSearchResponse = {
       status: "success",
       data: {
-        data: [],
+        items: [],
         pagination: { current_page: 2, per_page: 10, total: 123, last_page: 13 },
       },
     };
@@ -109,7 +109,7 @@ describe("searchHeritages (createSearchApi)", () => {
     const body: ApiSearchResponse = {
       status: "success",
       data: {
-        data: [],
+        items: [],
         pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
       },
     };
@@ -151,7 +151,7 @@ describe("searchHeritages (createSearchApi)", () => {
     const body: ApiSearchResponse = {
       status: "error",
       data: {
-        data: [],
+        items: [],
         pagination: { current_page: 1, per_page: 30, total: 0, last_page: 1 },
       },
     };

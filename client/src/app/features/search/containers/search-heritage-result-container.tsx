@@ -10,9 +10,10 @@ import {
 import { useHeritageSearchQuery } from "../../search/hooks/use-search-heritage-query";
 import SearchResultsPage from "../components/SearchResultsPage";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm";
-import type { Pagination, HeritageSearchResponse } from "../types";
+import type { Pagination } from "../types";
 import { HeritageSubHeader, type SearchValues } from "@features/top/components/HeritageSubHeader";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
+import type { ApiSearchResponse } from "@features/search/apis/search-api.ts";
 
 const fmtRangeText = (p: Pagination, count: number) => {
   if (count === 0) return `0 of ${p.total.toLocaleString("en-CA")}`;
@@ -22,15 +23,11 @@ const fmtRangeText = (p: Pagination, count: number) => {
 };
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
-
-const isHeritageSearchResponse = (v: unknown): v is HeritageSearchResponse => {
+const isValidListResult = (
+  v: unknown,
+): v is { items: ApiSearchResponse[]; pagination: Pagination } => {
   if (!isObject(v)) return false;
-  if (v.status !== "success" && v.status !== "error") return false;
-
-  const d = v.data;
-  if (!isObject(d)) return false;
-
-  return Array.isArray(d.items) && isObject(d.pagination);
+  return Array.isArray(v.items) && isObject(v.pagination);
 };
 
 export function SearchHeritageResultsContainer(): React.ReactElement {
@@ -77,11 +74,11 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
   }, []);
 
   const handleSubmit = React.useCallback(
-    (q: Partial<SearchValues>) => {
+    (query: Partial<SearchValues>) => {
       const merged: SearchValues = {
-        region: q.region ?? draft.region,
-        category: q.category ?? draft.category,
-        keyword: q.keyword ?? draft.keyword,
+        region: query.region ?? draft.region,
+        category: query.category ?? draft.category,
+        keyword: query.keyword ?? draft.keyword,
       };
 
       const nextParams: HeritageSearchParams = {
@@ -120,25 +117,20 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
     );
   }
 
-  if (!data) {
-    return <SearchResultsPage header={header} items={[]} pagination={null} rangeText="Loading…" />;
-  }
-  if (!isHeritageSearchResponse(data) || data.status !== "success") {
-    const status = isObject(data) && "status" in data ? String(data.status) : "unknown";
+  if (!data || !isValidListResult(data)) {
     return (
       <SearchResultsPage
         header={header}
         items={[]}
         pagination={null}
         rangeText="Unexpected response."
-        errorMessage={`API status is not success: ${status}`}
+        errorMessage={!data ? undefined : "Invalid data structure: items or pagination missing."}
       />
     );
   }
 
-  const dtoList = data.data.items;
-  const pagination = data.data.pagination;
-
+  const dtoList = data.items;
+  const pagination = data.pagination;
   const items = toWorldHeritageListVm(dtoList);
   const rangeText = fmtRangeText(pagination, items.length);
 
