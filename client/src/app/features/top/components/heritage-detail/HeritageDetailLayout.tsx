@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria";
 import { HeritageSubHeader, type SearchValues } from "../HeritageSubHeader.tsx";
@@ -7,6 +7,8 @@ import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
 import { textType } from "@shared/styles/typography";
+import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
+import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 
 type Props = {
   item: WorldHeritageDetailVm;
@@ -54,18 +56,31 @@ function HeritageDetailTabs({ items }: { items: readonly TabItem[] }) {
 
 export function HeritageDetailLayout({ item, locale }: Props) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
+  const setLabel = useSetBreadcrumbLabel();
 
   const handleSubmit = (q: Partial<SearchValues>) => {
     const next = { ...search, ...q };
     setSearch(next);
   };
 
+  useEffect(() => {
+    if (item.id && item.name) {
+      setLabel(`/heritages/${item.id}`, item.name);
+    }
+  }, [item.id, item.name, setLabel]);
+
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
       <HeritageDetailTabs items={TABS} />
+
+      <div className="mx-auto w-full max-w-6xl px-4 mt-4">
+        <BreadcrumbList />
+      </div>
+
       <HeritageHero item={item} locale={locale} />
+
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 md:pt-12">
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="space-y-10 md:space-y-12">
