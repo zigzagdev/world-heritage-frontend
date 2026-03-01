@@ -11,10 +11,13 @@ export const BreadcrumbList = () => {
 
   return (
     <Breadcrumbs
+      maxItems={3}
+      itemsBeforeCollapse={1}
+      itemsAfterCollapse={2}
       aria-label="breadcrumb"
       sx={{
-        my: 3,
-        "& .MuiBreadcrumbs-separator": { color: "#a1a1aa" },
+        marginTop: "4px",
+        marginBottom: "28px",
       }}
     >
       {segments.map((segment, index) => {
@@ -29,14 +32,7 @@ export const BreadcrumbList = () => {
           );
         if (isLast) {
           return (
-            <Typography
-              key={segment.path}
-              sx={{
-                fontWeight: 700,
-                fontSize: "0.875rem",
-                color: "#71717a",
-              }}
-            >
+            <Typography key={segment.path} color="text.primary" noWrap sx={{ maxWidth: 200 }}>
               {labelContent}
             </Typography>
           );
@@ -46,14 +42,12 @@ export const BreadcrumbList = () => {
             key={segment.path}
             component={RouterLink}
             to={segment.path}
-            underline="none"
             sx={{
-              fontSize: "0.875rem",
-              color: "#71717a",
-              "&:hover": {
-                color: "#4338ca",
-                textDecoration: "underline",
-              },
+              display: "block",
+              maxWidth: 150,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
           >
             {labelContent}
