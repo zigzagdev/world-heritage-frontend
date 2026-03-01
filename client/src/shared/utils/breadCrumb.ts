@@ -1,6 +1,6 @@
 import { matchPath } from "react-router-dom";
 import { breadcrumbMap } from "@features/constants/route-config.ts";
-import type { RouteConfig } from "@features/constants/route-config.ts";
+import type { RouteConfig } from "@shared/types/routes";
 
 export interface BreadcrumbSegment {
   path: string;
