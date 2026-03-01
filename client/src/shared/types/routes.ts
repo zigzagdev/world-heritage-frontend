@@ -1,20 +1,15 @@
 export interface RouteConfig {
   path: string;
   label: string;
-  parent?: string;
+  parent?: string | null;
   isDynamic?: boolean; // flag to indicate if the route has dynamic segments
 }
 
 // config/breadcrumbMap.ts
 export const breadcrumbMap: Record<string, RouteConfig> = {
   "/": {
-    path: "/",
-    label: "Home",
-  },
-  "/heritages": {
     path: "/heritages",
-    label: "World Heritages",
-    parent: "/",
+    label: "Top",
   },
   "/heritages/:id": {
     path: "/heritages/:id",
@@ -22,9 +17,10 @@ export const breadcrumbMap: Record<string, RouteConfig> = {
     parent: "/heritages",
     isDynamic: true,
   },
-  "/heritages/:id/edit": {
-    path: "/heritages/:id/edit",
-    label: "Edit",
-    parent: "/heritages/:id",
+  "/heritages/results": {
+    path: "/heritages/results",
+    label: "Search Results",
+    parent: "/heritages",
+    isDynamic: false,
   },
 };

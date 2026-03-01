@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { WorldHeritageVm } from "../../../../domain/types";
 import { HeritageCard } from "@features/top/cards/HeritageCard";
 import { Pagination } from "@features/top/components/Pagination.tsx";
+import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 
 type Pagination = {
   current_page: number;
@@ -51,6 +52,8 @@ export default function SearchResultsPage({
         </div>
 
         <div className="pt-8">
+          <BreadcrumbList />
+
           {items.length === 0 ? (
             <div className="py-20 text-center">
               <p className="text-sm text-zinc-600">No sites found.</p>
