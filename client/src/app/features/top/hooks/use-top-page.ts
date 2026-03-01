@@ -54,6 +54,7 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
   });
 
   const [filters, setFilters] = React.useState<Filters>(initialFilters);
+
   const [sort, setSort] = React.useState<SortOption>("default");
 
   const abortRef = React.useRef<AbortController | null>(null);
@@ -61,6 +62,7 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
 
   React.useEffect(() => {
     mountedRef.current = true;
+
     return () => {
       mountedRef.current = false;
       abortRef.current?.abort();
@@ -73,7 +75,11 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
     const abortController = new AbortController();
     abortRef.current = abortController;
 
-    setState((prev) => ({ ...prev, loading: true, error: null }));
+    setState((prev) => ({
+      ...prev,
+      loading: true,
+      error: null,
+    }));
 
     fetchTopPage({
       currentPage: targetPage,
@@ -84,7 +90,13 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
         if (!mountedRef.current) return;
 
         const vmList = toWorldHeritageListVm(res.items);
-        setState({ data: vmList, pagination: res.pagination, loading: false, error: null });
+
+        setState({
+          data: vmList,
+          pagination: res.pagination,
+          loading: false,
+          error: null,
+        });
       })
       .catch((e: unknown) => {
         if (!mountedRef.current) return;
@@ -98,7 +110,11 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
           return;
         }
 
-        setState((prev) => ({ ...prev, loading: false, error: e }));
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: e,
+        }));
       });
   }, []);
 
@@ -126,13 +142,21 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
 
   const categoryOptions = React.useMemo(() => {
     const set = new Set<string>();
-    for (const it of state.data) set.add(it.category);
+
+    for (const it of state.data) {
+      set.add(it.category);
+    }
+
     return Array.from(set).sort();
   }, [state.data]);
 
   const regionOptions = React.useMemo(() => {
     const set = new Set<string>();
-    for (const it of state.data) set.add(it.region);
+
+    for (const it of state.data) {
+      set.add(it.region);
+    }
+
     return Array.from(set).sort();
   }, [state.data]);
 
@@ -144,14 +168,18 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
         ? state.data
         : state.data.filter((it) => {
             if (category && it.category !== category) return false;
+
             if (region && it.region !== region) return false;
+
             return true;
           });
 
     const sorted = [...filtered];
 
     sorted.sort((a, b) => {
-      if (sort === "default") return a.id - b.id;
+      if (sort === "default") {
+        return a.id - b.id;
+      }
 
       const byYear =
         sort === "year_desc"
@@ -161,6 +189,7 @@ export function useTopPage(args: { currentPage: number; perPage: number }) {
       if (byYear !== 0) return byYear;
 
       const byArea = compareNullableNumber(a.areaHectares, b.areaHectares);
+
       if (byArea !== 0) return byArea;
 
       return a.id - b.id;

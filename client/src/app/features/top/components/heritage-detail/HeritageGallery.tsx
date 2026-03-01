@@ -15,10 +15,16 @@ export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSel
   const preview = images.slice(0, previewCount);
 
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm px-5 py-5 md:px-6 md:py-6">
-      <div className="flex items-center justify-between gap-3">
+    <section
+      id="gallery"
+      className="rounded-3xl border border-zinc-200 bg-white px-5 py-6 md:px-8 md:py-8"
+    >
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-sm font-extrabold tracking-wide text-zinc-900">GALLERY</h2>
+          <h2 className="text-lg md:text-xl font-extrabold tracking-tight text-zinc-900">
+            Gallery
+          </h2>
+          <p className="mt-1 text-sm text-zinc-600">Photos and visual details of the site.</p>
         </div>
 
         {hasMore && (
@@ -34,7 +40,7 @@ export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSel
         )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {preview.map((img) => (
           <button
             key={img.id}
@@ -46,7 +52,7 @@ export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSel
             aria-label={img.alt ? `Open photo: ${img.alt}` : "Open photo"}
             title={img.alt ?? "Open photo"}
           >
-            <figure className="overflow-hidden border border-zinc-200 bg-white">
+            <figure className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
               <img
                 src={img.url}
                 alt={img.alt ?? ""}
@@ -54,8 +60,8 @@ export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSel
                 className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
               />
 
-              <figcaption className="flex items-center justify-between">
-                <span className="truncate text-[11px] font-medium text-zinc-500">
+              <figcaption className="px-2 py-1.5">
+                <span className="block truncate text-[11px] font-medium text-zinc-500">
                   {img.credit ? `© ${img.credit}` : " "}
                 </span>
               </figcaption>
