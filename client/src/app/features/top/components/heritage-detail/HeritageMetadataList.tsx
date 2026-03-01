@@ -8,7 +8,7 @@ export type MetadataItem = {
 };
 
 type Props = {
-  items: readonly MetadataItem[];
+  items: readonly MetadataItem[] | null;
   className?: string;
 };
 
@@ -16,11 +16,11 @@ export function HeritageMetadataList({ items, className }: Props) {
   return (
     <dl className={className ?? "heritage-detail__definition-list"}>
       {items
-        .filter((item) => !item.hidden)
-        .map((item) => (
-          <div className="heritage-detail__definition-item" key={String(item.label)}>
-            <dt>{item.label}</dt>
-            <dd>{item.value}</dd>
+        ?.filter((item) => !item.hidden)
+        .map((item, index) => (
+          <div key={index} className="heritage-detail__definition-item">
+            <dt className="heritage-detail__definition-term">{item.label}</dt>
+            <dd className="heritage-detail__definition-description">{item.value}</dd>
           </div>
         ))}
     </dl>

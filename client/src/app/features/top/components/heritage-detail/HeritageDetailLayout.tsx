@@ -65,9 +65,7 @@ export function HeritageDetailLayout({ item, locale }: Props) {
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
       <HeritageDetailTabs items={TABS} />
-
       <HeritageHero item={item} locale={locale} />
-
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 md:pt-12">
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="space-y-10 md:space-y-12">
