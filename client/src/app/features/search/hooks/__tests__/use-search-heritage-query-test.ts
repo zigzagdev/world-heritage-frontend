@@ -60,7 +60,7 @@ const createDeferred = <T>(): Deferred<T> => {
 const OK: ApiSearchResponse = {
   status: "success",
   data: {
-    data: [
+    items: [
       {
         id: 1,
         official_name: "Himeji-jo",

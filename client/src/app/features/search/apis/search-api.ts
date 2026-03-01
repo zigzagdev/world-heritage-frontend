@@ -16,7 +16,7 @@ export type SearchParams = {
 export type ApiSearchResponse = {
   status: "success" | "error";
   data: {
-    data: ApiWorldHeritageDto[];
+    items: ApiWorldHeritageDto[];
     pagination: {
       current_page: number;
       per_page: number;
@@ -67,7 +67,7 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
       }
 
       return {
-        items: json.data.data,
+        items: json.data.items,
         pagination: json.data.pagination,
       };
     },
