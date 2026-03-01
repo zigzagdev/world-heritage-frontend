@@ -76,21 +76,23 @@
 
 .heritage-detail__definition-item {
   display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.25rem 0;
-  font-size: 0.9rem;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
 }
 
 .heritage-detail__definition-item dt {
-  font-weight: 500;
-  color: #4b5563;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #71717a;
+  text-transform: uppercase;
 }
 
 .heritage-detail__definition-item dd {
-  margin: 0;
-  text-align: right;
-  color: #111827;
+  font-size: 15px;
+  font-weight: 500;
+  color: #18181b;
 }
 
 .heritage-detail__section {

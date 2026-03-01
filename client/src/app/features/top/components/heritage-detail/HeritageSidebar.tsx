@@ -11,10 +11,14 @@ const formatCriteriaInline = (criteria: string[] | undefined) =>
 const isZeroCoord = (lat: number | null | undefined, lng: number | null | undefined) =>
   lat != null && lng != null && lat === 0 && lng === 0;
 
-const formatCoordinates = (lat: number | null | undefined, lng: number | null | undefined) => {
-  if (lat == null || lng == null) return "—";
-  if (isZeroCoord(lat, lng)) return "—";
-  return `${lat.toFixed(4)} ${lng.toFixed(4)}`;
+const formatLatitude = (lat: number, decimals: number = 4): string => {
+  const direction = lat >= 0 ? "N" : "S";
+  return `${Math.abs(lat).toFixed(decimals)}° ${direction}`;
+};
+
+const formatLongitude = (lng: number, decimals: number = 4): string => {
+  const direction = lng >= 0 ? "E" : "W";
+  return `${Math.abs(lng).toFixed(decimals)}° ${direction}`;
 };
 
 function GroupTitle({ children }: { children: React.ReactNode }) {
@@ -36,8 +40,25 @@ export function HeritageSidebar({ item }: Props) {
   const geography = [
     { label: "Region", value: item.region ?? "—" },
     {
-      label: "Coordinates",
-      value: formatCoordinates(item.latitude, item.longitude),
+      label: "Latitude",
+      value:
+        item.latitude == null ||
+        item.longitude == null ||
+        isZeroCoord(item.latitude, item.longitude)
+          ? "—"
+          : formatLatitude(item.latitude),
+      hidden:
+        (item.latitude == null && item.longitude == null) ||
+        isZeroCoord(item.latitude ?? null, item.longitude ?? null),
+    },
+    {
+      label: "Longitude",
+      value:
+        item.latitude == null ||
+        item.longitude == null ||
+        isZeroCoord(item.latitude, item.longitude)
+          ? "—"
+          : formatLongitude(item.longitude),
       hidden:
         (item.latitude == null && item.longitude == null) ||
         isZeroCoord(item.latitude ?? null, item.longitude ?? null),
@@ -60,7 +81,6 @@ export function HeritageSidebar({ item }: Props) {
 
         <div className="border-t border-zinc-100 p-5 space-y-6">
           <div className="space-y-2">
-            <GroupTitle>IDENTITY</GroupTitle>
             <HeritageMetadataList items={identity} />
           </div>
 
