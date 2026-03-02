@@ -9,23 +9,31 @@ export interface BreadcrumbSegment {
   isDynamic: boolean; // whether this segment is from a dynamic route
 }
 
-export const getBreadcrumbSegments = (pathname: string): BreadcrumbSegment[] => {
+export const getBreadcrumbSegments = (
+  pathname: string,
+  dynamicLabels?: Record<string, string>,
+): BreadcrumbSegment[] => {
   const segments: BreadcrumbSegment[] = [];
+
   const currentEntry = Object.values(breadcrumbMap).find((route) =>
     matchPath({ path: route.path, end: true }, pathname),
   );
 
   if (!currentEntry) return [];
+
   let step: RouteConfig | undefined = currentEntry;
 
   while (step) {
     const match = matchPath({ path: step.path, end: false }, pathname);
 
     if (match) {
+      const overrideLabel = dynamicLabels?.[step.path];
+      const label = overrideLabel ?? step.label;
+
       segments.unshift({
         path: match.pathname,
         pattern: step.path,
-        label: step.label,
+        label,
         isDynamic: !!step.isDynamic,
       });
     }
