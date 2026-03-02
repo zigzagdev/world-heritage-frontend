@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback } from "react";
+import React, { createContext, useState, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import type { BreadcrumbContextType, BreadcrumbMap } from "../../../domain/types.ts";
 
@@ -8,12 +8,15 @@ export const BreadcrumbProvider: React.FC<{ children: ReactNode }> = ({ children
   const [labels, setLabels] = useState<BreadcrumbMap>({});
 
   const setLabel = useCallback((path: string, label: string) => {
-    setLabels((prev) => ({ ...prev, [path]: label }));
+    setLabels((prev) => {
+      if (prev[path] === label) return prev;
+      return { ...prev, [path]: label };
+    });
   }, []);
 
-  return (
-    <BreadcrumbContext.Provider value={{ labels, setLabel }}>{children}</BreadcrumbContext.Provider>
-  );
+  const value = useMemo(() => ({ labels, setLabel }), [labels, setLabel]);
+
+  return <BreadcrumbContext.Provider value={value}>{children}</BreadcrumbContext.Provider>;
 };
 
 export default BreadcrumbContext;

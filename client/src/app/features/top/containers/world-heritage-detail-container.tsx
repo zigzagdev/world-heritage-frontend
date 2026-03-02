@@ -24,11 +24,12 @@ export function WorldHeritageDetailContainer() {
   const breadcrumbCtx = useContext(BreadcrumbContext);
   if (!breadcrumbCtx) throw new Error("BreadcrumbProvider is missing");
 
+  const { setLabel } = breadcrumbCtx;
+
   useEffect(() => {
     const label = isLoading ? "Loading…" : isError ? "Failed to load" : (item?.name ?? "Details");
-
-    breadcrumbCtx.setLabel("/heritages/:id", label);
-  }, [breadcrumbCtx, isLoading, isError, item?.name]);
+    setLabel("/heritages/:id", label);
+  }, [setLabel, isLoading, isError, item?.name]);
 
   if (isLoading) return <p>Loading…</p>;
 
