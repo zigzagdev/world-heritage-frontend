@@ -3,7 +3,7 @@ import type { RouteConfig } from "@shared/types/routes";
 export const breadcrumbMap: Record<string, RouteConfig> = {
   "/heritages": {
     path: "/heritages",
-    label: "Index",
+    label: "World Heritages",
     parent: null,
     isDynamic: false,
   },
