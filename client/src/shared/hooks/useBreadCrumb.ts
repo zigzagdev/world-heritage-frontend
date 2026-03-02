@@ -2,13 +2,11 @@ import { useLocation } from "react-router-dom";
 import { useMemo } from "react";
 import { getBreadcrumbSegments, type BreadcrumbSegment } from "@shared/utils/breadCrumb.ts";
 
-export const useBreadcrumbs = (): BreadcrumbSegment[] => {
+export const useBreadcrumbs = (dynamicLabels?: Record<string, string>): BreadcrumbSegment[] => {
   const { pathname } = useLocation();
 
   // whenever pathname changes, recalculate the breadcrumb segments
-  const segments = useMemo(() => {
-    return getBreadcrumbSegments(pathname);
-  }, [pathname]);
-
-  return segments;
+  return useMemo(() => {
+    return getBreadcrumbSegments(pathname, dynamicLabels);
+  }, [pathname, dynamicLabels]);
 };
