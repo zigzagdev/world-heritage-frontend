@@ -9,6 +9,12 @@ type State = {
   error: unknown | null;
 };
 
+function isAbortError(err: unknown): boolean {
+  if (typeof err !== "object" || err === null) return false;
+  const e = err as { name?: unknown; message?: unknown };
+  return e.name === "AbortError" || e.message === "The user aborted a request.";
+}
+
 export function useWorldHeritageDetail(id: string | null | undefined) {
   const [state, setState] = React.useState<State>({
     data: null,
@@ -17,32 +23,47 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
   });
 
   const abortRef = React.useRef<AbortController | null>(null);
+  const reqIdRef = React.useRef(0);
+
   const load = React.useCallback(() => {
     if (!id) {
+      abortRef.current?.abort();
+      abortRef.current = null;
       setState({ data: null, loading: false, error: null });
       return;
     }
 
+    // increment request ID for each load to identify the latest request
+    reqIdRef.current += 1;
+    const reqId = reqIdRef.current;
+
+    // former request is still in-flight, abort it
     abortRef.current?.abort();
-    const Aborting = new AbortController();
-    abortRef.current = Aborting;
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     setState((s) => ({ ...s, loading: true, error: null }));
 
-    fetchWorldHeritageDetail(id, { signal: Aborting.signal })
+    fetchWorldHeritageDetail(id, { signal: controller.signal })
       .then(toWorldHeritageDetailVm)
-      .then((vm) => setState({ data: vm, loading: false, error: null }))
+      .then((vm) => {
+        // prepare for the next request
+        if (reqId !== reqIdRef.current) return;
+        setState({ data: vm, loading: false, error: null });
+      })
       .catch((err: unknown) => {
-        if ((err as { name?: string }).name === "AbortError") return;
+        if (isAbortError(err)) return;
+        if (reqId !== reqIdRef.current) return;
         setState({ data: null, loading: false, error: err });
       });
   }, [id]);
 
   React.useEffect(() => {
-    if (!id) return;
     load();
-    return () => abortRef.current?.abort();
-  }, [id, load]);
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [load]);
 
   return {
     item: state.data,
