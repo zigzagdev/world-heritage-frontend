@@ -182,3 +182,10 @@ export type ApiWorldHeritageListResponse = {
   items: ApiWorldHeritageDto[];
   pagination: ApiPaginationDto;
 };
+
+export type BreadcrumbMap = Record<string, string>;
+
+export interface BreadcrumbContextType {
+  labels: BreadcrumbMap;
+  setLabel: (path: string, label: string) => void;
+}
