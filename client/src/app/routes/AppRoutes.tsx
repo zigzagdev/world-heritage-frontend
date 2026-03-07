@@ -8,6 +8,7 @@ export function AppRoutes() {
   return (
     <BreadcrumbProvider>
       <Routes>
+        <Route path="/" element={<Navigate to="/heritages" replace />} />
         <Route path="/heritages" element={<TopPageContainer />} />
         <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
         <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
