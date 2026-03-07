@@ -7,7 +7,7 @@ import path from "node:path";
 export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
-    base: mode === "production" ? "/world-heritage-frontend/" : "/",
+    base: mode === "production" ? "/heritages/" : "/",
     css: {
       postcss: {
         plugins: [tailwindcss(), autoprefixer()],
