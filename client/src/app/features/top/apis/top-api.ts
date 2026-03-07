@@ -20,11 +20,13 @@ type ListResponse<T> = {
 };
 
 const normalizeApiBase = (apiBase: string): string => {
+  console.log("apiBase before createTopApi:", apiBase);
   return apiBase.replace(/\/+$/, "");
 };
 
 export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
   const normalizedApiBase = normalizeApiBase(apiBase);
+
   const endpoint = `${normalizedApiBase}/api/v1/heritages`;
 
   const withCommonInit = (init?: RequestInit): RequestInit => ({
