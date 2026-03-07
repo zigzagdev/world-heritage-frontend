@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script>
+      (function () {
+        var repoBase = "/world-heritage-frontend";
+        var currentPath = window.location.pathname;
+        var currentSearch = window.location.search || "";
+        var currentHash = window.location.hash || "";
+
+        if (currentPath === repoBase || currentPath === repoBase + "/") {
+          window.location.replace(repoBase + "/");
+          return;
+        }
+
+        var routePath =
+          currentPath.indexOf(repoBase) === 0 ? currentPath.slice(repoBase.length) : currentPath;
+
+        if (!routePath.startsWith("/")) {
+          routePath = "/" + routePath;
+        }
+
+        sessionStorage.setItem("gh-pages-spa-redirect", routePath + currentSearch + currentHash);
+
+        window.location.replace(repoBase + "/");
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
