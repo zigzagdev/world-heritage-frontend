@@ -19,9 +19,13 @@ type ListResponse<T> = {
   data: ListResult<T>;
 };
 
+const normalizeApiBase = (apiBase: string): string => {
+  return apiBase.replace(/\/+$/, "");
+};
+
 export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
-  const base = apiBase.replace(/\/+$/, "");
-  const ENDPOINT = `${base}/api/v1/heritages`;
+  const normalizedApiBase = normalizeApiBase(apiBase);
+  const endpoint = `${normalizedApiBase}/api/v1/heritages`;
 
   const withCommonInit = (init?: RequestInit): RequestInit => ({
     ...init,
@@ -39,12 +43,14 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
       perPage: number;
       signal?: AbortSignal;
     }): Promise<ListResult<ApiWorldHeritageDto>> {
-      const url = new URL(ENDPOINT);
+      const url = new URL(endpoint);
       url.searchParams.set("current_page", String(args.currentPage));
       url.searchParams.set("per_page", String(args.perPage));
 
       const res = await fetchImpl(url.toString(), withCommonInit({ signal: args.signal }));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
       const json = (await res.json()) as ListResponse<ApiWorldHeritageDto>;
       if (json.status !== "success") {
@@ -58,9 +64,11 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
       id: string,
       init?: RequestInit,
     ): Promise<ApiWorldHeritageDetailDto> {
-      const url = `${ENDPOINT}/${encodeURIComponent(id)}`;
+      const url = `${endpoint}/${encodeURIComponent(id)}`;
       const res = await fetchImpl(url, withCommonInit(init));
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
 
       const json = (await res.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
       if (json.status !== "success") {

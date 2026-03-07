@@ -1,4 +1,4 @@
-import type { ApiWorldHeritageDto, ListResult } from "../../../../domain/types";
+import type { ApiWorldHeritageDto, ListResult, Pagination } from "../../../../domain/types";
 
 export type SearchApiDeps = {
   apiBase: string;
@@ -17,18 +17,19 @@ export type ApiSearchResponse = {
   status: "success" | "error";
   data: {
     items: ApiWorldHeritageDto[];
-    pagination: {
-      current_page: number;
-      per_page: number;
-      total: number;
-      last_page: number;
-    };
+    pagination: Pagination;
   };
 };
 
+const normalizeApiBase = (apiBase: string): string => apiBase.replace(/\/+$/, "");
+
 export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) => {
-  const base = apiBase.replace(/\/+$/, "");
-  const ENDPOINT = `${base}/api/v1/heritages/search`;
+  if (!apiBase) {
+    throw new Error("apiBase is required");
+  }
+
+  const base = normalizeApiBase(apiBase);
+  const endpoint = `${base}/api/v1/heritages/search`;
 
   const withCommonInit = (init?: RequestInit): RequestInit => ({
     ...init,
@@ -40,13 +41,19 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
     signal: init?.signal,
   });
 
-  const buildQuery = (params: SearchParams) => {
+  const buildQuery = (params: SearchParams): string => {
     const queryParams = new URLSearchParams();
-    if (params.keyword) queryParams.set("search_query", params.keyword);
-    if (params.region) queryParams.set("region", params.region);
-    if (params.category) queryParams.set("category", params.category);
+
+    const keyword = params.keyword?.trim();
+    const region = params.region?.trim();
+    const category = params.category?.trim();
+
+    if (keyword) queryParams.set("search_query", keyword);
+    if (region) queryParams.set("region", region);
+    if (category) queryParams.set("category", category);
     if (params.currentPage != null) queryParams.set("current_page", String(params.currentPage));
     if (params.perPage != null) queryParams.set("per_page", String(params.perPage));
+
     return queryParams.toString();
   };
 
@@ -56,10 +63,12 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
       init?: RequestInit,
     ): Promise<ListResult<ApiWorldHeritageDto>> {
       const query = buildQuery(params);
-      const url = query ? `${ENDPOINT}?${query}` : ENDPOINT;
+      const url = query ? `${endpoint}?${query}` : endpoint;
 
       const response = await fetchImpl(url, withCommonInit(init));
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
       const json = (await response.json()) as ApiSearchResponse;
       if (json.status !== "success") {
