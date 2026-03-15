@@ -4,7 +4,7 @@ import TopPage from "../components/TopPage";
 import { useTopPage } from "../hooks/use-top-page";
 
 import { HeritageSubHeader, type SearchValues } from "../components/HeritageSubHeader";
-import type { HeritageSearchParams } from "@features/search/mapper/search-heritage.types";
+import type { HeritageSearchParams } from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
