@@ -78,8 +78,6 @@ const mkHookState = (overrides: Partial<UseTopPageResult> = {}): UseTopPageResul
     hasActiveFilters: false,
     categoryOptions: [],
     regionOptions: [],
-    sort: "default",
-    setSort: jest.fn(),
   };
 
   return { ...base, ...overrides };

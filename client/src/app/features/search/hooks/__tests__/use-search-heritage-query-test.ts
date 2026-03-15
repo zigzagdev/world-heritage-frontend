@@ -4,8 +4,8 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { jest, expect, test, beforeEach, describe } from "@jest/globals";
 import { useHeritageSearchQuery } from "../use-search-heritage-query.ts";
 import { fetchSearchHeritagesResult } from "../../apis";
-import type { ApiSearchResponse } from "../../apis/search-api";
-import type { HeritageSearchParams } from "../../types.ts";
+import type { ApiSearchResponse, SearchParams } from "../../apis/search-api";
+import type { HeritageSearchParams } from "../../../../../domain/types.ts";
 
 type MinimalAbortSignal = { aborted: boolean };
 
@@ -13,28 +13,31 @@ interface MinimalAbortController {
   readonly signal: MinimalAbortSignal;
   abort(): void;
 }
+
 type AbortControllerCtor = new () => MinimalAbortController;
 
 if (!("AbortController" in globalThis) || typeof globalThis.AbortController !== "function") {
   class FakeAbortController implements MinimalAbortController {
     private _signal: MinimalAbortSignal = { aborted: false };
+
     get signal(): MinimalAbortSignal {
       return this._signal;
     }
+
     abort(): void {
       this._signal.aborted = true;
     }
   }
+
   (globalThis as { AbortController: AbortControllerCtor }).AbortController = FakeAbortController;
 }
 
-// hooksは「API 関数を呼び、状態を更新する」ので、ここはAPIをMockする形で対応
 jest.mock("../../apis", () => ({
   fetchSearchHeritagesResult: jest.fn(),
 }));
 
 type FetchFn = (
-  params: HeritageSearchParams,
+  params: SearchParams,
   init?: { signal?: AbortSignal },
 ) => Promise<ApiSearchResponse>;
 
@@ -43,17 +46,19 @@ const fetchSearchHeritagesResultMock =
 
 type Deferred<T> = {
   promise: Promise<T>;
-  resolve: (v: T) => void;
-  reject: (e: unknown) => void;
+  resolve: (value: T) => void;
+  reject: (error: unknown) => void;
 };
 
 const createDeferred = <T>(): Deferred<T> => {
-  let resolve!: (v: T) => void;
-  let reject!: (e: unknown) => void;
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+
   const promise = new Promise<T>((res, rej) => {
     resolve = res;
     reject = rej;
   });
+
   return { promise, resolve, reject };
 };
 
@@ -98,7 +103,18 @@ const makeParams = (overrides: Partial<HeritageSearchParams> = {}): HeritageSear
   year_inscribed_to: null,
   current_page: 1,
   per_page: 30,
+  order: null,
   ...overrides,
+});
+
+const toExpectedSearchParams = (params: HeritageSearchParams): SearchParams => ({
+  keyword: params.search_query ?? undefined,
+  region: params.region ?? undefined,
+  category: params.category ?? undefined,
+  yearInscribedFrom: params.year_inscribed_from ?? undefined,
+  yearInscribedTo: params.year_inscribed_to ?? undefined,
+  currentPage: params.current_page,
+  perPage: params.per_page,
 });
 
 describe("useHeritageSearchQuery", () => {
@@ -126,8 +142,11 @@ describe("useHeritageSearchQuery", () => {
       search_query: "Japan",
       region: "APA",
       category: "Cultural",
+      year_inscribed_from: 1990,
+      year_inscribed_to: 2000,
       current_page: 1,
       per_page: 30,
+      order: null,
     });
 
     const { result } = renderHook(() => useHeritageSearchQuery(urlParams));
@@ -146,7 +165,7 @@ describe("useHeritageSearchQuery", () => {
     expect(fetchSearchHeritagesResultMock).toHaveBeenCalledTimes(1);
 
     const [calledParams, calledInit] = fetchSearchHeritagesResultMock.mock.calls[0];
-    expect(calledParams).toEqual(urlParams);
+    expect(calledParams).toEqual(toExpectedSearchParams(urlParams));
     expect(calledInit?.signal).toBeDefined();
   });
 
@@ -182,16 +201,26 @@ describe("useHeritageSearchQuery", () => {
       return calls.length === 1 ? first.promise : second.promise;
     });
 
-    const initialUrlParams = makeParams({ search_query: "Japan", current_page: 1, per_page: 30 });
+    const initialUrlParams = makeParams({
+      search_query: "Japan",
+      current_page: 1,
+      per_page: 30,
+    });
 
     const { result, rerender } = renderHook(
-      (p: HeritageSearchParams) => useHeritageSearchQuery(p),
+      (params: HeritageSearchParams) => useHeritageSearchQuery(params),
       {
         initialProps: initialUrlParams,
       },
     );
 
-    rerender(makeParams({ search_query: "Japan", current_page: 2, per_page: 30 }));
+    rerender(
+      makeParams({
+        search_query: "Japan",
+        current_page: 2,
+        per_page: 30,
+      }),
+    );
 
     await act(async () => {
       first.reject(new DOMException("Aborted", "AbortError"));
@@ -217,7 +246,7 @@ describe("useHeritageSearchQuery", () => {
     const first = createDeferred<ApiSearchResponse>();
     const second = createDeferred<ApiSearchResponse>();
 
-    const signals: (AbortSignal | undefined)[] = [];
+    const signals: Array<AbortSignal | undefined> = [];
 
     fetchSearchHeritagesResultMock.mockImplementation((_params, init) => {
       signals.push(init?.signal);
@@ -225,13 +254,23 @@ describe("useHeritageSearchQuery", () => {
     });
 
     const { result, rerender } = renderHook(
-      (p: HeritageSearchParams) => useHeritageSearchQuery(p),
+      (params: HeritageSearchParams) => useHeritageSearchQuery(params),
       {
-        initialProps: makeParams({ search_query: "Japan", current_page: 1, per_page: 30 }),
+        initialProps: makeParams({
+          search_query: "Japan",
+          current_page: 1,
+          per_page: 30,
+        }),
       },
     );
 
-    rerender(makeParams({ search_query: "Japan", current_page: 2, per_page: 30 }));
+    rerender(
+      makeParams({
+        search_query: "Japan",
+        current_page: 2,
+        per_page: 30,
+      }),
+    );
 
     await act(async () => {
       second.resolve(OK);
@@ -250,14 +289,20 @@ describe("useHeritageSearchQuery", () => {
   test("アンマウント時に現在のリクエストを abort する", () => {
     const searchRequest = createDeferred<ApiSearchResponse>();
 
-    const captured: (AbortSignal | undefined)[] = [];
+    const captured: Array<AbortSignal | undefined> = [];
     fetchSearchHeritagesResultMock.mockImplementation((_params, init) => {
       captured.push(init?.signal);
       return searchRequest.promise;
     });
 
     const { unmount } = renderHook(() =>
-      useHeritageSearchQuery(makeParams({ search_query: "Japan", current_page: 1, per_page: 30 })),
+      useHeritageSearchQuery(
+        makeParams({
+          search_query: "Japan",
+          current_page: 1,
+          per_page: 30,
+        }),
+      ),
     );
 
     unmount();

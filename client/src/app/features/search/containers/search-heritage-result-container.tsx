@@ -1,7 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import type { HeritageSearchParams } from "../mapper/search-heritage.types";
+import type { HeritageSearchParams } from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,

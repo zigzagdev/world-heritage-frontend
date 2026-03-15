@@ -1,4 +1,4 @@
-import type { HeritageSearchParams } from "./search-heritage.types.ts";
+import type { HeritageSearchParams } from "../../../../domain/types.ts";
 import type { IdSortOption } from "../../../../domain/types.ts";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as defaultSearchParams } from "./search-heritage.types.ts";
 
