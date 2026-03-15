@@ -1,6 +1,7 @@
 import type {
   ApiWorldHeritageDto,
   ApiWorldHeritageDetailDto,
+  IdSortOption,
   ListResult,
 } from "../../../../domain/types.ts";
 
@@ -20,7 +21,6 @@ type ListResponse<T> = {
 };
 
 const normalizeApiBase = (apiBase: string): string => {
-  console.log("apiBase before createTopApi:", apiBase);
   return apiBase.replace(/\/+$/, "");
 };
 
@@ -43,11 +43,13 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
     async fetchTopPage(args: {
       currentPage: number;
       perPage: number;
+      order: IdSortOption;
       signal?: AbortSignal;
     }): Promise<ListResult<ApiWorldHeritageDto>> {
       const url = new URL(endpoint);
       url.searchParams.set("current_page", String(args.currentPage));
       url.searchParams.set("per_page", String(args.perPage));
+      url.searchParams.set("order", args.order);
 
       const res = await fetchImpl(url.toString(), withCommonInit({ signal: args.signal }));
       if (!res.ok) {

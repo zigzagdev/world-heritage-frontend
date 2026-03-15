@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { createTopApi } from "./top-api";
-import type { ApiWorldHeritageDto, ListResult, Pagination } from "../../../../domain/types.ts";
+import type {
+  ApiWorldHeritageDto,
+  ListResult,
+  Pagination,
+  IdSortOption,
+} from "../../../../domain/types.ts";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
 
@@ -77,9 +82,13 @@ describe("createTopApi", () => {
 
       fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
 
-      const out = await api.fetchTopPage({ currentPage: 1, perPage: 30 });
+      const out = await api.fetchTopPage({
+        currentPage: 1,
+        perPage: 30,
+        order: "asc",
+      });
 
-      const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
+      const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30&order=asc`;
 
       expect(fetchSpy).toHaveBeenCalledWith(
         expectedUrl,
@@ -103,10 +112,11 @@ describe("createTopApi", () => {
       await api.fetchTopPage({
         currentPage: 1,
         perPage: 30,
+        order: "asc",
         signal: abortController.signal,
       });
 
-      const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30`;
+      const expectedUrl = `${ENDPOINT}?current_page=1&per_page=30&order=asc`;
 
       expect(fetchSpy).toHaveBeenCalledWith(
         expectedUrl,
@@ -118,6 +128,30 @@ describe("createTopApi", () => {
       );
     });
 
+    it.each<[IdSortOption, string]>([
+      ["asc", `${ENDPOINT}?current_page=1&per_page=30&order=asc`],
+      ["desc", `${ENDPOINT}?current_page=1&per_page=30&order=desc`],
+    ])("uses %s order in query params", async (order, expectedUrl) => {
+      const items: ApiWorldHeritageDto[] = [];
+      const pagination = makePagination({ total: 0, last_page: 1 });
+
+      fetchSpy.mockResolvedValue(makeOkResponse(makeListResponse(items, pagination)) as Response);
+
+      await api.fetchTopPage({
+        currentPage: 1,
+        perPage: 30,
+        order,
+      });
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expectedUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Accept: "application/json" }),
+          credentials: "omit",
+        }),
+      );
+    });
+
     it("throws on HTTP error", async () => {
       fetchSpy.mockResolvedValue(makeNgResponse(500) as Response);
 
@@ -125,6 +159,7 @@ describe("createTopApi", () => {
         api.fetchTopPage({
           currentPage: 1,
           perPage: 30,
+          order: "asc",
           signal: new AbortController().signal,
         }),
       ).rejects.toThrow("HTTP 500");
@@ -139,6 +174,7 @@ describe("createTopApi", () => {
         api.fetchTopPage({
           currentPage: 1,
           perPage: 30,
+          order: "asc",
           signal: new AbortController().signal,
         }),
       ).rejects.toThrow("API status is not success: error");

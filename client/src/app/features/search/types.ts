@@ -5,8 +5,8 @@ export type HeritageSearchParams = {
   country: string | null;
   region: string | null;
   category: string | null;
-  year_inscribed_from: number | null;
-  year_inscribed_to: number | null;
+  year_inscribed_from: string | null;
+  year_inscribed_to: string | null;
   current_page: number;
   per_page: number;
 };
