@@ -9,6 +9,8 @@ export type SearchParams = {
   keyword?: string;
   region?: string;
   category?: string;
+  yearInscribedFrom?: number;
+  yearInscribedTo?: number;
   currentPage?: number;
   perPage?: number;
 };
@@ -47,10 +49,14 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
     const keyword = params.keyword?.trim();
     const region = params.region?.trim();
     const category = params.category?.trim();
+    const yearInscribedFrom = params.yearInscribedFrom?.toString().trim();
+    const yearInscribedTo = params.yearInscribedTo?.toString().trim();
 
     if (keyword) queryParams.set("search_query", keyword);
     if (region) queryParams.set("region", region);
     if (category) queryParams.set("category", category);
+    if (yearInscribedFrom) queryParams.set("year_inscribed_from", yearInscribedFrom);
+    if (yearInscribedTo) queryParams.set("year_inscribed_to", yearInscribedTo);
     if (params.currentPage != null) queryParams.set("current_page", String(params.currentPage));
     if (params.perPage != null) queryParams.set("per_page", String(params.perPage));
 
