@@ -1,5 +1,5 @@
-import type { HeritageSearchParams } from "../../../../domain/types.ts";
-import type { IdSortOption } from "../../../../domain/types.ts";
+import type { HeritageSearchParams, IdSortOption, StudyRegion } from "../../../../domain/types.ts";
+import { STUDY_REGIONS } from "../../../../domain/types.ts";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as defaultSearchParams } from "./search-heritage.types.ts";
 
 const toNullIfEmpty = (v: string | null): string | null => {
@@ -19,8 +19,18 @@ const toIntOrNull = (v: string | null): number | null => {
 
 const clampMin = (n: number, min: number) => (n < min ? min : n);
 
+const isStudyRegion = (value: string): value is StudyRegion => {
+  return STUDY_REGIONS.includes(value as StudyRegion);
+};
+
+const toRegionOrNull = (v: string | null): StudyRegion | null => {
+  const s = toNullIfEmpty(v);
+  if (s == null) return null;
+  return isStudyRegion(s) ? s : null;
+};
+
 const isIdSortOption = (value: string): value is IdSortOption => {
-  return value === "id_asc" || value === "id_desc";
+  return value === "asc" || value === "desc";
 };
 
 const toOrderOrNull = (v: string | null): IdSortOption | null => {
@@ -35,7 +45,7 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
   const search_query =
     toNullIfEmpty(searchParams.get("search_query")) ?? defaultSearchParams.search_query;
   const country = toNullIfEmpty(searchParams.get("country")) ?? defaultSearchParams.country;
-  const region = toNullIfEmpty(searchParams.get("region")) ?? defaultSearchParams.region;
+  const region = toRegionOrNull(searchParams.get("region")) ?? defaultSearchParams.region;
   const category = toNullIfEmpty(searchParams.get("category")) ?? defaultSearchParams.category;
 
   const year_inscribed_from =
@@ -100,7 +110,7 @@ export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
   if (p.order != null && p.order !== defaultSearchParams.order) {
     searchParams.set("order", p.order);
   }
-  console.log(searchParams.toString());
+
   const qs = searchParams.toString();
   return qs ? `?${qs}` : "";
 }

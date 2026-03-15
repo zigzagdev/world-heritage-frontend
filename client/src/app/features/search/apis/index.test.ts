@@ -91,13 +91,13 @@ describe("createSearchApi", () => {
 
       const out = await api.searchHeritages({
         keyword: "Japan",
-        region: "APA",
+        region: "Asia",
         category: "Cultural",
         currentPage: 2,
         perPage: 10,
       });
 
-      const expectedUrl = `${ENDPOINT}?search_query=Japan&region=APA&category=Cultural&current_page=2&per_page=10`;
+      const expectedUrl = `${ENDPOINT}?search_query=Japan&region=Asia&category=Cultural&current_page=2&per_page=10`;
 
       expect(fetchSpy).toHaveBeenCalledWith(
         expectedUrl,
