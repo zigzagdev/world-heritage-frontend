@@ -3,6 +3,17 @@ export type Category = "Cultural" | "Natural" | "Mixed";
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
 export type CriteriaCode = (typeof CRITERIA)[number];
 
+export const STUDY_REGIONS = [
+  "Africa",
+  "Asia",
+  "Europe",
+  "North America",
+  "South America",
+  "Oceania",
+] as const;
+
+export type StudyRegion = (typeof STUDY_REGIONS)[number];
+
 export type StatePartyMetaDto = {
   is_primary: boolean;
   inscription_year?: number;
