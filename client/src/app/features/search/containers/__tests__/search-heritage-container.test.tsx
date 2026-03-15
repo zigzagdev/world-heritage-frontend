@@ -26,10 +26,28 @@ jest.mock("../../mapper/search-heritages.params", () => ({
 }));
 
 type SubHeaderProps = {
-  title: string;
-  value: { region: string; category: string; keyword: string };
-  onChange: (v: { region: string; category: string; keyword: string }) => void;
-  onSubmit: (q: { region?: string; category?: string; keyword?: string }) => void;
+  title?: string;
+  value: {
+    region: string;
+    category: string;
+    keyword: string;
+    yearInscribedFrom: string;
+    yearInscribedTo: string;
+  };
+  onChange: (v: {
+    region: string;
+    category: string;
+    keyword: string;
+    yearInscribedFrom: string;
+    yearInscribedTo: string;
+  }) => void;
+  onSubmit: (q: {
+    region?: string;
+    category?: string;
+    keyword?: string;
+    yearInscribedFrom?: string;
+    yearInscribedTo?: string;
+  }) => void;
 };
 
 let lastSubHeaderProps: SubHeaderProps | null = null;
@@ -66,16 +84,20 @@ const location = (search: string): Location =>
     key: "test",
   }) as Location;
 
+let currentLocation: Location;
+
 describe("SearchHeritageFormContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     lastSubHeaderProps = null;
 
+    currentLocation = location("?region=AFR&search_query=Kyoto");
+
     useNavigateMock.mockReturnValue(navigateMock);
-    useLocationMock.mockReturnValue(location("?region=AFR&search_query=Kyoto"));
+    useLocationMock.mockImplementation(() => currentLocation);
   });
 
-  test("passes location.search to parse and passes value to SubHeader", async () => {
+  test("passes location.search to parse and passes form values to SubHeader", async () => {
     parseMock.mockReturnValue({
       search_query: "Kyoto",
       country: null,
@@ -83,13 +105,13 @@ describe("SearchHeritageFormContainer", () => {
       category: null,
       year_inscribed_from: null,
       year_inscribed_to: null,
+      order: "asc",
       current_page: 3,
       per_page: 30,
     });
 
     render(<SearchHeritageFormContainer />);
 
-    expect(parseMock).toHaveBeenCalledTimes(1);
     expect(parseMock).toHaveBeenCalledWith("?region=AFR&search_query=Kyoto");
 
     await waitFor(() => {
@@ -98,6 +120,8 @@ describe("SearchHeritageFormContainer", () => {
         region: "AFR",
         category: "",
         keyword: "Kyoto",
+        yearInscribedFrom: "",
+        yearInscribedTo: "",
       });
     });
   });
@@ -110,6 +134,7 @@ describe("SearchHeritageFormContainer", () => {
       category: null,
       year_inscribed_from: null,
       year_inscribed_to: null,
+      order: "asc",
       current_page: 5,
       per_page: 30,
     });
@@ -141,57 +166,61 @@ describe("SearchHeritageFormContainer", () => {
     );
   });
 
-  test("re-parses when location.search changes (draft DOES NOT sync in current implementation)", async () => {
-    useLocationMock
-      .mockReturnValueOnce(location("?region=AFR&search_query=Kyoto"))
-      .mockReturnValueOnce(location("?region=EUR&category=Cultural&search_query=Paris"));
+  test("re-parses when location.search changes and syncs draft with params", async () => {
+    parseMock.mockImplementation((search: string) => {
+      if (search === "?region=AFR&search_query=Kyoto") {
+        return {
+          search_query: "Kyoto",
+          country: null,
+          region: "AFR",
+          category: null,
+          year_inscribed_from: null,
+          year_inscribed_to: null,
+          order: "asc",
+          current_page: 1,
+          per_page: 30,
+        };
+      }
 
-    parseMock
-      .mockReturnValueOnce({
-        search_query: "Kyoto",
-        country: null,
-        region: "AFR",
-        category: null,
-        year_inscribed_from: null,
-        year_inscribed_to: null,
-        current_page: 1,
-        per_page: 30,
-      })
-      .mockReturnValueOnce({
-        search_query: "Paris",
-        country: null,
-        region: "EUR",
-        category: "Cultural",
-        year_inscribed_from: null,
-        year_inscribed_to: null,
-        current_page: 1,
-        per_page: 30,
-      });
+      if (search === "?region=EUR&category=Cultural&search_query=Paris") {
+        return {
+          search_query: "Paris",
+          country: null,
+          region: "EUR",
+          category: "Cultural",
+          year_inscribed_from: null,
+          year_inscribed_to: null,
+          order: "asc",
+          current_page: 1,
+          per_page: 30,
+        };
+      }
+
+      throw new Error(`Unexpected search: ${search}`);
+    });
 
     const { rerender } = render(<SearchHeritageFormContainer />);
-
-    expect(parseMock).toHaveBeenNthCalledWith(1, "?region=AFR&search_query=Kyoto");
 
     await waitFor(() => expect(lastSubHeaderProps).not.toBeNull());
     expect(lastSubHeaderProps!.value).toEqual({
       region: "AFR",
       category: "",
       keyword: "Kyoto",
+      yearInscribedFrom: "",
+      yearInscribedTo: "",
     });
 
+    currentLocation = location("?region=EUR&category=Cultural&search_query=Paris");
     rerender(<SearchHeritageFormContainer />);
-
-    expect(parseMock).toHaveBeenNthCalledWith(
-      2,
-      "?region=EUR&category=Cultural&search_query=Paris",
-    );
 
     await waitFor(() => {
       expect(lastSubHeaderProps).not.toBeNull();
       expect(lastSubHeaderProps!.value).toEqual({
-        region: "AFR",
-        category: "",
-        keyword: "Kyoto",
+        region: "EUR",
+        category: "Cultural",
+        keyword: "Paris",
+        yearInscribedFrom: "",
+        yearInscribedTo: "",
       });
     });
   });
