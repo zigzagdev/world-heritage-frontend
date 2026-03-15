@@ -196,3 +196,15 @@ export const ID_SORT_OPTIONS = {
 } as const;
 
 export type IdSortOption = (typeof ID_SORT_OPTIONS)[keyof typeof ID_SORT_OPTIONS];
+
+export interface HeritageSearchParams {
+  search_query: string | null;
+  country: string | null;
+  region: string | null;
+  category: string | null;
+  year_inscribed_from: number | null;
+  year_inscribed_to: number | null;
+  current_page: number;
+  per_page: number;
+  order: IdSortOption | null;
+}

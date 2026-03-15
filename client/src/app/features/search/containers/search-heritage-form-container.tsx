@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { HeritageSearchParams } from "../mapper/search-heritage.types";
+import type { HeritageSearchParams } from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { HeritageSearchParams } from "../mapper/search-heritage.types";
+import type { HeritageSearchParams } from "../../../../domain/types.ts";
 import { fetchSearchHeritagesResult } from "../apis";
 import type { SearchParams } from "../apis/search-api";
 import type { ApiWorldHeritageDto, ListResult } from "../../../../domain/types";
