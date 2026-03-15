@@ -2,60 +2,34 @@ import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { HeritageCard } from "../cards/HeritageCard";
 import type { ReactNode } from "react";
 import { Pagination } from "@features/top/components/Pagination.tsx";
-
-export type SortOption = "default" | "year_desc" | "year_asc";
+import type { IdSortOption } from "../../../../domain/types.ts";
 
 export type TopPageProps = {
   items: ReadonlyArray<WorldHeritageVm>;
   onClickItem?: (id: number) => void;
   onReload?: () => void;
-  sortOption?: SortOption;
-  onChangeSort?: (option: SortOption) => void;
   header?: ReactNode;
   currentPage?: number;
   perPage?: number;
   lastPage?: number;
+  order: IdSortOption;
+  onChangeOrder: (order: IdSortOption) => void;
   onChangePage?: (page: number) => void;
   onChangePerPage?: (perPage: number) => void;
   perPageOptions?: readonly number[];
   paginationDisabled?: boolean;
 };
 
-function SortSelect({
-  value = "default",
-  onChange,
-}: {
-  value?: SortOption;
-  onChange?: (v: SortOption) => void;
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange?.(e.target.value as SortOption)}
-      className="
-        h-10 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-800
-        shadow-sm hover:bg-zinc-50
-        focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
-      "
-      aria-label="Sort"
-    >
-      <option value="default">Sort</option>
-      <option value="year_desc">Year (new → old)</option>
-      <option value="year_asc">Year (old → new)</option>
-    </select>
-  );
-}
-
 export default function TopPage({
   items,
   onClickItem,
   onReload,
-  sortOption,
-  onChangeSort,
   header,
   currentPage,
   perPage,
   lastPage,
+  order,
+  onChangeOrder,
   onChangePage,
   onChangePerPage,
   perPageOptions,
@@ -87,7 +61,20 @@ export default function TopPage({
           </div>
 
           <div className="flex items-center gap-2">
-            <SortSelect value={sortOption} onChange={onChangeSort} />
+            <select
+              value={order}
+              onChange={(e) => onChangeOrder(e.target.value as IdSortOption)}
+              className="
+                h-10 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-800
+                shadow-sm hover:bg-zinc-50
+                focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
+              "
+              aria-label="Sort by ID"
+            >
+              <option value="asc">ID ascending</option>
+              <option value="desc">ID descending</option>
+            </select>
+
             {onReload && (
               <button
                 type="button"

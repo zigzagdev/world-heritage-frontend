@@ -189,3 +189,10 @@ export interface BreadcrumbContextType {
   labels: BreadcrumbMap;
   setLabel: (path: string, label: string) => void;
 }
+
+export const ID_SORT_OPTIONS = {
+  ASC: "asc",
+  DESC: "desc",
+} as const;
+
+export type IdSortOption = (typeof ID_SORT_OPTIONS)[keyof typeof ID_SORT_OPTIONS];
