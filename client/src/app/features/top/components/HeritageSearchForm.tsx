@@ -2,16 +2,24 @@ import { useState, useMemo } from "react";
 import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
 
-type SearchValues = {
+export type SearchValues = {
   region: string;
   category: string;
   keyword: string;
+  yearInscribedFrom: string;
+  yearInscribedTo: string;
 };
 
 type Props = {
   value?: SearchValues;
   onChange?: (next: SearchValues) => void;
-  onSubmit?: (next: { region?: string; category?: string; keyword?: string }) => void;
+  onSubmit?: (next: {
+    region?: string;
+    category?: string;
+    keyword?: string;
+    yearInscribedFrom?: string;
+    yearInscribedTo?: string;
+  }) => void;
   expandKeywordOnFocus?: boolean;
 };
 
@@ -41,17 +49,19 @@ export function HeritageSearchForm({
 }: Props) {
   const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
   const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
+
   const [internal, setInternal] = useState<SearchValues>({
     region: value?.region ?? "",
     category: value?.category ?? "",
     keyword: value?.keyword ?? "",
+    yearInscribedFrom: value?.yearInscribedFrom ?? "",
+    yearInscribedTo: value?.yearInscribedTo ?? "",
   });
 
   const searchValues = value ?? internal;
 
   const set = (patch: Partial<SearchValues>) => {
     const next: SearchValues = { ...searchValues, ...patch };
-
     if (!value) setInternal(next);
     onChange?.(next);
   };
@@ -61,12 +71,13 @@ export function HeritageSearchForm({
       region: searchValues.region || undefined,
       category: searchValues.category || undefined,
       keyword: searchValues.keyword.trim() || undefined,
+      yearInscribedFrom: searchValues.yearInscribedFrom || undefined,
+      yearInscribedTo: searchValues.yearInscribedTo || undefined,
     });
   };
 
   const [keywordFocused, setKeywordFocused] = useState(false);
   const compactKeywordOnly = expandKeywordOnFocus && keywordFocused;
-
   return (
     <form
       onSubmit={(e) => {
@@ -118,6 +129,36 @@ export function HeritageSearchForm({
         </div>
 
         <Divider hidden={compactKeywordOnly} />
+
+        <div
+          className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[260px]`}
+        >
+          <FieldLabel title="Year" subtitle="Inscribed" />
+          <div className="flex w-full items-center gap-2">
+            <input
+              type="number"
+              inputMode="numeric"
+              value={searchValues.yearInscribedFrom}
+              onChange={(e) => set({ yearInscribedFrom: e.target.value })}
+              placeholder="From"
+              className="h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400 hover:bg-zinc-50 focus:outline-none"
+              aria-label="Year inscribed from"
+            />
+            <span className="text-sm text-zinc-400">-</span>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={searchValues.yearInscribedTo}
+              onChange={(e) => set({ yearInscribedTo: e.target.value })}
+              placeholder="To"
+              className="h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400 hover:bg-zinc-50 focus:outline-none"
+              aria-label="Year inscribed to"
+            />
+          </div>
+        </div>
+
+        <Divider hidden={compactKeywordOnly} />
+
         <div
           className={`flex items-center gap-3 ${compactKeywordOnly ? "w-full" : "md:flex-1"} md:flex md:flex-1`}
         >

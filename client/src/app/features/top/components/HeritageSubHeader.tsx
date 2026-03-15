@@ -4,6 +4,8 @@ export type SearchValues = {
   region: string;
   category: string;
   keyword: string;
+  yearInscribedFrom: string;
+  yearInscribedTo: string;
 };
 
 type Props = {

@@ -1,4 +1,5 @@
 import type { HeritageSearchParams } from "./search-heritage.types.ts";
+import type { IdSortOption } from "../../../../domain/types.ts";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as defaultSearchParams } from "./search-heritage.types.ts";
 
 const toNullIfEmpty = (v: string | null): string | null => {
@@ -13,11 +14,20 @@ const toIntOrNull = (v: string | null): number | null => {
   if (s === "") return null;
   const n = Number(s);
   if (!Number.isFinite(n)) return null;
-  const i = Math.floor(n);
-  return i;
+  return Math.floor(n);
 };
 
 const clampMin = (n: number, min: number) => (n < min ? min : n);
+
+const isIdSortOption = (value: string): value is IdSortOption => {
+  return value === "id_asc" || value === "id_desc";
+};
+
+const toOrderOrNull = (v: string | null): IdSortOption | null => {
+  const s = toNullIfEmpty(v);
+  if (s == null) return null;
+  return isIdSortOption(s) ? s : null;
+};
 
 export function parseHeritageSearchParams(search: string): HeritageSearchParams {
   const searchParams = new URLSearchParams(search);
@@ -43,6 +53,8 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
     1,
   );
 
+  const order = toOrderOrNull(searchParams.get("order")) ?? defaultSearchParams.order;
+
   return {
     search_query,
     country,
@@ -52,6 +64,7 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
     year_inscribed_to,
     current_page,
     per_page,
+    order,
   };
 }
 
@@ -61,7 +74,7 @@ export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
   const setStr = (k: string, v: string | null, def: string | null) => {
     if (v == null) return;
     const s = v.trim();
-    if (!s) return;
+    if (s === "") return;
     if (def != null && s === def) return;
     searchParams.set(k, s);
   };
@@ -84,6 +97,10 @@ export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
   setNum("current_page", p.current_page, defaultSearchParams.current_page);
   setNum("per_page", p.per_page, defaultSearchParams.per_page);
 
+  if (p.order != null && p.order !== defaultSearchParams.order) {
+    searchParams.set("order", p.order);
+  }
+  console.log(searchParams.toString());
   const qs = searchParams.toString();
   return qs ? `?${qs}` : "";
 }
