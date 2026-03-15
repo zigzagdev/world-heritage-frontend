@@ -19,6 +19,8 @@ const DEFAULT_SEARCH: SearchValues = {
   region: "",
   category: "",
   keyword: "",
+  yearInscribedFrom: "",
+  yearInscribedTo: "",
 };
 
 type TabItem = {
