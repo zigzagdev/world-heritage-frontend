@@ -4,6 +4,7 @@ import type {
   ApiWorldHeritageDto,
   IdSortOption,
   ListResult,
+  StudyRegion,
   WorldHeritageVm,
 } from "../../../../domain/types";
 import { fetchTopPage } from "@features/top/apis";
@@ -24,7 +25,7 @@ type State = {
 
 type Filters = {
   category: string | null;
-  region: string | null;
+  region: StudyRegion | null;
 };
 
 const initialFilters: Filters = {
@@ -129,7 +130,7 @@ export function useTopPage(args: { currentPage: number; perPage: number; order?:
     setFilters((f) => ({ ...f, category }));
   }, []);
 
-  const setRegion = React.useCallback((region: string | null) => {
+  const setRegion = React.useCallback((region: StudyRegion | null) => {
     setFilters((f) => ({ ...f, region }));
   }, []);
 

@@ -1,4 +1,9 @@
-import type { ApiWorldHeritageDto, ListResult, Pagination } from "../../../../domain/types";
+import type {
+  ApiWorldHeritageDto,
+  ListResult,
+  Pagination,
+  StudyRegion,
+} from "../../../../domain/types";
 
 export type SearchApiDeps = {
   apiBase: string;
@@ -7,7 +12,7 @@ export type SearchApiDeps = {
 
 export type SearchParams = {
   keyword?: string;
-  region?: string;
+  region?: StudyRegion;
   category?: string;
   yearInscribedFrom?: number;
   yearInscribedTo?: number;
@@ -47,10 +52,10 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
     const queryParams = new URLSearchParams();
 
     const keyword = params.keyword?.trim();
-    const region = params.region?.trim();
+    const region = params.region;
     const category = params.category?.trim();
-    const yearInscribedFrom = params.yearInscribedFrom?.toString().trim();
-    const yearInscribedTo = params.yearInscribedTo?.toString().trim();
+    const yearInscribedFrom = params.yearInscribedFrom?.toString();
+    const yearInscribedTo = params.yearInscribedTo?.toString();
 
     if (keyword) queryParams.set("search_query", keyword);
     if (region) queryParams.set("region", region);

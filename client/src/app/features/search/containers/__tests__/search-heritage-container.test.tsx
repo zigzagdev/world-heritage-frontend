@@ -5,11 +5,12 @@ import { describe, test, expect, beforeEach, jest } from "@jest/globals";
 import type { Location, NavigateFunction } from "react-router-dom";
 import * as ReactRouterDOM from "react-router-dom";
 
-import { SearchHeritageFormContainer } from "../search-heritage-form-container";
+import TopPageContainer from "../../../top/containers/top-page-container";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
-} from "../../mapper/search-heritages.params";
+} from "@features/search/mapper/search-heritages.params";
+import type { HeritageSearchParams, IdSortOption } from "../../../../../domain/types";
 
 jest.mock("react-router-dom", () => {
   const actual = jest.requireActual("react-router-dom") as typeof import("react-router-dom");
@@ -20,42 +21,64 @@ jest.mock("react-router-dom", () => {
   };
 });
 
-jest.mock("../../mapper/search-heritages.params", () => ({
+jest.mock("@features/search/mapper/search-heritages.params", () => ({
   parseHeritageSearchParams: jest.fn(),
   serializeHeritageSearchParams: jest.fn(),
 }));
 
-type SubHeaderProps = {
-  title?: string;
-  value: {
-    region: string;
-    category: string;
-    keyword: string;
-    yearInscribedFrom: string;
-    yearInscribedTo: string;
-  };
-  onChange: (v: {
-    region: string;
-    category: string;
-    keyword: string;
-    yearInscribedFrom: string;
-    yearInscribedTo: string;
-  }) => void;
-  onSubmit: (q: {
-    region?: string;
-    category?: string;
-    keyword?: string;
-    yearInscribedFrom?: string;
-    yearInscribedTo?: string;
-  }) => void;
+const useTopPageMock = jest.fn();
+
+jest.mock("@features/top/hooks/use-top-page.ts", () => ({
+  useTopPage: (args: { currentPage: number; perPage: number; order: IdSortOption }) =>
+    useTopPageMock(args),
+}));
+
+type SearchValues = {
+  region: string;
+  category: string;
+  keyword: string;
+  yearInscribedFrom: string;
+  yearInscribedTo: string;
 };
 
-let lastSubHeaderProps: SubHeaderProps | null = null;
+type HeritageSubHeaderProps = {
+  value: SearchValues;
+  onChange: (v: SearchValues) => void;
+  onSubmit: (q: Partial<SearchValues>) => void;
+};
+
+let lastSubHeaderProps: HeritageSubHeaderProps | null = null;
 
 jest.mock("@features/top/components/HeritageSubHeader.tsx", () => ({
-  HeritageSubHeader: (props: SubHeaderProps) => {
+  HeritageSubHeader: (props: HeritageSubHeaderProps) => {
     lastSubHeaderProps = props;
     return null;
+  },
+}));
+
+type TopPageProps = {
+  header: React.ReactNode;
+  items: unknown[];
+  onClickItem: (id: number) => void;
+  onReload: () => void;
+  currentPage: number;
+  perPage: number;
+  order: IdSortOption;
+  onChangeOrder: (order: IdSortOption) => void;
+  lastPage: number;
+  onChangePage: (page: number) => void;
+  paginationDisabled: boolean;
+  onChangePerPage: (perPage: number) => void;
+  perPageOptions: number[];
+};
+
+let lastTopPageProps: TopPageProps | null = null;
+
+jest.mock("@features/top/components/TopPage.tsx", () => ({
+  __esModule: true,
+  default: (props: TopPageProps) => {
+    lastTopPageProps = props;
+    return <>{props.header}</>;
   },
 }));
 
@@ -77,7 +100,7 @@ const navigateMock = jest.fn() as unknown as jest.MockedFunction<NavigateFunctio
 
 const location = (search: string): Location =>
   ({
-    pathname: "/search",
+    pathname: "/heritages",
     search,
     hash: "",
     state: null,
@@ -86,142 +109,241 @@ const location = (search: string): Location =>
 
 let currentLocation: Location;
 
-describe("SearchHeritageFormContainer", () => {
+const makeParsedParams = (overrides: Partial<HeritageSearchParams> = {}): HeritageSearchParams => ({
+  search_query: null,
+  country: null,
+  region: null,
+  category: null,
+  year_inscribed_from: null,
+  year_inscribed_to: null,
+  current_page: 1,
+  per_page: 30,
+  order: "asc",
+  ...overrides,
+});
+
+describe("TopPageContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     lastSubHeaderProps = null;
+    lastTopPageProps = null;
 
-    currentLocation = location("?region=AFR&search_query=Kyoto");
+    currentLocation = location(
+      "?region=Africa&search_query=Kyoto&current_page=3&per_page=30&order=asc",
+    );
 
     useNavigateMock.mockReturnValue(navigateMock);
     useLocationMock.mockImplementation(() => currentLocation);
+
+    useTopPageMock.mockReturnValue({
+      items: [],
+      pagination: {
+        current_page: 3,
+        per_page: 30,
+        total: 100,
+        last_page: 4,
+      },
+      reload: jest.fn(),
+      isLoading: false,
+      isError: false,
+    });
   });
 
-  test("passes location.search to parse and passes form values to SubHeader", async () => {
-    parseMock.mockReturnValue({
-      search_query: "Kyoto",
-      country: null,
-      region: "AFR",
-      category: null,
-      year_inscribed_from: null,
-      year_inscribed_to: null,
-      order: "asc",
-      current_page: 3,
-      per_page: 30,
-    });
+  test("passes location.search to parse and passes default draft values to SubHeader", async () => {
+    parseMock.mockReturnValue(
+      makeParsedParams({
+        search_query: "Kyoto",
+        region: "Africa",
+        current_page: 3,
+        per_page: 30,
+        order: "asc",
+      }),
+    );
 
-    render(<SearchHeritageFormContainer />);
+    render(<TopPageContainer />);
 
-    expect(parseMock).toHaveBeenCalledWith("?region=AFR&search_query=Kyoto");
+    expect(parseMock).toHaveBeenCalledWith(
+      "?region=Africa&search_query=Kyoto&current_page=3&per_page=30&order=asc",
+    );
 
     await waitFor(() => {
       expect(lastSubHeaderProps).not.toBeNull();
       expect(lastSubHeaderProps!.value).toEqual({
-        region: "AFR",
+        region: "",
         category: "",
-        keyword: "Kyoto",
+        keyword: "",
         yearInscribedFrom: "",
         yearInscribedTo: "",
       });
     });
-  });
 
-  test("onSubmit sets current_page=1 then serialize -> navigate (with trimmed keyword)", async () => {
-    parseMock.mockReturnValue({
-      search_query: "Kyoto",
-      country: null,
-      region: "AFR",
-      category: null,
-      year_inscribed_from: null,
-      year_inscribed_to: null,
+    expect(useTopPageMock).toHaveBeenCalledWith({
+      currentPage: 3,
+      perPage: 30,
       order: "asc",
-      current_page: 5,
-      per_page: 30,
     });
 
-    serializeMock.mockReturnValue("?region=EUR&search_query=Paris&current_page=1");
+    expect(lastTopPageProps).not.toBeNull();
+    expect(lastTopPageProps!.currentPage).toBe(3);
+    expect(lastTopPageProps!.perPage).toBe(30);
+    expect(lastTopPageProps!.order).toBe("asc");
+  });
 
-    render(<SearchHeritageFormContainer />);
+  test("onSubmit serialises merged search params and navigates to results", async () => {
+    parseMock.mockReturnValue(
+      makeParsedParams({
+        current_page: 2,
+        per_page: 30,
+        order: "asc",
+      }),
+    );
+
+    serializeMock.mockReturnValue(
+      "?region=Europe&category=Cultural&search_query=Paris&year_inscribed_from=1990&current_page=1&per_page=30&order=asc",
+    );
+
+    render(<TopPageContainer />);
 
     await waitFor(() => expect(lastSubHeaderProps).not.toBeNull());
 
     act(() => {
-      lastSubHeaderProps!.onSubmit({ region: "EUR", keyword: " Paris " });
+      lastSubHeaderProps!.onSubmit({
+        region: "Europe",
+        category: "Cultural",
+        keyword: " Paris ",
+        yearInscribedFrom: "1990",
+      });
     });
 
     expect(serializeMock).toHaveBeenCalledTimes(1);
-    expect(serializeMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        region: "EUR",
-        category: null,
-        search_query: "Paris",
-        current_page: 1,
-      }),
-    );
+    expect(serializeMock).toHaveBeenCalledWith({
+      search_query: "Paris",
+      country: null,
+      region: "Europe",
+      category: "Cultural",
+      year_inscribed_from: 1990,
+      year_inscribed_to: null,
+      current_page: 1,
+      per_page: 30,
+      order: "asc",
+    });
 
-    expect(navigateMock).toHaveBeenCalledTimes(1);
     expect(navigateMock).toHaveBeenCalledWith(
-      { pathname: "/search", search: "?region=EUR&search_query=Paris&current_page=1" },
+      {
+        pathname: "/heritages/results",
+        search:
+          "?region=Europe&category=Cultural&search_query=Paris&year_inscribed_from=1990&current_page=1&per_page=30&order=asc",
+      },
       { replace: false },
     );
   });
 
-  test("re-parses when location.search changes and syncs draft with params", async () => {
-    parseMock.mockImplementation((search: string) => {
-      if (search === "?region=AFR&search_query=Kyoto") {
-        return {
-          search_query: "Kyoto",
-          country: null,
-          region: "AFR",
-          category: null,
-          year_inscribed_from: null,
-          year_inscribed_to: null,
-          order: "asc",
-          current_page: 1,
-          per_page: 30,
-        };
-      }
+  test("onSubmit converts empty region to null", async () => {
+    parseMock.mockReturnValue(
+      makeParsedParams({
+        current_page: 1,
+        per_page: 30,
+        order: "asc",
+      }),
+    );
 
-      if (search === "?region=EUR&category=Cultural&search_query=Paris") {
-        return {
-          search_query: "Paris",
-          country: null,
-          region: "EUR",
-          category: "Cultural",
-          year_inscribed_from: null,
-          year_inscribed_to: null,
-          order: "asc",
-          current_page: 1,
-          per_page: 30,
-        };
-      }
+    serializeMock.mockReturnValue("?current_page=1&per_page=30&order=asc");
 
-      throw new Error(`Unexpected search: ${search}`);
-    });
-
-    const { rerender } = render(<SearchHeritageFormContainer />);
+    render(<TopPageContainer />);
 
     await waitFor(() => expect(lastSubHeaderProps).not.toBeNull());
-    expect(lastSubHeaderProps!.value).toEqual({
-      region: "AFR",
-      category: "",
-      keyword: "Kyoto",
-      yearInscribedFrom: "",
-      yearInscribedTo: "",
-    });
 
-    currentLocation = location("?region=EUR&category=Cultural&search_query=Paris");
-    rerender(<SearchHeritageFormContainer />);
-
-    await waitFor(() => {
-      expect(lastSubHeaderProps).not.toBeNull();
-      expect(lastSubHeaderProps!.value).toEqual({
-        region: "EUR",
-        category: "Cultural",
-        keyword: "Paris",
-        yearInscribedFrom: "",
-        yearInscribedTo: "",
+    act(() => {
+      lastSubHeaderProps!.onSubmit({
+        region: "",
+        keyword: "Kyoto",
       });
     });
+
+    expect(serializeMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        region: null,
+        search_query: "Kyoto",
+        current_page: 1,
+      }),
+    );
+  });
+
+  test("changes page with current perPage and order preserved", async () => {
+    parseMock.mockReturnValue(
+      makeParsedParams({
+        current_page: 3,
+        per_page: 30,
+        order: "asc",
+      }),
+    );
+
+    render(<TopPageContainer />);
+
+    await waitFor(() => expect(lastTopPageProps).not.toBeNull());
+
+    act(() => {
+      lastTopPageProps!.onChangePage(4);
+    });
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      {
+        pathname: "/heritages",
+        search: "?region=Africa&search_query=Kyoto&current_page=4&per_page=30&order=asc",
+      },
+      { replace: false },
+    );
+  });
+
+  test("changes perPage and resets current_page to 1", async () => {
+    parseMock.mockReturnValue(
+      makeParsedParams({
+        current_page: 3,
+        per_page: 30,
+        order: "asc",
+      }),
+    );
+
+    render(<TopPageContainer />);
+
+    await waitFor(() => expect(lastTopPageProps).not.toBeNull());
+
+    act(() => {
+      lastTopPageProps!.onChangePerPage(50);
+    });
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      {
+        pathname: "/heritages",
+        search: "?region=Africa&search_query=Kyoto&current_page=1&per_page=50&order=asc",
+      },
+      { replace: false },
+    );
+  });
+
+  test("changes order and resets current_page to 1", async () => {
+    parseMock.mockReturnValue(
+      makeParsedParams({
+        current_page: 3,
+        per_page: 30,
+        order: "asc",
+      }),
+    );
+
+    render(<TopPageContainer />);
+
+    await waitFor(() => expect(lastTopPageProps).not.toBeNull());
+
+    act(() => {
+      lastTopPageProps!.onChangeOrder("desc");
+    });
+
+    expect(navigateMock).toHaveBeenCalledWith(
+      {
+        pathname: "/heritages",
+        search: "?region=Africa&search_query=Kyoto&current_page=1&per_page=30&order=desc",
+      },
+      { replace: false },
+    );
   });
 });

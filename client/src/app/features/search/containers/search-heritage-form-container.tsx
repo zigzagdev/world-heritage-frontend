@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import type { HeritageSearchParams } from "../../../../domain/types";
 import {
@@ -10,6 +10,17 @@ import {
   type SearchValues,
 } from "@features/top/components/HeritageSubHeader.tsx";
 
+const REGION_VALUES = [
+  "Africa",
+  "Asia",
+  "Europe",
+  "North America",
+  "South America",
+  "Oceania",
+] as const;
+
+type HeritageRegion = (typeof REGION_VALUES)[number];
+
 const toSearchYearOrNull = (value: string): number | null => {
   const trimmed = value.trim();
   if (trimmed === "") return null;
@@ -18,6 +29,19 @@ const toSearchYearOrNull = (value: string): number | null => {
   if (!Number.isFinite(parsed)) return null;
 
   return Math.floor(parsed);
+};
+
+const toTrimmedStringOrNull = (value: string): string | null => {
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed;
+};
+
+const toRegionOrNull = (value: string): HeritageRegion | null => {
+  const trimmed = value.trim();
+
+  if (trimmed === "") return null;
+
+  return REGION_VALUES.includes(trimmed as HeritageRegion) ? (trimmed as HeritageRegion) : null;
 };
 
 export function SearchHeritageFormContainer() {
@@ -66,22 +90,28 @@ export function SearchHeritageFormContainer() {
         yearInscribedFrom: query.yearInscribedFrom ?? draft.yearInscribedFrom,
         yearInscribedTo: query.yearInscribedTo ?? draft.yearInscribedTo,
       };
-      const yearInscribedFrom = toSearchYearOrNull(merged.yearInscribedFrom);
-      const yearInscribedTo = toSearchYearOrNull(merged.yearInscribedTo);
 
       const nextParams: HeritageSearchParams = {
         ...params,
-        region: merged.region.trim() ? merged.region.trim() : null,
-        category: merged.category.trim() ? merged.category.trim() : null,
-        search_query: merged.keyword.trim() ? merged.keyword.trim() : null,
-        year_inscribed_from: yearInscribedFrom,
-        year_inscribed_to: yearInscribedTo,
+        region: toRegionOrNull(merged.region),
+        category: toTrimmedStringOrNull(merged.category),
+        search_query: toTrimmedStringOrNull(merged.keyword),
+        year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
+        year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
         current_page: 1,
       };
+
       const search = serializeHeritageSearchParams(nextParams);
-      navigate({ pathname: location.pathname, search }, { replace: false });
+
+      navigate(
+        {
+          pathname: location.pathname,
+          search,
+        },
+        { replace: false },
+      );
     },
-    [navigate, location.pathname, params, draft],
+    [draft, location.pathname, navigate, params],
   );
 
   return <HeritageSubHeader value={draft} onChange={onChange} onSubmit={onSubmit} />;

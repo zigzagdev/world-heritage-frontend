@@ -1,7 +1,8 @@
 import { HeritageSearchForm } from "./HeritageSearchForm";
+import type { StudyRegion } from "../../../../domain/types.ts";
 
 export type SearchValues = {
-  region: string;
+  region: StudyRegion | "";
   category: string;
   keyword: string;
   yearInscribedFrom: string;
