@@ -1,4 +1,5 @@
-export type Category = "Cultural" | "Natural" | "Mixed";
+export const CATEGORIES = ["Cultural", "Natural", "Mixed"] as const;
+export type Category = (typeof CATEGORIES)[number];
 
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
 export type CriteriaCode = (typeof CRITERIA)[number];
@@ -212,7 +213,7 @@ export interface HeritageSearchParams {
   search_query: string | null;
   country: string | null;
   region: StudyRegion | null;
-  category: string | null;
+  category: Category | null;
   year_inscribed_from: number | null;
   year_inscribed_to: number | null;
   current_page: number;
