@@ -1,25 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { HeritageSearchParams } from "../../../../domain/types";
+import {
+  STUDY_REGIONS,
+  CATEGORIES,
+  type Category,
+  type HeritageSearchParams,
+  type StudyRegion,
+} from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
 } from "../mapper/search-heritages.params.ts";
-import {
-  HeritageSubHeader,
-  type SearchValues,
-} from "@features/top/components/HeritageSubHeader.tsx";
-
-const REGION_VALUES = [
-  "Africa",
-  "Asia",
-  "Europe",
-  "North America",
-  "South America",
-  "Oceania",
-] as const;
-
-type HeritageRegion = (typeof REGION_VALUES)[number];
+import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader.tsx";
+import type { SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
 
 const toSearchYearOrNull = (value: string): number | null => {
   const trimmed = value.trim();
@@ -31,17 +24,27 @@ const toSearchYearOrNull = (value: string): number | null => {
   return Math.floor(parsed);
 };
 
-const toTrimmedStringOrNull = (value: string): string | null => {
-  const trimmed = value.trim();
-  return trimmed === "" ? null : trimmed;
+const isStudyRegion = (value: string): value is StudyRegion => {
+  return (STUDY_REGIONS as readonly string[]).includes(value);
 };
 
-const toRegionOrNull = (value: string): HeritageRegion | null => {
+const isCategory = (value: string): value is Category => {
+  return (CATEGORIES as readonly string[]).includes(value);
+};
+
+const toRegionOrNull = (value: StudyRegion | ""): StudyRegion | null => {
+  if (value === "") return null;
+  return isStudyRegion(value) ? value : null;
+};
+
+const toCategoryOrNull = (value: Category | ""): Category | null => {
+  if (value === "") return null;
+  return isCategory(value) ? value : null;
+};
+
+const toKeywordOrNull = (value: string): string | null => {
   const trimmed = value.trim();
-
-  if (trimmed === "") return null;
-
-  return REGION_VALUES.includes(trimmed as HeritageRegion) ? (trimmed as HeritageRegion) : null;
+  return trimmed === "" ? null : trimmed;
 };
 
 export function SearchHeritageFormContainer() {
@@ -94,8 +97,8 @@ export function SearchHeritageFormContainer() {
       const nextParams: HeritageSearchParams = {
         ...params,
         region: toRegionOrNull(merged.region),
-        category: toTrimmedStringOrNull(merged.category),
-        search_query: toTrimmedStringOrNull(merged.keyword),
+        category: toCategoryOrNull(merged.category),
+        search_query: toKeywordOrNull(merged.keyword),
         year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
         year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
         current_page: 1,

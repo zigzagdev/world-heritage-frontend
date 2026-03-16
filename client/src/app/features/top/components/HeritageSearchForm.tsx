@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
-import { STUDY_REGIONS, type StudyRegion } from "../../../../domain/types.ts";
+import {
+  CATEGORIES,
+  STUDY_REGIONS,
+  type Category,
+  type StudyRegion,
+} from "../../../../domain/types.ts";
 
 export type SearchValues = {
   region: StudyRegion | "";
-  category: string;
+  category: Category | "";
   keyword: string;
   yearInscribedFrom: string;
   yearInscribedTo: string;
@@ -16,7 +21,7 @@ type Props = {
   onChange?: (next: SearchValues) => void;
   onSubmit?: (next: {
     region?: StudyRegion | "";
-    category?: string;
+    category?: Category | "";
     keyword?: string;
     yearInscribedFrom?: string;
     yearInscribedTo?: string;
@@ -31,6 +36,15 @@ const isStudyRegion = (value: string): value is StudyRegion => {
 const toStudyRegionOrEmpty = (value: string): StudyRegion | "" => {
   if (value === "") return "";
   return isStudyRegion(value) ? value : "";
+};
+
+const isCategory = (value: string): value is Category => {
+  return (CATEGORIES as readonly string[]).includes(value);
+};
+
+const toCategoryOrEmpty = (value: string): Category | "" => {
+  if (value === "") return "";
+  return isCategory(value) ? value : "";
 };
 
 function Divider({ hidden }: { hidden?: boolean }) {
@@ -58,7 +72,7 @@ export function HeritageSearchForm({
   expandKeywordOnFocus = true,
 }: Props) {
   const regionOptions: readonly (StudyRegion | "")[] = ["", ...STUDY_REGIONS];
-  const categoryOptions = ["", "Cultural", "Natural", "Mixed"] as const;
+  const categoryOptions: readonly (Category | "")[] = ["", ...CATEGORIES];
 
   const [internal, setInternal] = useState<SearchValues>({
     region: value?.region ?? "",
@@ -127,7 +141,7 @@ export function HeritageSearchForm({
           <FieldLabel title="Category" subtitle="Type" />
           <select
             value={searchValues.category}
-            onChange={(e) => set({ category: e.target.value })}
+            onChange={(e) => set({ category: toCategoryOrEmpty(e.target.value) })}
             className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
             aria-label="Category"
           >

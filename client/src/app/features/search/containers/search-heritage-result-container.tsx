@@ -11,7 +11,8 @@ import { useHeritageSearchQuery } from "../../search/hooks/use-search-heritage-q
 import SearchResultsPage from "../components/SearchResultsPage";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm";
 import type { Pagination } from "../types";
-import { HeritageSubHeader, type SearchValues } from "@features/top/components/HeritageSubHeader";
+import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
+import type { SearchValues } from "@features/top/components/HeritageSearchForm";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
 import type { ApiSearchResponse } from "@features/search/apis/search-api";
 

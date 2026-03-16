@@ -1,10 +1,18 @@
 import { useMemo, useState } from "react";
 import { Button } from "@shared/uis/Button";
 import SearchIcon from "@mui/icons-material/Search";
+import { STUDY_REGIONS, CATEGORIES } from "../../../../../domain/types";
+import type { Category, StudyRegion } from "../../../../../domain/types";
+
+type SearchQuery = {
+  region?: StudyRegion;
+  category?: Category;
+  keyword?: string;
+};
 
 type Props = {
   title: string;
-  onSearch?: (q: { region?: string; category?: string; keyword?: string }) => void;
+  onSearch?: (q: SearchQuery) => void;
   onKeywordChange?: (keyword: string) => void;
 };
 
@@ -21,19 +29,27 @@ function FieldLabel({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props) {
-  const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
-  const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
+const isStudyRegion = (value: string): value is StudyRegion => {
+  return STUDY_REGIONS.includes(value as StudyRegion);
+};
 
-  const [region, setRegion] = useState("");
-  const [category, setCategory] = useState("");
+const isCategory = (value: string): value is Category => {
+  return CATEGORIES.includes(value as Category);
+};
+
+export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props): React.JSX.Element {
+  const regionOptions = useMemo(() => ["", ...STUDY_REGIONS] as const, []);
+  const categoryOptions = useMemo(() => ["", ...CATEGORIES] as const, []);
+
+  const [region, setRegion] = useState<StudyRegion | "">("");
+  const [category, setCategory] = useState<Category | "">("");
   const [keyword, setKeyword] = useState("");
 
   const submit = () => {
     onSearch?.({
-      region: region || undefined,
-      category: category || undefined,
-      keyword: keyword.trim() || undefined,
+      region: region === "" ? undefined : region,
+      category: category === "" ? undefined : category,
+      keyword: keyword.trim() === "" ? undefined : keyword.trim(),
     });
   };
 
@@ -56,13 +72,16 @@ export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props) {
                   <FieldLabel title="Region" subtitle="Area" />
                   <select
                     value={region}
-                    onChange={(e) => setRegion(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setRegion(value === "" || isStudyRegion(value) ? value : "");
+                    }}
                     className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
                     aria-label="Region"
                   >
-                    {regionOptions.map((v, i) => (
-                      <option key={`${v || "all"}-${i}`} value={v}>
-                        {v ? v : "All"}
+                    {regionOptions.map((value, index) => (
+                      <option key={`${value || "all"}-${index}`} value={value}>
+                        {value || "All"}
                       </option>
                     ))}
                   </select>
@@ -74,13 +93,16 @@ export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props) {
                   <FieldLabel title="Category" subtitle="Type" />
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setCategory(value === "" || isCategory(value) ? value : "");
+                    }}
                     className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
                     aria-label="Category"
                   >
-                    {categoryOptions.map((v, i) => (
-                      <option key={`${v || "all"}-${i}`} value={v}>
-                        {v ? v : "All"}
+                    {categoryOptions.map((value, index) => (
+                      <option key={`${value || "all"}-${index}`} value={value}>
+                        {value || "All"}
                       </option>
                     ))}
                   </select>

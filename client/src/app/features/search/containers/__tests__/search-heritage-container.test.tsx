@@ -169,9 +169,9 @@ describe("TopPageContainer", () => {
     await waitFor(() => {
       expect(lastSubHeaderProps).not.toBeNull();
       expect(lastSubHeaderProps!.value).toEqual({
-        region: "",
+        region: "Africa",
         category: "",
-        keyword: "",
+        keyword: "Kyoto",
         yearInscribedFrom: "",
         yearInscribedTo: "",
       });

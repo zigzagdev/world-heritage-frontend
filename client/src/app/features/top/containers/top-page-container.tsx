@@ -3,17 +3,40 @@ import { useLocation, useNavigate } from "react-router-dom";
 import TopPage from "../components/TopPage";
 import { useTopPage } from "../hooks/use-top-page";
 
-import { HeritageSubHeader, type SearchValues } from "../components/HeritageSubHeader";
-import type { HeritageSearchParams } from "../../../../domain/types";
+import { HeritageSubHeader } from "../components/HeritageSubHeader";
+import { type SearchValues } from "../components/HeritageSearchForm";
+import type {
+  Category,
+  HeritageSearchParams,
+  IdSortOption,
+  StudyRegion,
+} from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
 } from "@features/search/mapper/search-heritages.params";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "@features/search/mapper/search-heritage.types";
-import type { IdSortOption } from "../../../../domain/types";
 
 const DEFAULT_TOP_PER_PAGE = 30;
 const DEFAULT_ORDER: IdSortOption = "asc";
+
+const toStudyRegionOrNull = (value: StudyRegion | ""): StudyRegion | null => {
+  return value === "" ? null : value;
+};
+
+const toCategoryOrNull = (value: Category | ""): Category | null => {
+  return value === "" ? null : value;
+};
+
+const toSearchYearOrNull = (value: string): number | null => {
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) return null;
+
+  return Math.floor(parsed);
+};
 
 export default function TopPageContainer(): React.ReactElement {
   const location = useLocation();
@@ -21,8 +44,10 @@ export default function TopPageContainer(): React.ReactElement {
 
   const params: HeritageSearchParams = React.useMemo(() => {
     const parsed = parseHeritageSearchParams(location.search);
+
     return {
       ...SEARCH_PARAMS,
+      ...parsed,
       current_page: parsed.current_page ?? 1,
       per_page: parsed.per_page ?? DEFAULT_TOP_PER_PAGE,
       order: parsed.order ?? DEFAULT_ORDER,
@@ -45,12 +70,30 @@ export default function TopPageContainer(): React.ReactElement {
   );
 
   const [draft, setDraft] = React.useState<SearchValues>({
-    region: "",
-    category: "",
-    keyword: "",
-    yearInscribedFrom: "",
-    yearInscribedTo: "",
+    region: params.region ?? "",
+    category: params.category ?? "",
+    keyword: params.search_query ?? "",
+    yearInscribedFrom:
+      params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
+    yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
   });
+
+  React.useEffect(() => {
+    setDraft({
+      region: params.region ?? "",
+      category: params.category ?? "",
+      keyword: params.search_query ?? "",
+      yearInscribedFrom:
+        params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
+      yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
+    });
+  }, [
+    params.region,
+    params.category,
+    params.search_query,
+    params.year_inscribed_from,
+    params.year_inscribed_to,
+  ]);
 
   const handleSubmit = React.useCallback(
     (query: Partial<SearchValues>) => {
@@ -64,26 +107,27 @@ export default function TopPageContainer(): React.ReactElement {
 
       const nextParams: HeritageSearchParams = {
         ...SEARCH_PARAMS,
-        search_query: merged.keyword.trim() ? merged.keyword.trim() : null,
-        region: merged.region || null,
-        category: merged.category || null,
-        year_inscribed_from: merged.yearInscribedFrom ? Number(merged.yearInscribedFrom) : null,
-        year_inscribed_to: merged.yearInscribedTo ? Number(merged.yearInscribedTo) : null,
+        search_query: merged.keyword.trim() === "" ? null : merged.keyword.trim(),
+        region: toStudyRegionOrNull(merged.region),
+        category: toCategoryOrNull(merged.category),
+        year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
+        year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
         current_page: 1,
         per_page: perPage,
         order,
+        country: null,
       };
 
       const search = serializeHeritageSearchParams(nextParams);
-      navigate({ pathname: "/heritages/results", search }, { replace: false });
 
+      navigate({ pathname: "/heritages/results", search }, { replace: false });
       setDraft(merged);
     },
-    [navigate, draft, perPage, order],
+    [draft, navigate, order, perPage],
   );
 
-  const handleChangeDraft = React.useCallback((v: SearchValues) => {
-    setDraft(v);
+  const handleChangeDraft = React.useCallback((value: SearchValues) => {
+    setDraft(value);
   }, []);
 
   const handleChangePage = React.useCallback(
@@ -96,7 +140,7 @@ export default function TopPageContainer(): React.ReactElement {
 
       navigate({ pathname: "/heritages", search: `?${sp.toString()}` }, { replace: false });
     },
-    [navigate, location.search, perPage, order],
+    [location.search, navigate, order, perPage],
   );
 
   const handleChangePerPage = React.useCallback(
@@ -109,7 +153,7 @@ export default function TopPageContainer(): React.ReactElement {
 
       navigate({ pathname: "/heritages", search: `?${sp.toString()}` }, { replace: false });
     },
-    [navigate, location.search, order],
+    [location.search, navigate, order],
   );
 
   const handleChangeOrder = React.useCallback(
@@ -122,7 +166,7 @@ export default function TopPageContainer(): React.ReactElement {
 
       navigate({ pathname: "/heritages", search: `?${sp.toString()}` }, { replace: false });
     },
-    [navigate, location.search, perPage],
+    [location.search, navigate, perPage],
   );
 
   if (isLoading) {
@@ -140,7 +184,7 @@ export default function TopPageContainer(): React.ReactElement {
     return (
       <>
         <HeritageSubHeader value={draft} onChange={handleChangeDraft} onSubmit={handleSubmit} />
-        <main className="p-6 space-y-3">
+        <main className="space-y-3 p-6">
           <div className="text-red-700">Failed to load.</div>
           <button type="button" onClick={reload} className="underline">
             Retry
