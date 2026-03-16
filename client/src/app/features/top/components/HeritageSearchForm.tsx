@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
+import { STUDY_REGIONS, type StudyRegion } from "../../../../domain/types.ts";
 
 export type SearchValues = {
-  region: string;
+  region: StudyRegion | "";
   category: string;
   keyword: string;
   yearInscribedFrom: string;
@@ -14,13 +15,22 @@ type Props = {
   value?: SearchValues;
   onChange?: (next: SearchValues) => void;
   onSubmit?: (next: {
-    region?: string;
+    region?: StudyRegion | "";
     category?: string;
     keyword?: string;
     yearInscribedFrom?: string;
     yearInscribedTo?: string;
   }) => void;
   expandKeywordOnFocus?: boolean;
+};
+
+const isStudyRegion = (value: string): value is StudyRegion => {
+  return (STUDY_REGIONS as readonly string[]).includes(value);
+};
+
+const toStudyRegionOrEmpty = (value: string): StudyRegion | "" => {
+  if (value === "") return "";
+  return isStudyRegion(value) ? value : "";
 };
 
 function Divider({ hidden }: { hidden?: boolean }) {
@@ -47,8 +57,8 @@ export function HeritageSearchForm({
   onSubmit,
   expandKeywordOnFocus = true,
 }: Props) {
-  const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
-  const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
+  const regionOptions: readonly (StudyRegion | "")[] = ["", ...STUDY_REGIONS];
+  const categoryOptions = ["", "Cultural", "Natural", "Mixed"] as const;
 
   const [internal, setInternal] = useState<SearchValues>({
     region: value?.region ?? "",
@@ -78,6 +88,7 @@ export function HeritageSearchForm({
 
   const [keywordFocused, setKeywordFocused] = useState(false);
   const compactKeywordOnly = expandKeywordOnFocus && keywordFocused;
+
   return (
     <form
       onSubmit={(e) => {
@@ -96,7 +107,7 @@ export function HeritageSearchForm({
           <FieldLabel title="Region" subtitle="Area" />
           <select
             value={searchValues.region}
-            onChange={(e) => set({ region: e.target.value })}
+            onChange={(e) => set({ region: toStudyRegionOrEmpty(e.target.value) })}
             className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
             aria-label="Region"
           >

@@ -8,21 +8,24 @@ import { CRITERIA } from "../../../../domain/types.ts";
 
 const ORDER: readonly CriteriaCode[] = CRITERIA;
 
-const isCode = (v: string): v is CriteriaCode => (ORDER as readonly string[]).includes(v);
+const isCode = (value: string): value is CriteriaCode =>
+  (ORDER as readonly string[]).includes(value);
 
-const normalizeCriteria = (arr: readonly (string | CriteriaCode)[]): CriteriaCode[] =>
-  Array.from(new Set(arr))
+const normalizeCriteria = (values: readonly (string | CriteriaCode)[]): CriteriaCode[] =>
+  Array.from(new Set(values))
     .filter(isCode)
     .sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
 
-const fmtHa = (v: number | null) => (v == null ? "—" : `${Number(v).toLocaleString("en-CA")} ha`);
+const fmtHa = (value: number | null): string =>
+  value == null ? "—" : `${Number(value).toLocaleString("en-CA")} ha`;
 
-const titleOf = (data: ApiWorldHeritageDto) =>
+const titleOf = (data: ApiWorldHeritageDto): string =>
   data.heritage_name_jp || data.official_name || data.name;
 
-const countryLabelOf = (data: ApiWorldHeritageDto) => data.country_name_jp || data.country || null;
+const countryLabelOf = (data: ApiWorldHeritageDto): string | null =>
+  data.country_name_jp || data.country || null;
 
-const subtitleOf = (data: ApiWorldHeritageDto) =>
+const subtitleOf = (data: ApiWorldHeritageDto): string =>
   [countryLabelOf(data), data.region].filter(Boolean).join(" · ");
 
 const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
@@ -31,14 +34,16 @@ const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
 const normalizeStatePartiesMeta = (
   meta: ApiWorldHeritageDto["state_parties_meta"],
 ): WorldHeritageVm["statePartiesMeta"] => {
-  if (Array.isArray(meta)) return {};
+  if (Array.isArray(meta)) {
+    return {};
+  }
 
   return Object.fromEntries(
-    Object.entries(meta).map(([k, v]) => [
-      k,
+    Object.entries(meta).map(([key, value]) => [
+      key,
       {
-        isPrimary: v.is_primary,
-        inscriptionYear: v.inscription_year,
+        isPrimary: value.is_primary,
+        inscriptionYear: value.inscription_year,
       },
     ]),
   );

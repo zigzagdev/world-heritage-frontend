@@ -3,6 +3,17 @@ export type Category = "Cultural" | "Natural" | "Mixed";
 export const CRITERIA = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x"] as const;
 export type CriteriaCode = (typeof CRITERIA)[number];
 
+export const STUDY_REGIONS = [
+  "Africa",
+  "Asia",
+  "Europe",
+  "North America",
+  "South America",
+  "Oceania",
+] as const;
+
+export type StudyRegion = (typeof STUDY_REGIONS)[number];
+
 export type StatePartyMetaDto = {
   is_primary: boolean;
   inscription_year?: number;
@@ -36,7 +47,7 @@ export type ApiWorldHeritageDto = {
   heritage_name_jp: string;
   country: string;
   country_name_jp: string;
-  region: string;
+  region: StudyRegion;
   category: Category;
   year_inscribed: number;
   latitude: number | null;
@@ -63,7 +74,7 @@ export type ApiWorldHeritageDetailDto = {
   heritage_name_jp: string;
   country: string;
   country_name_jp: string;
-  region: string;
+  region: StudyRegion;
   category: Category;
   year_inscribed: number;
   latitude: number | null;
@@ -133,7 +144,7 @@ export type WorldHeritageVm = {
   heritageNameJp: string;
   country: string;
   countryNameJp: string;
-  region: string;
+  region: StudyRegion;
   category: Category;
   yearInscribed: number;
   latitude: number | null;
@@ -200,7 +211,7 @@ export type IdSortOption = (typeof ID_SORT_OPTIONS)[keyof typeof ID_SORT_OPTIONS
 export interface HeritageSearchParams {
   search_query: string | null;
   country: string | null;
-  region: string | null;
+  region: StudyRegion | null;
   category: string | null;
   year_inscribed_from: number | null;
   year_inscribed_to: number | null;
