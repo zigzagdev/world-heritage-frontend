@@ -1,15 +1,6 @@
-import { HeritageSearchForm } from "./HeritageSearchForm";
-import type { StudyRegion } from "../../../../domain/types.ts";
+import { HeritageSearchForm, type SearchValues } from "./HeritageSearchForm";
 
-export type SearchValues = {
-  region: StudyRegion | "";
-  category: string;
-  keyword: string;
-  yearInscribedFrom: string;
-  yearInscribedTo: string;
-};
-
-type Props = {
+export type Props = {
   value: SearchValues;
   onSubmit: (q: Partial<SearchValues>) => void;
   onChange?: (v: SearchValues) => void;

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria";
-import { HeritageSubHeader, type SearchValues } from "../HeritageSubHeader.tsx";
+import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
+import { type SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
 import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
