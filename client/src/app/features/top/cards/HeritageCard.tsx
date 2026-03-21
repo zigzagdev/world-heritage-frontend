@@ -67,6 +67,7 @@ export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
             <img
               src={item.thumbnailUrl}
               alt={item.thumbnailUrl ?? title}
+              referrerPolicy="no-referrer"
               loading="lazy"
               className="h-56 w-full object-cover sm:h-64 lg:h-72"
             />
