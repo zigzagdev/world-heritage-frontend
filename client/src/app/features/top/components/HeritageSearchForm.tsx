@@ -101,7 +101,7 @@ export function HeritageSearchForm({
             aria-label="Region"
           >
             {regionOptions.map((opt, i) => (
-              <option key={`${opt || "all"}-${i}`} value={opt}>
+              <option key={`${opt || "All"}-${i}`} value={opt}>
                 {opt ? opt : "All"}
               </option>
             ))}

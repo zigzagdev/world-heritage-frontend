@@ -56,6 +56,7 @@ export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSel
               <img
                 src={img.url}
                 alt={img.alt ?? ""}
+                referrerPolicy="no-referrer"
                 loading="lazy"
                 className="aspect-[4/3] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
               />

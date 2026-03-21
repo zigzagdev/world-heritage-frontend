@@ -149,7 +149,6 @@ export default function TopPageContainer(): React.ReactElement {
       </>
     );
   }
-
   return (
     <TopPage
       header={
