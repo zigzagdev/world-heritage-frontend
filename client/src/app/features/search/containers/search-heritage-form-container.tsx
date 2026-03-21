@@ -5,10 +5,8 @@ import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
 } from "../mapper/search-heritages.params.ts";
-import {
-  HeritageSubHeader,
-  type SearchValues,
-} from "@features/top/components/HeritageSubHeader.tsx";
+import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader.tsx";
+import type { SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
 
 const toSearchYearOrNull = (value: string): number | null => {
   const trimmed = value.trim();
@@ -46,6 +44,13 @@ export function SearchHeritageFormContainer({ onApiModeChange }: Props) {
   useEffect(() => {
     onApiModeChange?.(isSearchMode);
   }, [isSearchMode, onApiModeChange]);
+
+  // If no search condition exists on the results page, redirect to the list page.
+  useEffect(() => {
+    if (!isSearchMode && location.pathname === "/heritages/results") {
+      navigate({ pathname: "/heritages", search: location.search }, { replace: true });
+    }
+  }, [isSearchMode, location.pathname, location.search, navigate]);
 
   const valueFromUrl: SearchValues = useMemo(
     () => ({
@@ -87,8 +92,8 @@ export function SearchHeritageFormContainer({ onApiModeChange }: Props) {
 
       const nextParams: HeritageSearchParams = {
         ...params,
-        region: merged.region.trim() || null,
-        category: merged.category.trim() || null,
+        region: (merged.region.trim() || null) as HeritageSearchParams["region"],
+        category: (merged.category.trim() || null) as HeritageSearchParams["category"],
         search_query: merged.keyword.trim() || null,
         year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
         year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
