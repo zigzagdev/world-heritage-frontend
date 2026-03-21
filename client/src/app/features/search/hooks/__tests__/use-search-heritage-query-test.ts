@@ -140,7 +140,7 @@ describe("useHeritageSearchQuery", () => {
 
     const urlParams = makeParams({
       search_query: "Japan",
-      region: "APA",
+      region: "Asia",
       category: "Cultural",
       year_inscribed_from: 1990,
       year_inscribed_to: 2000,

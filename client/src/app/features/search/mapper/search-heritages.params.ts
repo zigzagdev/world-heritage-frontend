@@ -1,5 +1,10 @@
-import type { HeritageSearchParams } from "../../../../domain/types.ts";
-import type { IdSortOption } from "../../../../domain/types.ts";
+import type {
+  Category,
+  HeritageSearchParams,
+  IdSortOption,
+  StudyRegion,
+} from "../../../../domain/types.ts";
+import { CATEGORIES, STUDY_REGIONS } from "../../../../domain/types.ts";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as defaultSearchParams } from "./search-heritage.types.ts";
 
 const toNullIfEmpty = (v: string | null): string | null => {
@@ -12,20 +17,47 @@ const toIntOrNull = (v: string | null): number | null => {
   if (v == null) return null;
   const s = v.trim();
   if (s === "") return null;
+
   const n = Number(s);
   if (!Number.isFinite(n)) return null;
+
   return Math.floor(n);
 };
 
-const clampMin = (n: number, min: number) => (n < min ? min : n);
+const clampMin = (n: number, min: number): number => {
+  return n < min ? min : n;
+};
+
+const isStudyRegion = (value: string): value is StudyRegion => {
+  return STUDY_REGIONS.includes(value as StudyRegion);
+};
+
+const toRegionOrNull = (v: string | null): StudyRegion | null => {
+  const s = toNullIfEmpty(v);
+  if (s == null) return null;
+
+  return isStudyRegion(s) ? s : null;
+};
+
+const isCategory = (value: string): value is Category => {
+  return CATEGORIES.includes(value as Category);
+};
+
+const toCategoryOrNull = (v: string | null): Category | null => {
+  const s = toNullIfEmpty(v);
+  if (s == null) return null;
+
+  return isCategory(s) ? s : null;
+};
 
 const isIdSortOption = (value: string): value is IdSortOption => {
-  return value === "id_asc" || value === "id_desc";
+  return value === "asc" || value === "desc";
 };
 
 const toOrderOrNull = (v: string | null): IdSortOption | null => {
   const s = toNullIfEmpty(v);
   if (s == null) return null;
+
   return isIdSortOption(s) ? s : null;
 };
 
@@ -34,12 +66,16 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
 
   const search_query =
     toNullIfEmpty(searchParams.get("search_query")) ?? defaultSearchParams.search_query;
+
   const country = toNullIfEmpty(searchParams.get("country")) ?? defaultSearchParams.country;
-  const region = toNullIfEmpty(searchParams.get("region")) ?? defaultSearchParams.region;
-  const category = toNullIfEmpty(searchParams.get("category")) ?? defaultSearchParams.category;
+
+  const region = toRegionOrNull(searchParams.get("region")) ?? defaultSearchParams.region;
+
+  const category = toCategoryOrNull(searchParams.get("category")) ?? defaultSearchParams.category;
 
   const year_inscribed_from =
     toIntOrNull(searchParams.get("year_inscribed_from")) ?? defaultSearchParams.year_inscribed_from;
+
   const year_inscribed_to =
     toIntOrNull(searchParams.get("year_inscribed_to")) ?? defaultSearchParams.year_inscribed_to;
 
@@ -73,17 +109,21 @@ export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
 
   const setStr = (k: string, v: string | null, def: string | null) => {
     if (v == null) return;
+
     const s = v.trim();
     if (s === "") return;
     if (def != null && s === def) return;
+
     searchParams.set(k, s);
   };
 
   const setNum = (k: string, v: number | null, def: number | null) => {
     if (v == null) return;
     if (!Number.isFinite(v)) return;
+
     const i = Math.floor(v);
     if (def != null && i === def) return;
+
     searchParams.set(k, String(i));
   };
 
@@ -100,7 +140,7 @@ export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
   if (p.order != null && p.order !== defaultSearchParams.order) {
     searchParams.set("order", p.order);
   }
-  console.log(searchParams.toString());
+
   const qs = searchParams.toString();
   return qs ? `?${qs}` : "";
 }

@@ -1,10 +1,16 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
+import {
+  CATEGORIES,
+  STUDY_REGIONS,
+  type Category,
+  type StudyRegion,
+} from "../../../../domain/types.ts";
 
 export type SearchValues = {
-  region: string;
-  category: string;
+  region: StudyRegion | "";
+  category: Category | "";
   keyword: string;
   yearInscribedFrom: string;
   yearInscribedTo: string;
@@ -14,13 +20,31 @@ type Props = {
   value?: SearchValues;
   onChange?: (next: SearchValues) => void;
   onSubmit?: (next: {
-    region?: string;
-    category?: string;
+    region?: StudyRegion | "";
+    category?: Category | "";
     keyword?: string;
     yearInscribedFrom?: string;
     yearInscribedTo?: string;
   }) => void;
   expandKeywordOnFocus?: boolean;
+};
+
+const isStudyRegion = (value: string): value is StudyRegion => {
+  return (STUDY_REGIONS as readonly string[]).includes(value);
+};
+
+const toStudyRegionOrEmpty = (value: string): StudyRegion | "" => {
+  if (value === "") return "";
+  return isStudyRegion(value) ? value : "";
+};
+
+const isCategory = (value: string): value is Category => {
+  return (CATEGORIES as readonly string[]).includes(value);
+};
+
+const toCategoryOrEmpty = (value: string): Category | "" => {
+  if (value === "") return "";
+  return isCategory(value) ? value : "";
 };
 
 function Divider({ hidden }: { hidden?: boolean }) {
@@ -47,8 +71,8 @@ export function HeritageSearchForm({
   onSubmit,
   expandKeywordOnFocus = true,
 }: Props) {
-  const regionOptions = useMemo(() => ["", "AFR", "ARB", "APA", "EUR", "LAC"] as const, []);
-  const categoryOptions = useMemo(() => ["", "Cultural", "Natural", "Mixed"] as const, []);
+  const regionOptions: readonly (StudyRegion | "")[] = ["", ...STUDY_REGIONS];
+  const categoryOptions: readonly (Category | "")[] = ["", ...CATEGORIES];
 
   const [internal, setInternal] = useState<SearchValues>({
     region: value?.region ?? "",
@@ -78,6 +102,7 @@ export function HeritageSearchForm({
 
   const [keywordFocused, setKeywordFocused] = useState(false);
   const compactKeywordOnly = expandKeywordOnFocus && keywordFocused;
+
   return (
     <form
       onSubmit={(e) => {
@@ -96,7 +121,7 @@ export function HeritageSearchForm({
           <FieldLabel title="Region" subtitle="Area" />
           <select
             value={searchValues.region}
-            onChange={(e) => set({ region: e.target.value })}
+            onChange={(e) => set({ region: toStudyRegionOrEmpty(e.target.value) })}
             className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
             aria-label="Region"
           >
@@ -116,7 +141,7 @@ export function HeritageSearchForm({
           <FieldLabel title="Category" subtitle="Type" />
           <select
             value={searchValues.category}
-            onChange={(e) => set({ category: e.target.value })}
+            onChange={(e) => set({ category: toCategoryOrEmpty(e.target.value) })}
             className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
             aria-label="Category"
           >
