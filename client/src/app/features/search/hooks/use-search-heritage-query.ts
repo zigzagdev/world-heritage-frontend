@@ -18,7 +18,15 @@ const toSearchParams = (params: HeritageSearchParams): SearchParams => ({
   perPage: params.per_page,
 });
 
-export function useHeritageSearchQuery(params: HeritageSearchParams) {
+type Options = {
+  /** If false, the API call is skipped. Defaults to true. */
+  enabled?: boolean;
+};
+
+export function useHeritageSearchQuery(
+  params: HeritageSearchParams,
+  { enabled = true }: Options = {},
+) {
   const [data, setData] = useState<ListResult<ApiWorldHeritageDto> | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
@@ -26,6 +34,13 @@ export function useHeritageSearchQuery(params: HeritageSearchParams) {
   const request: SearchParams = useMemo(() => toSearchParams(params), [params]);
 
   useEffect(() => {
+    if (!enabled) {
+      setData(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const abortController = new AbortController();
 
     setLoading(true);
@@ -42,7 +57,7 @@ export function useHeritageSearchQuery(params: HeritageSearchParams) {
       .finally(() => setLoading(false));
 
     return () => abortController.abort();
-  }, [request]);
+  }, [enabled, request]);
 
   return { data, isLoading, error };
 }
