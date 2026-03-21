@@ -3,17 +3,12 @@ import { Button } from "@shared/uis/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import { STUDY_REGIONS, CATEGORIES } from "../../../../../domain/types";
 import type { Category, StudyRegion } from "../../../../../domain/types";
-
-type SearchQuery = {
-  region?: StudyRegion;
-  category?: Category;
-  keyword?: string;
-};
+import type { SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
 
 type Props = {
-  title: string;
-  onSearch?: (q: SearchQuery) => void;
-  onKeywordChange?: (keyword: string) => void;
+  value?: SearchValues;
+  onChange?: (next: SearchValues) => void;
+  onSubmit?: (query: Partial<SearchValues>) => void;
 };
 
 function Divider() {
@@ -37,19 +32,33 @@ const isCategory = (value: string): value is Category => {
   return CATEGORIES.includes(value as Category);
 };
 
-export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props): React.JSX.Element {
+export function HeritageSubHeader({ value, onChange, onSubmit }: Props): React.JSX.Element {
   const regionOptions = useMemo(() => ["", ...STUDY_REGIONS] as const, []);
   const categoryOptions = useMemo(() => ["", ...CATEGORIES] as const, []);
 
-  const [region, setRegion] = useState<StudyRegion | "">("");
-  const [category, setCategory] = useState<Category | "">("");
-  const [keyword, setKeyword] = useState("");
+  const [internal, setInternal] = useState<SearchValues>({
+    region: value?.region ?? "",
+    category: value?.category ?? "",
+    keyword: value?.keyword ?? "",
+    yearInscribedFrom: value?.yearInscribedFrom ?? "",
+    yearInscribedTo: value?.yearInscribedTo ?? "",
+  });
+
+  const current = value ?? internal;
+
+  const set = (patch: Partial<SearchValues>) => {
+    const next: SearchValues = { ...current, ...patch };
+    if (!value) setInternal(next);
+    onChange?.(next);
+  };
 
   const submit = () => {
-    onSearch?.({
-      region: region === "" ? undefined : region,
-      category: category === "" ? undefined : category,
-      keyword: keyword.trim() === "" ? undefined : keyword.trim(),
+    onSubmit?.({
+      region: current.region,
+      category: current.category,
+      keyword: current.keyword,
+      yearInscribedFrom: current.yearInscribedFrom,
+      yearInscribedTo: current.yearInscribedTo,
     });
   };
 
@@ -61,8 +70,6 @@ export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props): 
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                console.log(title);
-                onKeywordChange?.(keyword);
                 submit();
               }}
               className="rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm"
@@ -71,17 +78,17 @@ export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props): 
                 <div className="flex items-center gap-3 md:w-[180px]">
                   <FieldLabel title="Region" subtitle="Area" />
                   <select
-                    value={region}
+                    value={current.region}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      setRegion(value === "" || isStudyRegion(value) ? value : "");
+                      const v = e.target.value;
+                      set({ region: v === "" || isStudyRegion(v) ? v : "" });
                     }}
                     className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
                     aria-label="Region"
                   >
-                    {regionOptions.map((value, index) => (
-                      <option key={`${value || "all"}-${index}`} value={value}>
-                        {value || "All"}
+                    {regionOptions.map((opt, i) => (
+                      <option key={`${opt || "all"}-${i}`} value={opt}>
+                        {opt || "All"}
                       </option>
                     ))}
                   </select>
@@ -92,17 +99,17 @@ export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props): 
                 <div className="flex items-center gap-3 md:w-[220px]">
                   <FieldLabel title="Category" subtitle="Type" />
                   <select
-                    value={category}
+                    value={current.category}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      setCategory(value === "" || isCategory(value) ? value : "");
+                      const v = e.target.value;
+                      set({ category: v === "" || isCategory(v) ? v : "" });
                     }}
                     className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
                     aria-label="Category"
                   >
-                    {categoryOptions.map((value, index) => (
-                      <option key={`${value || "all"}-${index}`} value={value}>
-                        {value || "All"}
+                    {categoryOptions.map((opt, i) => (
+                      <option key={`${opt || "all"}-${i}`} value={opt}>
+                        {opt || "All"}
                       </option>
                     ))}
                   </select>
@@ -113,8 +120,8 @@ export function HeritageSubHeader({ title, onSearch, onKeywordChange }: Props): 
                 <div className="flex items-center gap-3 md:flex-1">
                   <FieldLabel title="Keyword" subtitle="Name / Country" />
                   <input
-                    value={keyword}
-                    onChange={(e) => setKeyword(e.target.value)}
+                    value={current.keyword}
+                    onChange={(e) => set({ keyword: e.target.value })}
                     placeholder="Search the List"
                     className="h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400 hover:bg-zinc-50 focus:outline-none"
                     aria-label="Keyword"
