@@ -40,6 +40,14 @@ const isValidListResult = (
   return Array.isArray(value.items) && isObject(value.pagination);
 };
 
+/** Determine whether any valid search condition exists */
+const hasSearchParams = (params: HeritageSearchParams): boolean =>
+  params.search_query !== null ||
+  params.region !== null ||
+  params.category !== null ||
+  params.year_inscribed_from !== null ||
+  params.year_inscribed_to !== null;
+
 const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   region: params.region ?? "",
   category: params.category ?? "",
@@ -93,9 +101,18 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
     [location.search],
   );
 
+  // If no search condition exists, redirect to the list page.
+  const isSearchMode = hasSearchParams(params);
+
+  React.useEffect(() => {
+    if (!isSearchMode) {
+      navigate({ pathname: "/heritages", search: location.search }, { replace: true });
+    }
+  }, [isSearchMode, location.search, navigate]);
+
   const { draft, setDraft, handleChange } = useHeritageSearchDraft(params);
 
-  const { data, isLoading, error } = useHeritageSearchQuery(params);
+  const { data, isLoading, error } = useHeritageSearchQuery(params, { enabled: isSearchMode });
 
   const handleClickItem = React.useCallback(
     (id: number) => {
