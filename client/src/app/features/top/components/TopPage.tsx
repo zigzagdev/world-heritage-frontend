@@ -3,6 +3,7 @@ import { HeritageCard } from "../cards/HeritageCard";
 import type { ReactNode } from "react";
 import { Pagination } from "@features/top/components/Pagination.tsx";
 import type { IdSortOption } from "../../../../domain/types.ts";
+import { Map } from "./map.tsx";
 
 export type TopPageProps = {
   items: ReadonlyArray<WorldHeritageVm>;
@@ -93,6 +94,10 @@ export default function TopPage({
       </div>
 
       <div>{header}</div>
+
+      <div className="mt-4">
+        <Map items={items} onClickItem={onClickItem} />
+      </div>
 
       <div className="pt-8">
         {items.length === 0 ? (
