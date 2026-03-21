@@ -1,13 +1,9 @@
-import {
-  type HeritageSearchParams,
-  ID_SORT_OPTIONS,
-  STUDY_REGIONS,
-} from "../../../../domain/types.ts";
+import { type HeritageSearchParams, ID_SORT_OPTIONS } from "../../../../domain/types.ts";
 
 export const DEFAULT_HERITAGE_SEARCH_PARAMS: HeritageSearchParams = {
   search_query: null,
   country: null,
-  region: STUDY_REGIONS[0],
+  region: null,
   category: null,
   year_inscribed_from: null,
   year_inscribed_to: null,

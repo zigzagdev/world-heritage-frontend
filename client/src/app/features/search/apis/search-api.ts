@@ -28,6 +28,16 @@ export type ApiSearchResponse = {
   };
 };
 
+export const hasSearchConditions = (params: SearchParams): boolean => {
+  return !!(
+    params.keyword?.trim() ||
+    params.region?.trim() ||
+    params.category?.trim() ||
+    params.yearInscribedFrom ||
+    params.yearInscribedTo
+  );
+};
+
 const normalizeApiBase = (apiBase: string): string => apiBase.replace(/\/+$/, "");
 
 export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) => {
