@@ -1,12 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  STUDY_REGIONS,
-  CATEGORIES,
-  type Category,
-  type HeritageSearchParams,
-  type StudyRegion,
-} from "../../../../domain/types";
+import type { HeritageSearchParams } from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
@@ -17,37 +11,25 @@ import type { SearchValues } from "@features/top/components/HeritageSearchForm.t
 const toSearchYearOrNull = (value: string): number | null => {
   const trimmed = value.trim();
   if (trimmed === "") return null;
-
   const parsed = Number(trimmed);
   if (!Number.isFinite(parsed)) return null;
-
   return Math.floor(parsed);
 };
 
-const isStudyRegion = (value: string): value is StudyRegion => {
-  return (STUDY_REGIONS as readonly string[]).includes(value);
+/** Determine whether any valid search condition exists */
+const hasSearchParams = (params: HeritageSearchParams): boolean =>
+  params.search_query !== null ||
+  params.region !== null ||
+  params.category !== null ||
+  params.year_inscribed_from !== null ||
+  params.year_inscribed_to !== null;
+
+type Props = {
+  /** Notify the parent which API should be used: list or search */
+  onApiModeChange?: (isSearch: boolean) => void;
 };
 
-const isCategory = (value: string): value is Category => {
-  return (CATEGORIES as readonly string[]).includes(value);
-};
-
-const toRegionOrNull = (value: StudyRegion | ""): StudyRegion | null => {
-  if (value === "") return null;
-  return isStudyRegion(value) ? value : null;
-};
-
-const toCategoryOrNull = (value: Category | ""): Category | null => {
-  if (value === "") return null;
-  return isCategory(value) ? value : null;
-};
-
-const toKeywordOrNull = (value: string): string | null => {
-  const trimmed = value.trim();
-  return trimmed === "" ? null : trimmed;
-};
-
-export function SearchHeritageFormContainer() {
+export function SearchHeritageFormContainer({ onApiModeChange }: Props) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -55,6 +37,20 @@ export function SearchHeritageFormContainer() {
     () => parseHeritageSearchParams(location.search),
     [location.search],
   );
+
+  // If any search parameter exists, we consider it as "search mode". Otherwise, it's "list mode".
+  const isSearchMode = useMemo(() => hasSearchParams(params), [params]);
+
+  useEffect(() => {
+    onApiModeChange?.(isSearchMode);
+  }, [isSearchMode, onApiModeChange]);
+
+  // If no search condition exists on the results page, redirect to the list page.
+  useEffect(() => {
+    if (!isSearchMode && location.pathname === "/heritages/results") {
+      navigate({ pathname: "/heritages", search: location.search }, { replace: true });
+    }
+  }, [isSearchMode, location.pathname, location.search, navigate]);
 
   const valueFromUrl: SearchValues = useMemo(
     () => ({
@@ -96,25 +92,18 @@ export function SearchHeritageFormContainer() {
 
       const nextParams: HeritageSearchParams = {
         ...params,
-        region: toRegionOrNull(merged.region),
-        category: toCategoryOrNull(merged.category),
-        search_query: toKeywordOrNull(merged.keyword),
+        region: (merged.region.trim() || null) as HeritageSearchParams["region"],
+        category: (merged.category.trim() || null) as HeritageSearchParams["category"],
+        search_query: merged.keyword.trim() || null,
         year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
         year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
         current_page: 1,
       };
 
       const search = serializeHeritageSearchParams(nextParams);
-
-      navigate(
-        {
-          pathname: location.pathname,
-          search,
-        },
-        { replace: false },
-      );
+      navigate({ pathname: location.pathname, search }, { replace: false });
     },
-    [draft, location.pathname, navigate, params],
+    [navigate, location.pathname, params, draft],
   );
 
   return <HeritageSubHeader value={draft} onChange={onChange} onSubmit={onSubmit} />;
