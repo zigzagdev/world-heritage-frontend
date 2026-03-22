@@ -1,7 +1,7 @@
-import type {
-  ApiWorldHeritageDto,
-  WorldHeritageVm,
-  CriteriaCode,
+import {
+  type ApiWorldHeritageDto,
+  type WorldHeritageVm,
+  type CriteriaCode,
 } from "../../../../domain/types.ts";
 import { statePartyLabels } from "@features/constants/state-party-labels.ts";
 import { CRITERIA } from "../../../../domain/types.ts";
@@ -66,7 +66,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     name: data.name,
     heritageNameJp: data.heritage_name_jp,
 
-    country: data.country,
+    country: data.country_name_jp,
     countryNameJp: data.country_name_jp,
     region: data.region,
     stateParty,
