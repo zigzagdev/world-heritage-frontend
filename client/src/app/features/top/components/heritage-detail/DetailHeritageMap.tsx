@@ -7,8 +7,8 @@ type Props = {
   longitude: number | null;
 };
 
-const isValidCoord = (latitude: number | null, longtitude: number | null): latitude is number =>
-  latitude !== null && longtitude !== null && latitude !== 0 && longtitude !== 0;
+const isValidCoord = (latitude: number | null, longitude: number | null) =>
+  latitude !== null && longitude !== null && latitude !== 0 && longitude !== 0;
 
 // red diamond icon using DivIcon
 const redDiamondIcon = divIcon({
@@ -19,20 +19,22 @@ const redDiamondIcon = divIcon({
 });
 
 export function DetailHeritageMap({ latitude, longitude }: Props) {
-  if (!isValidCoord(latitude, longitude)) {
+  if (!isValidCoord(latitude, longitude) || latitude === null || longitude === null) {
     return null;
   }
 
+  const centre: [number, number] = [latitude, longitude];
+
   return (
     <MapContainer
-      center={[latitude, longitude]}
+      center={centre}
       zoom={7}
       style={{ height: "160px", width: "100%" }}
       scrollWheelZoom={false}
       zoomControl={true}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Marker position={[latitude, longitude]} icon={redDiamondIcon} />
+      <Marker position={centre} icon={redDiamondIcon} />
     </MapContainer>
   );
 }
