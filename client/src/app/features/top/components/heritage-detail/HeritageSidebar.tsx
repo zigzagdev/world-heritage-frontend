@@ -1,5 +1,6 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { HeritageMetadataList } from "./HeritageMetadataList";
+import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 
 type Props = {
   item: WorldHeritageDetailVm;
@@ -112,9 +113,7 @@ export function HeritageSidebar({ item }: Props) {
 
       <div className="rounded-3xl border border-zinc-200 bg-white/80 shadow-sm backdrop-blur p-4">
         <div className="text-base font-extrabold tracking-tight text-zinc-900">Map</div>
-        <div className="mt-3 grid h-40 place-items-center rounded-2xl bg-zinc-100 text-sm font-medium text-zinc-500">
-          Map
-        </div>
+        <DetailHeritageMap latitude={item.latitude} longitude={item.longitude} />
       </div>
     </aside>
   );

@@ -35,7 +35,7 @@ describe("toWorldHeritageVm", () => {
       officialName: "Shirakami-Sanchi",
       name: "Shirakami-Sanchi",
       heritageNameJp: "白神山地",
-      country: "Japan",
+      country: "日本",
       countryNameJp: "日本",
       region: "Asia",
       stateParty: "JPN",
