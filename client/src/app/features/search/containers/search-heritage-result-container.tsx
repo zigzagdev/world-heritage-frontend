@@ -9,6 +9,7 @@ import {
 
 import { useHeritageSearchQuery } from "../../search/hooks/use-search-heritage-query";
 import SearchResultsPage from "../components/SearchResultsPage";
+import type { WorldHeritageVm } from "../../../../domain/types";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm";
 import type { Pagination } from "../types";
 import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
@@ -160,34 +161,36 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
     [draft, navigate, setDraft],
   );
 
+  // Hooks must be called at the top level before any early returns.
+  const handleBackToAllSites = React.useCallback(() => {
+    navigate("/heritages", { replace: true });
+  }, [navigate]);
+
   const header = (
     <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />
   );
 
+  const baseProps = {
+    header,
+    onBackToAllSites: handleBackToAllSites,
+    items: [] as WorldHeritageVm[],
+    pagination: null,
+  };
+
   if (isLoading) {
-    return <SearchResultsPage header={header} items={[]} pagination={null} rangeText="Loading…" />;
+    return <SearchResultsPage {...baseProps} pagination={null} rangeText="Loading…" />;
   }
 
   if (error) {
     const message = error instanceof Error ? error.message : "Failed";
 
-    return (
-      <SearchResultsPage
-        header={header}
-        items={[]}
-        pagination={null}
-        rangeText="Failed to load."
-        errorMessage={message}
-      />
-    );
+    return <SearchResultsPage {...baseProps} rangeText="Failed to load." errorMessage={message} />;
   }
 
   if (!data || !isValidListResult(data)) {
     return (
       <SearchResultsPage
-        header={header}
-        items={[]}
-        pagination={null}
+        {...baseProps}
         rangeText="Unexpected response."
         errorMessage={!data ? undefined : "Invalid data structure: items or pagination missing."}
       />
@@ -206,6 +209,7 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
       rangeText={rangeText}
       onClickItem={handleClickItem}
       onPageChange={handlePageChange}
+      onBackToAllSites={handleBackToAllSites}
     />
   );
 }
