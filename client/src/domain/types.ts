@@ -220,3 +220,8 @@ export interface HeritageSearchParams {
   per_page: number;
   order: IdSortOption | null;
 }
+
+export type RegionCount = {
+  region: StudyRegion;
+  count: number;
+};
