@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@shared/uis/Button.tsx";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   CATEGORIES,
@@ -26,51 +25,34 @@ type Props = {
     yearInscribedFrom?: string;
     yearInscribedTo?: string;
   }) => void;
-  expandKeywordOnFocus?: boolean;
 };
 
-const isStudyRegion = (value: string): value is StudyRegion => {
-  return (STUDY_REGIONS as readonly string[]).includes(value);
-};
-
-const toStudyRegionOrEmpty = (value: string): StudyRegion | "" => {
-  if (value === "") return "";
-  return isStudyRegion(value) ? value : "";
-};
-
-const isCategory = (value: string): value is Category => {
-  return (CATEGORIES as readonly string[]).includes(value);
-};
+const isCategory = (value: string): value is Category =>
+  (CATEGORIES as readonly string[]).includes(value);
 
 const toCategoryOrEmpty = (value: string): Category | "" => {
   if (value === "") return "";
   return isCategory(value) ? value : "";
 };
 
-function Divider({ hidden }: { hidden?: boolean }) {
-  return (
-    <div
-      className={`${hidden ? "hidden" : "hidden md:block"} h-8 w-px bg-zinc-200`}
-      aria-hidden="true"
-    />
-  );
-}
+const REGION_LABELS: Record<StudyRegion | "", string> = {
+  "": "All",
+  Africa: "Africa",
+  Asia: "Asia",
+  Europe: "Europe",
+  "North America": "North America",
+  "South America": "South America",
+  Oceania: "Oceania",
+};
 
-function FieldLabel({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div className="min-w-[84px] leading-tight">
-      <div className="text-[11px] font-semibold text-zinc-600">{title}</div>
-      <div className="text-[11px] text-zinc-400">{subtitle}</div>
-    </div>
-  );
-}
+const CATEGORY_LABELS: Record<Category | "", string> = {
+  "": "All",
+  Cultural: "Cultural",
+  Natural: "Natural",
+  Mixed: "Mixed",
+};
 
-export function HeritageSearchForm({
-  value,
-  onChange,
-  onSubmit,
-  expandKeywordOnFocus = true,
-}: Props) {
+export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
   const regionOptions: readonly (StudyRegion | "")[] = ["", ...STUDY_REGIONS];
   const categoryOptions: readonly (Category | "")[] = ["", ...CATEGORIES];
 
@@ -100,117 +82,123 @@ export function HeritageSearchForm({
     });
   };
 
-  const [keywordFocused, setKeywordFocused] = useState(false);
-  const compactKeywordOnly = expandKeywordOnFocus && keywordFocused;
-
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         submit();
       }}
-      className="
-        rounded-2xl border border-zinc-200 bg-white px-4 py-3 shadow-sm
-        focus-within:ring-2 focus-within:ring-indigo-200 focus-within:border-indigo-300
-      "
+      className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden"
     >
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-        <div
-          className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[180px]`}
-        >
-          <FieldLabel title="Region" subtitle="Area" />
-          <select
-            value={searchValues.region}
-            onChange={(e) => set({ region: toStudyRegionOrEmpty(e.target.value) })}
-            className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
-            aria-label="Region"
-          >
-            {regionOptions.map((opt, i) => (
-              <option key={`${opt || "All"}-${i}`} value={opt}>
-                {opt ? opt : "All"}
-              </option>
-            ))}
-          </select>
+      {/* Region チップ */}
+      <div className="px-4 pt-3 pb-2 border-b border-zinc-100">
+        <div className="text-[11px] font-semibold text-zinc-400 mb-2">Region</div>
+        <div className="flex flex-wrap gap-2">
+          {regionOptions.map((opt) => {
+            const isActive = searchValues.region === opt;
+            return (
+              <button
+                key={opt || "all"}
+                type="button"
+                onClick={() => set({ region: opt })}
+                className={`
+                  px-3 py-1.5 rounded-full text-xs font-semibold border transition-all
+                  ${
+                    isActive
+                      ? "bg-zinc-900 text-white border-zinc-900"
+                      : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+                  }
+                `}
+              >
+                {REGION_LABELS[opt]}
+              </button>
+            );
+          })}
         </div>
+      </div>
 
-        <Divider hidden={compactKeywordOnly} />
-
-        <div
-          className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[220px]`}
-        >
-          <FieldLabel title="Category" subtitle="Type" />
-          <select
-            value={searchValues.category}
-            onChange={(e) => set({ category: toCategoryOrEmpty(e.target.value) })}
-            className="h-10 w-full rounded-xl bg-transparent px-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50 focus:outline-none"
-            aria-label="Category"
-          >
-            {categoryOptions.map((opt, i) => (
-              <option key={`${opt || "all"}-${i}`} value={opt}>
-                {opt ? opt : "All"}
-              </option>
-            ))}
-          </select>
+      {/* Category チップ */}
+      <div className="px-4 pt-3 pb-2 border-b border-zinc-100">
+        <div className="text-[11px] font-semibold text-zinc-400 mb-2">Category</div>
+        <div className="flex flex-wrap gap-2">
+          {categoryOptions.map((opt) => {
+            const isActive = searchValues.category === opt;
+            return (
+              <button
+                key={opt || "all"}
+                type="button"
+                onClick={() => set({ category: toCategoryOrEmpty(opt) })}
+                className={`
+                  px-3 py-1.5 rounded-full text-xs font-semibold border transition-all
+                  ${
+                    isActive
+                      ? "bg-zinc-900 text-white border-zinc-900"
+                      : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+                  }
+                `}
+              >
+                {CATEGORY_LABELS[opt]}
+              </button>
+            );
+          })}
         </div>
+      </div>
 
-        <Divider hidden={compactKeywordOnly} />
-
-        <div
-          className={`${compactKeywordOnly ? "hidden" : "flex"} items-center gap-3 md:flex md:w-[260px]`}
-        >
-          <FieldLabel title="Year" subtitle="Inscribed" />
-          <div className="flex w-full items-center gap-2">
-            <input
-              type="number"
-              inputMode="numeric"
-              value={searchValues.yearInscribedFrom}
-              onChange={(e) => set({ yearInscribedFrom: e.target.value })}
-              placeholder="From"
-              className="h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400 hover:bg-zinc-50 focus:outline-none"
-              aria-label="Year inscribed from"
-            />
-            <span className="text-sm text-zinc-400">-</span>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={searchValues.yearInscribedTo}
-              onChange={(e) => set({ yearInscribedTo: e.target.value })}
-              placeholder="To"
-              className="h-10 w-full rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400 hover:bg-zinc-50 focus:outline-none"
-              aria-label="Year inscribed to"
-            />
+      {/* Year + Keyword + Submit */}
+      <div className="divide-y divide-zinc-100 sm:divide-y-0 sm:flex sm:items-stretch">
+        {/* Year */}
+        <div className="flex items-center gap-3 px-4 py-3 sm:border-r sm:border-zinc-100 sm:w-[220px] shrink-0">
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-semibold text-zinc-500">Year Inscribed</div>
+            <div className="flex items-center gap-1">
+              <input
+                type="number"
+                inputMode="numeric"
+                value={searchValues.yearInscribedFrom}
+                onChange={(e) => set({ yearInscribedFrom: e.target.value })}
+                placeholder="From"
+                className="w-full bg-transparent text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none"
+                aria-label="Year inscribed from"
+              />
+              <span className="text-zinc-300">–</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={searchValues.yearInscribedTo}
+                onChange={(e) => set({ yearInscribedTo: e.target.value })}
+                placeholder="To"
+                className="w-full bg-transparent text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none"
+                aria-label="Year inscribed to"
+              />
+            </div>
           </div>
         </div>
+        {/* Keyword + Submit */}
+        <div className="flex flex-1 items-center gap-3 px-4 py-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-semibold text-zinc-500">Keyword</div>
+            <input
+              value={searchValues.keyword}
+              onChange={(e) => set({ keyword: e.target.value })}
+              placeholder="Name / Country"
+              className="w-full bg-transparent text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none"
+              aria-label="Keyword"
+            />
+          </div>
 
-        <Divider hidden={compactKeywordOnly} />
-
-        <div
-          className={`flex items-center gap-3 ${compactKeywordOnly ? "w-full" : "md:flex-1"} md:flex md:flex-1`}
-        >
-          <FieldLabel title="Keyword" subtitle="Name / Country" />
-          <input
-            value={searchValues.keyword}
-            onChange={(e) => set({ keyword: e.target.value })}
-            onFocus={() => setKeywordFocused(true)}
-            onBlur={() => setKeywordFocused(false)}
-            placeholder="Search the List"
-            className="h-10 w-full flex-1 rounded-xl bg-transparent px-2 text-sm text-zinc-900 placeholder:text-zinc-400 hover:bg-zinc-50 focus:outline-none"
-            aria-label="Keyword"
-          />
-          <Button
+          <button
             type="submit"
-            size="sm"
             className="
-              h-10 shrink-0 rounded-full px-4 !bg-rose-600 !text-white hover:!bg-rose-700
+              shrink-0 flex items-center gap-1.5 h-9 rounded-full px-4
+              bg-rose-600 text-white text-sm font-semibold
+              hover:bg-rose-700 transition-colors
               focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400
-              focus-visible:ring-offset-2 focus-visible:ring-offset-white
             "
             aria-label="Search"
-            title="Search"
           >
             <SearchIcon fontSize="small" />
-            <span className="ml-2 text-sm font-semibold md:hidden">Search</span>
-          </Button>
+            <span>Search</span>
+          </button>
         </div>
       </div>
     </form>
