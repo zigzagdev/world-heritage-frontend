@@ -54,7 +54,10 @@ export function SearchResultMapComponent({ items }: Props) {
         style={{ height: "360px", width: "100%" }}
         scrollWheelZoom={false}
       >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+        />
         <FitBounds items={validItems} />
         {validItems.map((item) => (
           <CircleMarker

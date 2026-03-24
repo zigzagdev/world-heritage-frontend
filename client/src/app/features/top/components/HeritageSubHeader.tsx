@@ -12,12 +12,7 @@ export function HeritageSubHeader({ value, onSubmit, onChange }: Props) {
       <div className="mx-auto w-full max-w-6xl px-4 py-3">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="w-full md:w-[1000px]">
-            <HeritageSearchForm
-              value={value}
-              expandKeywordOnFocus
-              onChange={onChange}
-              onSubmit={onSubmit}
-            />
+            <HeritageSearchForm value={value} onChange={onChange} onSubmit={onSubmit} />
           </div>
         </div>
       </div>

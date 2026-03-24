@@ -72,8 +72,8 @@ export default function TopPage({
               "
               aria-label="Sort by ID"
             >
-              <option value="asc">ID ascending</option>
-              <option value="desc">ID descending</option>
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
             </select>
 
             {onReload && (
