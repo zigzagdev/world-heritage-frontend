@@ -38,7 +38,7 @@ export default function SearchResultsPage({
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
               <h1
@@ -64,7 +64,7 @@ export default function SearchResultsPage({
             ) : null}
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {onBackToAllSites ? (
               <button
                 type="button"
@@ -78,32 +78,6 @@ export default function SearchResultsPage({
                 Back to all sites
               </button>
             ) : null}
-
-            <button
-              type="button"
-              disabled
-              className="
-                h-9 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700
-                shadow-sm opacity-60
-              "
-              aria-label="Study mode (coming soon)"
-              title="Coming soon"
-            >
-              Study mode (soon)
-            </button>
-
-            <button
-              type="button"
-              disabled
-              className="
-                h-9 rounded-xl bg-indigo-600 px-3 text-xs font-semibold text-white
-                shadow-sm opacity-60
-              "
-              aria-label="Quick quiz (coming soon)"
-              title="Coming soon"
-            >
-              Quick quiz (soon)
-            </button>
           </div>
         </div>
       </div>
