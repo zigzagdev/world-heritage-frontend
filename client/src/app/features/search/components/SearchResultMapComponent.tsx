@@ -31,7 +31,7 @@ function FitBounds({ items }: { items: WorldHeritageVm[] }) {
       item.longitude as number,
     ]);
 
-    map.fitBounds(bounds, { padding: [40, 40] });
+    map.fitBounds(bounds, { padding: [40, 40], maxZoom: 5 });
   }, [items, map]);
 
   return null;
