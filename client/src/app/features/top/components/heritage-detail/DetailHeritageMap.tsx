@@ -1,40 +1,56 @@
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { divIcon } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 type Props = {
   latitude: number | null;
   longitude: number | null;
+  name?: string;
 };
 
-const isValidCoord = (latitude: number | null, longitude: number | null) =>
-  latitude !== null && longitude !== null && latitude !== 0 && longitude !== 0;
+const isValidCoord = (lat: number | null, lng: number | null): lat is number =>
+  lat !== null && lng !== null && lat !== 0 && lng !== 0;
 
-// red diamond icon using DivIcon
 const redDiamondIcon = divIcon({
   className: "",
-  html: `<div class="w-3.5 h-3.5 bg-rose-600 rotate-45 border-2 border-white shadow-md"></div>`,
+  html: `<div class="w-5 h-5 bg-rose-600 rotate-45 border-2 border-white shadow-md"></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
 
-export function DetailHeritageMap({ latitude, longitude }: Props) {
-  if (!isValidCoord(latitude, longitude) || latitude === null || longitude === null) {
+export function DetailHeritageMap({ latitude, longitude, name }: Props) {
+  if (!isValidCoord(latitude, longitude)) {
     return null;
   }
 
-  const centre: [number, number] = [latitude, longitude];
+  const centre: [number, number] = [latitude as number, longitude as number];
 
   return (
-    <MapContainer
-      center={centre}
-      zoom={7}
-      style={{ height: "160px", width: "100%" }}
-      scrollWheelZoom={false}
-      zoomControl={true}
-    >
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <Marker position={centre} icon={redDiamondIcon} />
-    </MapContainer>
+    <div className="rounded-2xl border border-zinc-200 overflow-hidden shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-2.5 bg-white border-b border-zinc-100">
+        <div className="flex items-center gap-1.5 text-sm font-semibold text-zinc-700">
+          <LocationOnIcon fontSize="small" className="text-rose-500" />
+          <span>Location</span>
+        </div>
+        {name && <span className="text-xs text-zinc-400 truncate max-w-[160px]">{name}</span>}
+      </div>
+
+      {/* Map */}
+      <MapContainer
+        center={centre}
+        zoom={5}
+        style={{ height: "200px", width: "100%" }}
+        scrollWheelZoom={true}
+        zoomControl={true}
+      >
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+        />
+        <Marker position={centre} icon={redDiamondIcon} />
+      </MapContainer>
+    </div>
   );
 }
