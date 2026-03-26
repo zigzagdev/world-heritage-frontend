@@ -7,6 +7,7 @@ import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
+import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
@@ -32,9 +33,11 @@ type TabItem = {
 const TABS: readonly TabItem[] = [
   { label: "Description", href: "#content" },
   { label: "Maps", href: "#geo-map" },
-  { label: "Documents", href: "#documents" },
   { label: "Gallery", href: "#gallery" },
 ] as const;
+
+const formatCriteriaInline = (criteria: string[] | undefined) =>
+  criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
 
 function HeritageDetailTabs({ items }: { items: readonly TabItem[] }) {
   return (
@@ -53,6 +56,42 @@ function HeritageDetailTabs({ items }: { items: readonly TabItem[] }) {
           </a>
         ))}
       </nav>
+    </div>
+  );
+}
+
+// Key exam info: visible without scrolling on all screen sizes.
+function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 mt-4">
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <div>
+          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
+            Region
+          </div>
+          <div className="text-sm font-semibold text-zinc-900">{item.region ?? "—"}</div>
+        </div>
+        <div>
+          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
+            Category
+          </div>
+          <div className="text-sm font-semibold text-zinc-900">{item.category ?? "—"}</div>
+        </div>
+        <div>
+          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
+            Year Inscribed
+          </div>
+          <div className="text-sm font-semibold text-zinc-900">{item.yearInscribed ?? "—"}</div>
+        </div>
+        <div>
+          <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
+            Criteria
+          </div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {formatCriteriaInline(item.criteria)}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -82,15 +121,26 @@ export function HeritageDetailLayout({ item, locale }: Props) {
         <BreadcrumbList />
       </div>
 
+      {/* Hero image */}
       <HeritageHero item={item} locale={locale} />
 
-      <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 md:pt-12">
+      {/* Key exam info: always visible */}
+      <KeyExamInfo item={item} />
+
+      {/* Map: mobile only (PC shows in sidebar) */}
+      <div className="mx-auto w-full max-w-6xl px-4 mt-6 lg:hidden" id="geo-map">
+        <DetailHeritageMap latitude={item.latitude} longitude={item.longitude} />
+      </div>
+
+      <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8">
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-          <div className="space-y-10 md:space-y-12">
+          {/* Left: Overview → Gallery */}
+          <div className="space-y-8" id="content">
             <HeritageOverViewSection item={item} />
             <HeritageGallery images={item.images} />
           </div>
 
+          {/* Right: Sidebar (PC only) */}
           <div className="lg:sticky lg:top-24">
             <HeritageSidebar item={item} />
           </div>
