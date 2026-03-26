@@ -24,6 +24,8 @@ export function DetailHeritageMap({ latitude, longitude, name }: Props) {
     return null;
   }
 
+  const centre: [number, number] = [latitude as number, longitude as number];
+
   return (
     <div className="rounded-2xl border border-zinc-200 overflow-hidden shadow-sm">
       {/* Header */}
@@ -37,7 +39,7 @@ export function DetailHeritageMap({ latitude, longitude, name }: Props) {
 
       {/* Map */}
       <MapContainer
-        center={[latitude, longitude]}
+        center={centre}
         zoom={5}
         style={{ height: "200px", width: "100%" }}
         scrollWheelZoom={true}
@@ -47,7 +49,7 @@ export function DetailHeritageMap({ latitude, longitude, name }: Props) {
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
         />
-        <Marker position={[latitude, longitude]} icon={redDiamondIcon} />
+        <Marker position={centre} icon={redDiamondIcon} />
       </MapContainer>
     </div>
   );
