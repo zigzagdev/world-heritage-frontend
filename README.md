@@ -1,20 +1,17 @@
 # World Heritage Explorer（フロントエンド） / World Heritage Explorer (Frontend)
 
-ユネスコ世界遺産を検索・比較するための SPA です。  
+ユネスコ世界遺産を検索・比較するアプリのフロントエンドの内容です。  
 A SPA to search and compare UNESCO World Heritage sites.
 
 ---
 
 ## 主な機能 / Highlights
 
-- **地域 / カテゴリ / キーワード**によるフィルタリング（「旅行スタイル」に合わせた単一検索バー）  
+- **地域 / カテゴリ / キーワード**によるフィルタリング
   Filter by **Region / Category / Keyword** (single "travel-style" search bar)
 
-- 画像ファーストのレイアウトによる、一覧→詳細へのスムーズなナビゲーション  
+- 画像ファーストのレイアウトによる、一覧→詳細へ遷移
   Clean list-to-detail navigation with image-first layout
-
-- ダークモードでも**ホワイトベースのUI**を維持し、高い可読性を確保  
-  UI stays **white-based even in dark mode** for readability
 
 ---
 
