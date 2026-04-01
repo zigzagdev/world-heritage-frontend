@@ -47,7 +47,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "lint-staged": "^16.2.3",
     "postcss": "^8.5.6",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "react-test-renderer": "^19.2.4",
     "tailwindcss": "^3.4.18",
     "ts-jest": "^29.4.5",
@@ -61,6 +61,6 @@
       "eslint --fix --max-warnings=0 --cache",
       "prettier -w"
     ],
-    "*.{json,md,css,scss,html,yml,yaml}": "prettier -w"
+    "*.{json,md,css,scss,html,yml,yaml}": "npx prettier -w"
   }
 }
