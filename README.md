@@ -1,7 +1,7 @@
 # World Heritage Explorer（フロントエンド） / World Heritage Explorer (Frontend)
 
-ユネスコ世界遺産を検索・比較するアプリのフロントエンドの内容です。  
-A SPA to search and compare UNESCO World Heritage sites.
+ユネスコ世界遺産を検索アプリのフロントエンドの内容です。  
+A SPA to search UNESCO World Heritage sites.
 
 ---
 
@@ -10,7 +10,7 @@ A SPA to search and compare UNESCO World Heritage sites.
 - **地域 / カテゴリ / キーワード**によるフィルタリング
   Filter by **Region / Category / Keyword** (single "travel-style" search bar)
 
-- 画像ファーストのレイアウトによる、一覧→詳細へ遷移
+- 画像を押下することで、一覧→詳細へ遷移
   Clean list-to-detail navigation with image-first layout
 
 ---
