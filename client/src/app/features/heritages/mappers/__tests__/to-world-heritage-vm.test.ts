@@ -47,6 +47,7 @@ describe("toWorldHeritageVm", () => {
       latitude: null,
       longitude: null,
       shortDescription: "desc",
+      shortDescriptionJp: "ダミー",
       unescoSiteUrl: "https://whc.unesco.org/en/list/663",
       primaryStatePartyCode: null,
       criteriaText: "ix, x",

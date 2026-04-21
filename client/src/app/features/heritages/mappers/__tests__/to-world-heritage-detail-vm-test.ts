@@ -41,6 +41,7 @@ const baseDto = (
   area_hectares: 107,
   buffer_zone_hectares: 143,
   short_description: "dummy",
+  short_description_jp: "ダミー",
   unesco_site_url: "https://example.com",
   state_party: null,
   state_party_codes: ["JPN"],
@@ -75,7 +76,7 @@ describe("toWorldHeritageDetailVm", () => {
     expect(vm.countryNameJp).toBe(dto.country_name_jp);
     expect(vm.region).toBe(dto.region);
 
-    // detail 差分
+    // detail
     expect(vm.primaryStatePartyCode).toBe("JPN");
     expect(vm.thumbnailUrl).toBe(dto.thumbnail_url);
 
