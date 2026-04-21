@@ -19,7 +19,7 @@ A SPA to search and compare UNESCO World Heritage sites.
 
 - React + TypeScript + Vite
 - React Router
-- TailwindCSS（ホワイトベーステーマポリシー / white-based theme policy）
+- TailwindCSS
 - （任意 / Optional）Jest + Testing Library
 
 ---
