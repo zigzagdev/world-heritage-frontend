@@ -130,7 +130,7 @@ export type WorldHeritageVm = {
   areaHectares: number | null;
   bufferZoneHectares: number | null;
   shortDescription: string;
-  shortDescriptionJp: string | null;
+  shortDescriptionJp?: string | null;
   unescoSiteUrl: string | null;
   stateParty: string | null;
   statePartyCodes: string[];
