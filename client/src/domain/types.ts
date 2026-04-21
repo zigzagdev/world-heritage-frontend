@@ -58,7 +58,7 @@ export type ApiWorldHeritageDto = {
   area_hectares: number | null;
   buffer_zone_hectares: number | null;
   short_description: string;
-  short_description_jp: string | null;
+  short_description_jp?: string | null;
   unesco_site_url: string | null;
   state_party: string | null;
   state_party_codes: string[];
@@ -86,7 +86,7 @@ export type ApiWorldHeritageDetailDto = {
   area_hectares: number | null;
   buffer_zone_hectares: number | null;
   short_description: string;
-  short_description_jp: string | null;
+  short_description_jp?: string | null;
   unesco_site_url: string | null;
 
   state_party: string | null;
