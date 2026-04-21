@@ -58,6 +58,7 @@ export type ApiWorldHeritageDto = {
   area_hectares: number | null;
   buffer_zone_hectares: number | null;
   short_description: string;
+  short_description_jp?: string | null;
   unesco_site_url: string | null;
   state_party: string | null;
   state_party_codes: string[];
@@ -85,6 +86,7 @@ export type ApiWorldHeritageDetailDto = {
   area_hectares: number | null;
   buffer_zone_hectares: number | null;
   short_description: string;
+  short_description_jp?: string | null;
   unesco_site_url: string | null;
 
   state_party: string | null;
@@ -94,33 +96,6 @@ export type ApiWorldHeritageDetailDto = {
 
   thumbnail_url: string | null;
   images: ApiWorldHeritageImageDto[];
-};
-
-/**
- * APIResponse wrapper（multiType）
- */
-export type ApiListResponse<T> = {
-  status: string;
-  data: ListResult<T>;
-};
-
-/**
- * APIResponse wrapper（detailType）
- */
-export type ApiDetailResponse<T> = {
-  status: string;
-  data: T;
-};
-
-export type WorldHeritageListItemVm = {
-  id: number;
-  title: string;
-  subtitle: string;
-  category: Category;
-  country: string;
-  yearInscribed: number;
-  isEndangered: boolean;
-  thumbnailUrl: string | null;
 };
 
 export type StatePartyMetaVm = {
@@ -155,6 +130,7 @@ export type WorldHeritageVm = {
   areaHectares: number | null;
   bufferZoneHectares: number | null;
   shortDescription: string;
+  shortDescriptionJp?: string | null;
   unescoSiteUrl: string | null;
   stateParty: string | null;
   statePartyCodes: string[];
@@ -182,18 +158,6 @@ export type ListResult<T> = {
 };
 
 export type WorldHeritageDetailVm = WorldHeritageVm;
-
-export type ApiPaginationDto = {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-};
-
-export type ApiWorldHeritageListResponse = {
-  items: ApiWorldHeritageDto[];
-  pagination: ApiPaginationDto;
-};
 
 export type BreadcrumbMap = Record<string, string>;
 
