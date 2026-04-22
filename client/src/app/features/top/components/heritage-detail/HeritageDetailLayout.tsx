@@ -15,6 +15,7 @@ import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 type Props = {
   item: WorldHeritageDetailVm;
   locale: Locale;
+  toggleLocale: () => void;
 };
 
 const DEFAULT_SEARCH: SearchValues = {
@@ -96,7 +97,7 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
   );
 }
 
-export function HeritageDetailLayout({ item, locale }: Props) {
+export function HeritageDetailLayout({ item, locale, toggleLocale }: Props) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const setLabel = useSetBreadcrumbLabel();
 
@@ -115,7 +116,15 @@ export function HeritageDetailLayout({ item, locale }: Props) {
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
-      <HeritageDetailTabs items={TABS} />
+      <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8 flex items-center justify-between">
+        <HeritageDetailTabs items={TABS} />
+        <button
+          onClick={toggleLocale}
+          className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 shrink-0"
+        >
+          {locale === "ja" ? "🇯🇵" : "🇬🇧"}
+        </button>
+      </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-4">
         <BreadcrumbList />
