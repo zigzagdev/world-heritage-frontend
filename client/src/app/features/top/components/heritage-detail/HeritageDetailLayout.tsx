@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria";
 import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
@@ -100,10 +101,20 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
 export function HeritageDetailLayout({ item, locale, toggleLocale }: Props) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const setLabel = useSetBreadcrumbLabel();
+  const navigate = useNavigate();
 
   const handleSubmit = (q: Partial<SearchValues>) => {
     const next = { ...search, ...q };
     setSearch(next);
+
+    const params = new URLSearchParams();
+    if (next.keyword) params.set("search_query", next.keyword);
+    if (next.region) params.set("region", next.region);
+    if (next.category) params.set("category", next.category);
+    if (next.yearInscribedFrom) params.set("year_inscribed_from", next.yearInscribedFrom);
+    if (next.yearInscribedTo) params.set("year_inscribed_to", next.yearInscribedTo);
+
+    navigate(`/heritages/results?${params.toString()}`);
   };
 
   useEffect(() => {
