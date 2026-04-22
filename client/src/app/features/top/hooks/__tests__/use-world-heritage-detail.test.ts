@@ -97,6 +97,7 @@ describe("useWorldHeritageDetail", () => {
       area_hectares: null,
       buffer_zone_hectares: null,
       short_description: "A group of historic sites in Kyoto.",
+
       unesco_site_url: "https://example.com/kyoto",
       state_party: "Japan",
       state_party_codes: ["JPN"],
