@@ -3,9 +3,10 @@ import { textType } from "@shared/styles/typography.ts";
 
 type Props = {
   item: WorldHeritageDetailVm;
+  locale: string;
 };
 
-export function HeritageOverViewSection({ item }: Props) {
+export function HeritageOverViewSection({ item, locale }: Props) {
   return (
     <section
       id="overview"
@@ -31,7 +32,9 @@ export function HeritageOverViewSection({ item }: Props) {
 
       {item.shortDescription ? (
         <p className={`${textType.body} ${textType.measure} mt-4 whitespace-pre-wrap`}>
-          {item.shortDescription}
+          {locale === "ja" && item.shortDescriptionJp
+            ? item.shortDescriptionJp
+            : item.shortDescription}
         </p>
       ) : (
         <p className={`${textType.body} mt-4 text-zinc-400`}>—</p>
