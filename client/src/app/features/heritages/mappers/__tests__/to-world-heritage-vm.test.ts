@@ -19,6 +19,7 @@ const base: ApiWorldHeritageDto = {
   area_hectares: 442,
   buffer_zone_hectares: 320,
   short_description: "desc",
+  short_description_jp: "ダミー",
   unesco_site_url: "https://whc.unesco.org/en/list/663",
   state_party: "JPN",
   state_party_codes: ["JPN"],
