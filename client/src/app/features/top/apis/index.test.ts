@@ -43,6 +43,7 @@ const makeDto = (overrides: Partial<ApiWorldHeritageDto> = {}): ApiWorldHeritage
   area_hectares: null,
   buffer_zone_hectares: null,
   short_description: "",
+  short_description_jp: "",
   unesco_site_url: "https://ex.com/1",
   state_party: null,
   state_party_codes: ["JPN"],

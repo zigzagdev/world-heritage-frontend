@@ -80,6 +80,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     latitude: data.latitude,
     longitude: data.longitude,
     shortDescription: data.short_description,
+    shortDescriptionJp: data.short_description_jp,
     unescoSiteUrl: data.unesco_site_url,
     statePartyCodes: statePartyLabelsJp,
     statePartiesMeta: normalizeStatePartiesMeta(data.state_parties_meta),

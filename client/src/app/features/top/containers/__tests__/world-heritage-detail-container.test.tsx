@@ -145,6 +145,7 @@ describe("WorldHeritageDetailContainer", () => {
       latitude: null,
       longitude: null,
       shortDescription: "dummy",
+      shortDescriptionJp: "ダミー",
       unescoSiteUrl: "https://example.com",
       statePartyCodes: [],
       statePartiesMeta: {},

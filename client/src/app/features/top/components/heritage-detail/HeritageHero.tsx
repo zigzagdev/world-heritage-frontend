@@ -6,7 +6,7 @@ type Props = {
   locale: Locale;
 };
 
-export function HeritageHero({ item }: Props) {
+export function HeritageHero({ item, locale }: Props) {
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
@@ -14,8 +14,8 @@ export function HeritageHero({ item }: Props) {
     <header className="mx-auto w-full max-w-6xl px-4 pt-10 pb-6">
       <div className="mb-5 md:mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
-          {item.heritageNameJp}
-          {item.name && (
+          {locale === "ja" && item.heritageNameJp ? item.heritageNameJp : item.name}
+          {locale === "ja" && item.heritageNameJp && item.name && (
             <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
               （{item.name}）
             </span>

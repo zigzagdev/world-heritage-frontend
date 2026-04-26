@@ -13,8 +13,18 @@ function resolveLocale(raw: string | null): Locale {
 export function WorldHeritageDetailContainer() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const locale = useMemo(() => resolveLocale(searchParams.get("lang")), [searchParams]);
+
+  const toggleLanguageLocation = () => {
+    const theOther = locale === "ja" ? "en" : "ja";
+    setSearchParams((prev) => {
+      const nowLocal = new URLSearchParams(prev);
+      nowLocal.set("lang", theOther);
+
+      return nowLocal;
+    });
+  };
 
   useEffect(() => {
     if (!id) navigate("/heritages", { replace: true });
@@ -51,5 +61,5 @@ export function WorldHeritageDetailContainer() {
     );
   }
 
-  return <HeritageDetailLayout item={item} locale={locale} />;
+  return <HeritageDetailLayout item={item} locale={locale} toggleLocale={toggleLanguageLocation} />;
 }
