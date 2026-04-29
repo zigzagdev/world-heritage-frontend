@@ -1,17 +1,10 @@
-import type { ApiWorldHeritageDto, WorldHeritageVm } from "../../../../domain/types";
+import type { ApiWorldHeritageDto, Pagination, WorldHeritageVm } from "../../../../domain/types";
 import type { HeritageSearchResponse } from "../types";
 import { toWorldHeritageListVm } from "../../heritages/mappers/to-world-heritage-vm";
 
-export type UiPagination = {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-};
-
 export type HeritageSearchResultVm = {
   items: WorldHeritageVm[];
-  pagination: UiPagination;
+  pagination: Pagination;
   isFirstPage: boolean;
   isLastPage: boolean;
   rangeText: string;
@@ -20,58 +13,66 @@ export type HeritageSearchResultVm = {
 type FlatSuccess = { status: "success"; data: ApiWorldHeritageDto[] };
 type PagedSuccess = {
   status: "success";
-  data: { items: ApiWorldHeritageDto[]; pagination: UiPagination };
+  data: { items: ApiWorldHeritageDto[]; pagination: Pagination };
 };
 
-const isObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
 
-const isUiPagination = (v: unknown): v is UiPagination => {
-  if (!isObject(v)) return false;
-  const n = (x: unknown) => typeof x === "number" && Number.isFinite(x);
-  return n(v.current_page) && n(v.per_page) && n(v.total) && n(v.last_page);
+const isFiniteNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
+
+const isPagination = (value: unknown): value is Pagination => {
+  if (!isObject(value)) return false;
+  return (
+    isFiniteNumber(value.current_page) &&
+    isFiniteNumber(value.per_page) &&
+    isFiniteNumber(value.total) &&
+    isFiniteNumber(value.last_page)
+  );
 };
 
-const isFlatSuccess = (v: unknown): v is FlatSuccess => {
-  if (!isObject(v)) return false;
-  return v.status === "success" && Array.isArray(v.data);
+const isFlatSuccess = (value: unknown): value is FlatSuccess => {
+  if (!isObject(value)) return false;
+  return value.status === "success" && Array.isArray(value.data);
 };
 
-const isPagedSuccess = (v: unknown): v is PagedSuccess => {
-  if (!isObject(v)) return false;
-  if (v.status !== "success") return false;
-  const d = v.data;
-  if (!isObject(d)) return false;
-  return Array.isArray(d.items) && isUiPagination(d.pagination);
+const isPagedSuccess = (value: unknown): value is PagedSuccess => {
+  if (!isObject(value)) return false;
+  if (value.status !== "success") return false;
+  const data = value.data;
+  if (!isObject(data)) return false;
+  return Array.isArray(data.items) && isPagination(data.pagination);
 };
 
-const fmtRangeText = (p: UiPagination, count: number) => {
-  if (count === 0) return `0 of ${p.total.toLocaleString("en-CA")}`;
-  const start = (p.current_page - 1) * p.per_page + 1;
+const formatRangeText = (pagination: Pagination, count: number): string => {
+  if (count === 0) return `0 of ${pagination.total.toLocaleString("en-CA")}`;
+  const start = (pagination.current_page - 1) * pagination.per_page + 1;
   const end = start + count - 1;
-  return `${start}–${end} of ${p.total.toLocaleString("en-CA")}`;
+  return `${start}–${end} of ${pagination.total.toLocaleString("en-CA")}`;
 };
 
 export const toHeritageSearchResultVm = (
-  res: HeritageSearchResponse | FlatSuccess,
+  response: HeritageSearchResponse | FlatSuccess,
 ): HeritageSearchResultVm => {
-  if (isPagedSuccess(res)) {
-    const items = toWorldHeritageListVm(res.data.items);
-    const pagination = res.data.pagination;
+  if (isPagedSuccess(response)) {
+    const items = toWorldHeritageListVm(response.data.items);
+    const pagination = response.data.pagination;
 
     return {
       items,
       pagination,
       isFirstPage: pagination.current_page <= 1,
       isLastPage: pagination.current_page >= pagination.last_page,
-      rangeText: fmtRangeText(pagination, items.length),
+      rangeText: formatRangeText(pagination, items.length),
     };
   }
 
-  if (isFlatSuccess(res)) {
-    const items = toWorldHeritageListVm(res.data);
-    const total = res.data.length;
+  if (isFlatSuccess(response)) {
+    const items = toWorldHeritageListVm(response.data);
+    const total = response.data.length;
 
-    const pagination: UiPagination = {
+    const pagination: Pagination = {
       current_page: 1,
       per_page: total,
       total,
@@ -83,7 +84,7 @@ export const toHeritageSearchResultVm = (
       pagination,
       isFirstPage: true,
       isLastPage: true,
-      rangeText: fmtRangeText(pagination, items.length),
+      rangeText: formatRangeText(pagination, items.length),
     };
   }
 

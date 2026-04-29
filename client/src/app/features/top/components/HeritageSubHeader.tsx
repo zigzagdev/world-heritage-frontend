@@ -1,4 +1,5 @@
-import { HeritageSearchForm, type SearchValues } from "./HeritageSearchForm";
+import { HeritageSearchForm } from "./HeritageSearchForm";
+import { type SearchValues } from "../../../../domain/types.ts";
 
 export type Props = {
   value: SearchValues;

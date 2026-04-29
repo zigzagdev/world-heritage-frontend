@@ -4,17 +4,11 @@ import type {
   ApiWorldHeritageDto,
   IdSortOption,
   ListResult,
+  Pagination,
   StudyRegion,
   WorldHeritageVm,
 } from "../../../../domain/types";
 import { fetchTopPage } from "@features/top/apis";
-
-type Pagination = {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-};
 
 type State = {
   data: WorldHeritageVm[];

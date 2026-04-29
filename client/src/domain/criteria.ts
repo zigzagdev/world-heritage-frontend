@@ -1,5 +1,6 @@
 import en from "../locals/en/world-heritage-criteria.json";
 import ja from "../locals/ja/world-heritage-criteria.json";
+import { type CriteriaCode } from "./types.ts";
 
 export type CriteriaText = {
   title: string;
@@ -19,7 +20,6 @@ export const CRITERIA_CODES = [
   "x",
 ] as const;
 
-export type CriteriaCode = (typeof CRITERIA_CODES)[number];
 export type CriteriaDict = Record<CriteriaCode, CriteriaText>;
 
 export const LOCALES = ["en", "ja"] as const;
@@ -41,13 +41,6 @@ export const getCriteria = (code: CriteriaCode, locale: Locale): CriteriaText =>
   if (fallback) return fallback;
 
   return { title: code, description: "" };
-};
-
-export const getCriteriaSafe = (code: CriteriaCode, locale: string): CriteriaText => {
-  const safeLocale: Locale = (LOCALES as readonly string[]).includes(locale)
-    ? (locale as Locale)
-    : "en";
-  return CRITERIA_BY_LOCALE[safeLocale][code];
 };
 
 export const isCriteriaCode = (v: string): v is CriteriaCode => {
