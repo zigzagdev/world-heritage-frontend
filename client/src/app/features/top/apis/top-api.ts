@@ -10,14 +10,22 @@ export type TopApiDeps = {
   fetchImpl?: typeof fetch;
 };
 
-type DetailResponse<T> = {
+type DetailResponse = {
   status: string;
-  data: T;
+  data: ApiWorldHeritageDetailDto;
 };
 
-type ListResponse<T> = {
+type ListResponse = {
   status: string;
-  data: ListResult<T>;
+  data: ListResult<ApiWorldHeritageDto>;
+};
+
+const isListResponse = (json: unknown): json is ListResponse => {
+  return typeof json === "object" && json !== null && "status" in json && "data" in json;
+};
+
+const isDetailResponse = (json: unknown): json is DetailResponse => {
+  return typeof json === "object" && json !== null && "status" in json && "data" in json;
 };
 
 const normalizeApiBase = (apiBase: string): string => {
@@ -56,7 +64,11 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
         throw new Error(`HTTP ${res.status}`);
       }
 
-      const json = (await res.json()) as ListResponse<ApiWorldHeritageDto>;
+      const json = await res.json();
+
+      if (!isListResponse(json)) {
+        throw new Error("Unexpected response shape");
+      }
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }
@@ -74,7 +86,12 @@ export const createTopApi = ({ apiBase, fetchImpl = fetch }: TopApiDeps) => {
         throw new Error(`HTTP ${res.status}`);
       }
 
-      const json = (await res.json()) as DetailResponse<ApiWorldHeritageDetailDto>;
+      const json = await res.json();
+
+      if (!isDetailResponse(json)) {
+        throw new Error("Unexpected response shape");
+      }
+
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }
