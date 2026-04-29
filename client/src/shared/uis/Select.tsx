@@ -8,15 +8,6 @@ import {
   type SelectProps,
 } from "@mui/material";
 
-export type Option<T extends string | number> = { value: T; label: React.ReactNode };
-
-export type Props<T extends string | number> = Omit<SelectProps, "value" | "onChange"> & {
-  label?: string;
-  value: T;
-  onChange: (value: T) => void;
-  options: Option<T>[];
-};
-
 export default function Select<T extends string | number>({
   label,
   value,
@@ -26,7 +17,12 @@ export default function Select<T extends string | number>({
   labelId,
   fullWidth = true,
   ...rest
-}: Props<T>) {
+}: Omit<SelectProps, "value" | "onChange"> & {
+  label?: string;
+  value: T;
+  onChange: (value: T) => void;
+  options: { value: T; label: React.ReactNode }[];
+}) {
   const _labelId = labelId ?? (id ? `${id}-label` : undefined);
 
   const map = React.useMemo(
