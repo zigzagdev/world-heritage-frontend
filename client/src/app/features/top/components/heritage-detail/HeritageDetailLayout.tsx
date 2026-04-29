@@ -152,7 +152,7 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           {/* Left: Overview → Gallery */}
           <div className="space-y-8" id="content">
-            <HeritageOverViewSection item={item} locale={locale} />
+            <HeritageOverViewSection item={item} />
             <HeritageGallery images={item.images} />
           </div>
 
