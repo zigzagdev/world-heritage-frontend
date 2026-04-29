@@ -5,7 +5,7 @@ import type { RegionCount } from "../../../../domain/types.ts";
 type State = {
   data: RegionCount[];
   isLoading: boolean;
-  error: Error | null;
+  error: unknown;
 };
 
 export function useRegionCount() {

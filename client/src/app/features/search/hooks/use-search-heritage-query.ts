@@ -19,7 +19,7 @@ const toSearchParams = (params: HeritageSearchParams): SearchParams => ({
 });
 
 type Options = {
-  /** If false, the API call is skipped. Defaults to true. */
+  /** If false, the API call is skipped. Default is true. */
   enabled?: boolean;
 };
 

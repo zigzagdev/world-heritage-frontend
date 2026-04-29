@@ -3,20 +3,20 @@ import { toWorldHeritageDetailVm } from "@features/heritages/mappers/to-world-he
 import type { WorldHeritageDetailVm } from "../../../../domain/types.ts";
 import { fetchWorldHeritageDetail } from "../apis";
 
-type State = {
-  data: WorldHeritageDetailVm | null;
-  loading: boolean;
-  error: unknown | null;
-};
-
 function isAbortError(err: unknown): boolean {
   if (typeof err !== "object" || err === null) return false;
-  const e = err as { name?: unknown; message?: unknown };
-  return e.name === "AbortError" || e.message === "The user aborted a request.";
+  return (
+    ("name" in err && err.name === "AbortError") ||
+    ("message" in err && err.message === "The user aborted a request.")
+  );
 }
 
 export function useWorldHeritageDetail(id: string | null | undefined) {
-  const [state, setState] = React.useState<State>({
+  const [state, setState] = React.useState<{
+    data: WorldHeritageDetailVm | null;
+    loading: boolean;
+    error: unknown;
+  }>({
     data: null,
     loading: false,
     error: null,
@@ -42,7 +42,7 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setState((s) => ({ ...s, loading: true, error: null }));
+    setState((state) => ({ ...state, loading: true, error: null }));
 
     fetchWorldHeritageDetail(id, { signal: controller.signal })
       .then(toWorldHeritageDetailVm)
