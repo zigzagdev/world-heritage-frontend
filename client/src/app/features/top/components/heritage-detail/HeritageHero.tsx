@@ -1,7 +1,8 @@
 import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
-import type { Locale } from "../../../../../domain/criteria.ts";
+import { useLocale } from "@shared/locale/LocaleHooks.ts";
 
-export function HeritageHero({ item, locale }: { item: WorldHeritageDetailVm; locale: Locale }) {
+export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
+  const { locale } = useLocale();
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
