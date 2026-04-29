@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 
-type BaseCardProps = {
+export function BaseCard({
+  children,
+  as = "div",
+  onClick,
+}: {
   children: ReactNode;
   as?: "li" | "div";
   onClick?: () => void;
-};
-
-export function BaseCard({ children, as = "div", onClick }: BaseCardProps) {
+}) {
   // Render element type can be switched (e.g. "div" for general layout, "li" inside <ul>/<ol>)
   // This keeps HTML semantics correct while reusing the same card styles.
   const Wrapper = as;
