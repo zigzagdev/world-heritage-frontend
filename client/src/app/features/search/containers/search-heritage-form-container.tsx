@@ -1,12 +1,26 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import type { HeritageSearchParams } from "../../../../domain/types";
+import type {
+  Category,
+  HeritageSearchParams,
+  IdSortOption,
+  SearchValues,
+  StudyRegion,
+} from "../../../../domain/types";
 import {
   parseHeritageSearchParams,
   serializeHeritageSearchParams,
-} from "../mapper/search-heritages.params.ts";
-import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader.tsx";
-import type { SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
+} from "../mapper/search-heritages.params";
+import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
+import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
+
+const DEFAULT_TOP_PER_PAGE = 30;
+const DEFAULT_ORDER: IdSortOption = "asc";
+
+const toStudyRegionOrNull = (value: StudyRegion | ""): StudyRegion | null =>
+  value === "" ? null : value;
+
+const toCategoryOrNull = (value: Category | ""): Category | null => (value === "" ? null : value);
 
 const toSearchYearOrNull = (value: string): number | null => {
   const trimmed = value.trim();
@@ -16,71 +30,40 @@ const toSearchYearOrNull = (value: string): number | null => {
   return Math.floor(parsed);
 };
 
-/** Determine whether any valid search condition exists */
-const hasSearchParams = (params: HeritageSearchParams): boolean =>
-  params.search_query !== null ||
-  params.region !== null ||
-  params.category !== null ||
-  params.year_inscribed_from !== null ||
-  params.year_inscribed_to !== null;
+const toSearchValues = (params: HeritageSearchParams): SearchValues => ({
+  region: params.region ?? "",
+  category: params.category ?? "",
+  keyword: params.search_query ?? "",
+  yearInscribedFrom: params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
+  yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
+});
 
-type Props = {
-  /** Notify the parent which API should be used: list or search */
-  onApiModeChange?: (isSearch: boolean) => void;
-};
-
-export function SearchHeritageFormContainer({ onApiModeChange }: Props) {
+export function SearchHeritageFormContainer() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const params: HeritageSearchParams = useMemo(
-    () => parseHeritageSearchParams(location.search),
-    [location.search],
-  );
+  const params: HeritageSearchParams = useMemo(() => {
+    const parsed = parseHeritageSearchParams(location.search);
+    return {
+      ...SEARCH_PARAMS,
+      ...parsed,
+      current_page: parsed.current_page ?? 1,
+      per_page: parsed.per_page ?? DEFAULT_TOP_PER_PAGE,
+      order: parsed.order ?? DEFAULT_ORDER,
+    };
+  }, [location.search]);
 
-  // If any search parameter exists, we consider it as "search mode". Otherwise, it's "list mode".
-  const isSearchMode = useMemo(() => hasSearchParams(params), [params]);
-
-  useEffect(() => {
-    onApiModeChange?.(isSearchMode);
-  }, [isSearchMode, onApiModeChange]);
-
-  // If no search condition exists on the results page, redirect to the list page.
-  useEffect(() => {
-    if (!isSearchMode && location.pathname === "/heritages/results") {
-      navigate({ pathname: "/heritages", search: location.search }, { replace: true });
-    }
-  }, [isSearchMode, location.pathname, location.search, navigate]);
-
-  const valueFromUrl: SearchValues = useMemo(
-    () => ({
-      region: params.region ?? "",
-      category: params.category ?? "",
-      keyword: params.search_query ?? "",
-      yearInscribedFrom:
-        params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
-      yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
-    }),
-    [
-      params.region,
-      params.category,
-      params.search_query,
-      params.year_inscribed_from,
-      params.year_inscribed_to,
-    ],
-  );
-
-  const [draft, setDraft] = useState<SearchValues>(valueFromUrl);
+  const [draft, setDraft] = useState<SearchValues>(() => toSearchValues(params));
 
   useEffect(() => {
-    setDraft(valueFromUrl);
-  }, [valueFromUrl]);
+    setDraft(toSearchValues(params));
+  }, [params]);
 
-  const onChange = useCallback((next: SearchValues) => {
+  const handleChange = useCallback((next: SearchValues) => {
     setDraft(next);
   }, []);
 
-  const onSubmit = useCallback(
+  const handleSubmit = useCallback(
     (query: Partial<SearchValues>) => {
       const merged: SearchValues = {
         region: query.region ?? draft.region,
@@ -91,20 +74,24 @@ export function SearchHeritageFormContainer({ onApiModeChange }: Props) {
       };
 
       const nextParams: HeritageSearchParams = {
-        ...params,
-        region: (merged.region.trim() || null) as HeritageSearchParams["region"],
-        category: (merged.category.trim() || null) as HeritageSearchParams["category"],
-        search_query: merged.keyword.trim() || null,
+        ...SEARCH_PARAMS,
+        search_query: merged.keyword.trim() === "" ? null : merged.keyword.trim(),
+        region: toStudyRegionOrNull(merged.region),
+        category: toCategoryOrNull(merged.category),
         year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
         year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
         current_page: 1,
+        per_page: params.per_page ?? DEFAULT_TOP_PER_PAGE,
+        order: params.order ?? DEFAULT_ORDER,
+        country: null,
       };
 
       const search = serializeHeritageSearchParams(nextParams);
-      navigate({ pathname: location.pathname, search }, { replace: false });
+      navigate({ pathname: "/heritages/results", search }, { replace: false });
+      setDraft(merged);
     },
-    [navigate, location.pathname, params, draft],
+    [draft, navigate, params.per_page, params.order],
   );
 
-  return <HeritageSubHeader value={draft} onChange={onChange} onSubmit={onSubmit} />;
+  return <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />;
 }
