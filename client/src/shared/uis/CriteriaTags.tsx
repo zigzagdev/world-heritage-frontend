@@ -2,9 +2,9 @@ import {
   getCriteria,
   isCriteriaCode,
   UNESCO_CRITERIA_SOURCE_URL,
-  type CriteriaCode,
   type Locale,
 } from "../../domain/criteria";
+import type { CriteriaCode } from "../../domain/types.ts";
 
 type Props = {
   criteria: readonly (CriteriaCode | string)[];
