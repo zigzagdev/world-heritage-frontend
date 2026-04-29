@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
+import type { WorldHeritageDetailVm, SearchValues } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria";
 import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
-import { type SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
 import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
@@ -13,12 +12,6 @@ import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 
-type Props = {
-  item: WorldHeritageDetailVm;
-  locale: Locale;
-  toggleLocale: () => void;
-};
-
 const DEFAULT_SEARCH: SearchValues = {
   region: "",
   category: "",
@@ -27,12 +20,7 @@ const DEFAULT_SEARCH: SearchValues = {
   yearInscribedTo: "",
 };
 
-type TabItem = {
-  label: string;
-  href: `#${string}`;
-};
-
-const TABS: readonly TabItem[] = [
+const TABS: readonly { label: string; href: `#${string}` }[] = [
   { label: "Description", href: "#content" },
   { label: "Maps", href: "#geo-map" },
   { label: "Gallery", href: "#gallery" },
@@ -41,20 +29,27 @@ const TABS: readonly TabItem[] = [
 const formatCriteriaInline = (criteria: string[] | undefined) =>
   criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
 
-function HeritageDetailTabs({ items }: { items: readonly TabItem[] }) {
+function HeritageDetailTabs({
+  items,
+}: {
+  items: readonly {
+    label: string;
+    href: `#${string}`;
+  }[];
+}) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8">
       <nav
         aria-label="Heritage sections"
         className={`flex gap-6 overflow-x-auto border-b border-sky-200 ${textType.body} font-semibold`}
       >
-        {items.map((t) => (
+        {items.map((text) => (
           <a
-            key={t.href}
-            href={t.href}
+            key={text.href}
+            href={text.href}
             className="whitespace-nowrap py-3 text-sky-700 border-b-2 border-transparent hover:text-sky-900 hover:border-sky-500"
           >
-            {t.label}
+            {text.label}
           </a>
         ))}
       </nav>
@@ -98,7 +93,15 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
   );
 }
 
-export function HeritageDetailLayout({ item, locale, toggleLocale }: Props) {
+export function HeritageDetailLayout({
+  item,
+  locale,
+  toggleLocale,
+}: {
+  item: WorldHeritageDetailVm;
+  locale: Locale;
+  toggleLocale: () => void;
+}) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();

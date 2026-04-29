@@ -1,12 +1,13 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { textType } from "@shared/styles/typography.ts";
 
-type Props = {
+export function HeritageOverViewSection({
+  item,
+  locale,
+}: {
   item: WorldHeritageDetailVm;
   locale: string;
-};
-
-export function HeritageOverViewSection({ item, locale }: Props) {
+}) {
   return (
     <section
       id="overview"

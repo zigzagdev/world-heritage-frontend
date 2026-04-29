@@ -1,15 +1,5 @@
 import type { MouseEvent } from "react";
 
-type PaginationProps = {
-  currentPage: number;
-  perPage: number;
-  lastPage: number;
-  onChange: (page: number) => void;
-  disabled?: boolean;
-  windowSize?: number;
-  simple?: boolean;
-};
-
 function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, n));
 }
@@ -18,19 +8,19 @@ function buildPageItems(
   current: number,
   last: number,
   windowSize: number,
-  edgeCount: number = 4, //先頭/末尾で必ず出す個数
+  edgeCount: number = 4, // display at least count page
 ): Array<number | "…"> {
   if (last <= 1) return [1];
 
   const pages = new Set<number>();
 
-  // 先頭ページ
+  // top page
   for (let p = 1; p <= Math.min(edgeCount, last); p++) pages.add(p);
 
-  // 末尾ページ
+  // last page
   for (let p = Math.max(1, last - edgeCount + 1); p <= last; p++) pages.add(p);
 
-  // 現在ページ
+  // current page
   for (let p = current - windowSize; p <= current + windowSize; p++) {
     if (p >= 1 && p <= last) pages.add(p);
   }
@@ -55,7 +45,15 @@ export function Pagination({
   disabled = false,
   windowSize = 1,
   simple = false,
-}: PaginationProps) {
+}: {
+  currentPage: number;
+  perPage: number;
+  lastPage: number;
+  onChange: (page: number) => void;
+  disabled?: boolean;
+  windowSize?: number;
+  simple?: boolean;
+}) {
   const last = Math.max(1, lastPage);
   const current = clamp(currentPage, 1, last);
 

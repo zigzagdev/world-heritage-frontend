@@ -1,14 +1,17 @@
 import type { WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import { Button } from "@shared/uis/Button.tsx";
 
-type Props = {
+export function HeritageGallery({
+  images,
+  previewCount = 6,
+  onOpenGallery,
+  onSelectImage,
+}: {
   images: WorldHeritageImageVm[];
   previewCount?: number;
   onOpenGallery?: () => void;
   onSelectImage?: (img: Pick<WorldHeritageImageVm, "id" | "url" | "alt" | "credit">) => void;
-};
-
-export function HeritageGallery({ images, previewCount = 6, onOpenGallery, onSelectImage }: Props) {
+}) {
   if (!images?.length) return null;
 
   const hasMore = images.length > previewCount;

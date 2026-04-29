@@ -2,10 +2,6 @@ import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 import { HeritageMetadataList } from "./HeritageMetadataList.tsx";
 
-type Props = {
-  item: WorldHeritageDetailVm;
-};
-
 const formatCriteriaInline = (criteria: string[] | undefined) =>
   criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
 
@@ -22,7 +18,7 @@ const formatLongitude = (lng: number): string => {
   return `${Math.abs(lng).toFixed(4)}° ${direction}`;
 };
 
-export function HeritageSidebar({ item }: Props) {
+export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
   const hasCoord =
     item.latitude != null && item.longitude != null && !isZeroCoord(item.latitude, item.longitude);
 

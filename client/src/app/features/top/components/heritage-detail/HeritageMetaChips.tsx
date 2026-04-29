@@ -1,9 +1,5 @@
 import type { WorldHeritageVm } from "../../../../../domain/types.ts";
 
-type Props = {
-  item: WorldHeritageVm;
-};
-
 type ChipProps = {
   label: string;
   value?: string | number | null;
@@ -29,7 +25,7 @@ function Chip({ label, value, tone = "default" }: ChipProps) {
   );
 }
 
-export function HeritageMetaChips({ item }: Props) {
+export function HeritageMetaChips({ item }: { item: WorldHeritageVm }) {
   const criteriaLabel =
     Array.isArray(item.criteria) && item.criteria.length > 0 ? item.criteria.join(", ") : undefined;
 

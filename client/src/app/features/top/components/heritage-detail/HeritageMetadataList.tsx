@@ -7,12 +7,13 @@ export type MetadataItem = {
   hidden?: boolean;
 };
 
-type Props = {
-  items: readonly MetadataItem[] | null;
+export function HeritageMetadataList({
+  items,
+  className,
+}: {
+  items: readonly MetadataItem[];
   className?: string;
-};
-
-export function HeritageMetadataList({ items, className }: Props) {
+}) {
   return (
     <dl className={className ?? "heritage-detail__definition-list"}>
       {items

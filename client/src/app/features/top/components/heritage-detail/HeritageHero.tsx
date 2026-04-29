@@ -1,12 +1,7 @@
 import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import type { Locale } from "../../../../../domain/criteria.ts";
 
-type Props = {
-  item: WorldHeritageDetailVm;
-  locale: Locale;
-};
-
-export function HeritageHero({ item, locale }: Props) {
+export function HeritageHero({ item, locale }: { item: WorldHeritageDetailVm; locale: Locale }) {
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
