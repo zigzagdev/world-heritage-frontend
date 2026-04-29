@@ -20,8 +20,7 @@ export type SearchParams = {
   perPage?: number;
 };
 
-// Used only inside searchHeritages, no need to export
-type ApiSearchResponse = {
+export type ApiSearchResponse = {
   status: "success" | "error";
   data: {
     items: ApiWorldHeritageDto[];
