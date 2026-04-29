@@ -1,16 +1,12 @@
 import type { ReactNode } from "react";
-import type { WorldHeritageVm } from "../../../../domain/types";
+import type {
+  WorldHeritageVm,
+  Pagination as SearchResultsPagination,
+} from "../../../../domain/types";
 import { HeritageCard } from "@features/top/cards/HeritageCard";
 import { Pagination } from "@features/top/components/Pagination.tsx";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 import { SearchResultMapComponent } from "@features/search/components/SearchResultMapComponent.tsx";
-
-type SearchResultsPagination = {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-};
 
 export type SearchResultsPageProps = {
   header?: ReactNode;

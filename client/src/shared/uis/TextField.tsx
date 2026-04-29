@@ -2,9 +2,7 @@ import * as React from "react";
 import { TextField as MUITextField } from "@mui/material";
 import type { TextFieldProps as MUITextFieldProps } from "@mui/material";
 
-export type Props = MUITextFieldProps;
-
-const TextField = React.forwardRef<HTMLInputElement, Props>(function TextField(
+const TextField = React.forwardRef<HTMLInputElement, MUITextFieldProps>(function TextField(
   { helperText, id: idProp, ...props },
   ref,
 ) {

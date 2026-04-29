@@ -1,13 +1,11 @@
-import React from "react";
+import type { FC } from "react";
 
-type HeroImageProps = {
+export const HeroImage: FC<{
   src: string;
   alt: string;
   credit?: string | null;
   unescoUrl?: string | null;
-};
-
-export const HeroImage: React.FC<HeroImageProps> = ({ src, alt, credit, unescoUrl }) => (
+}> = ({ src, alt, credit, unescoUrl }) => (
   <figure className="heritage-detail__hero">
     <img src={src} alt={alt} className="heritage-detail__hero-image" />
 

@@ -25,13 +25,14 @@ export function toWorldHeritageDetailVm(dto: ApiWorldHeritageDetailDto): WorldHe
     area_hectares: dto.area_hectares,
     buffer_zone_hectares: dto.buffer_zone_hectares,
     short_description: dto.short_description,
-    short_description_jp: dto.short_description_jp,
     unesco_site_url: dto.unesco_site_url,
     state_party: dto.state_party,
     state_party_codes: dto.state_party_codes,
     state_parties_meta: dto.state_parties_meta,
     thumbnail: dto.thumbnail_url,
   } satisfies import("../../../../domain/types.ts").ApiWorldHeritageDto;
+
+  // Ensure the reshaped object satisfies ApiWorldHeritageDto at compile time
 
   const base: WorldHeritageVm = toWorldHeritageVm(listDto);
 

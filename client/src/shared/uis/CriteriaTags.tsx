@@ -2,16 +2,17 @@ import {
   getCriteria,
   isCriteriaCode,
   UNESCO_CRITERIA_SOURCE_URL,
-  type CriteriaCode,
   type Locale,
 } from "../../domain/criteria";
+import type { CriteriaCode } from "../../domain/types.ts";
 
-type Props = {
+export function CriteriaTags({
+  criteria,
+  locale,
+}: {
   criteria: readonly (CriteriaCode | string)[];
   locale: Locale;
-};
-
-export function CriteriaTags({ criteria, locale }: Props) {
+}) {
   const safeCriteria = criteria
     .map((criterion) => String(criterion).trim().toLowerCase())
     .filter((criterion): criterion is CriteriaCode => isCriteriaCode(criterion));

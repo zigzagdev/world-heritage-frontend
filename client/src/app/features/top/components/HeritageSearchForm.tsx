@@ -4,16 +4,9 @@ import {
   CATEGORIES,
   STUDY_REGIONS,
   type Category,
+  type SearchValues,
   type StudyRegion,
 } from "../../../../domain/types.ts";
-
-export type SearchValues = {
-  region: StudyRegion | "";
-  category: Category | "";
-  keyword: string;
-  yearInscribedFrom: string;
-  yearInscribedTo: string;
-};
 
 type Props = {
   value?: SearchValues;

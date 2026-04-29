@@ -3,12 +3,6 @@ import { divIcon } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-type Props = {
-  latitude: number | null;
-  longitude: number | null;
-  name?: string;
-};
-
 const isValidCoord = (lat: number | null, lng: number | null): lat is number =>
   lat !== null && lng !== null && lat !== 0 && lng !== 0;
 
@@ -19,7 +13,15 @@ const redDiamondIcon = divIcon({
   iconAnchor: [10, 10],
 });
 
-export function DetailHeritageMap({ latitude, longitude, name }: Props) {
+export function DetailHeritageMap({
+  latitude,
+  longitude,
+  name,
+}: {
+  latitude: number | null;
+  longitude: number | null;
+  name?: string;
+}) {
   if (!isValidCoord(latitude, longitude)) {
     return null;
   }

@@ -5,10 +5,6 @@ import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
 import type { LatLngBoundsExpression } from "leaflet";
 
-type Props = {
-  items: WorldHeritageVm[];
-};
-
 const CATEGORY_COLOR: Record<string, string> = {
   Cultural: "#f59e0b",
   Natural: "#22c55e",
@@ -37,7 +33,7 @@ function FitBounds({ items }: { items: WorldHeritageVm[] }) {
   return null;
 }
 
-export function SearchResultMapComponent({ items }: Props) {
+export function SearchResultMapComponent({ items }: { items: WorldHeritageVm[] }) {
   const navigate = useNavigate();
 
   const validItems = items.filter((item) => isValidCoordinate(item.latitude, item.longitude));

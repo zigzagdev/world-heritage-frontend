@@ -189,3 +189,11 @@ export type RegionCount = {
   region: StudyRegion;
   count: number;
 };
+
+export type SearchValues = {
+  region: StudyRegion | "";
+  category: Category | "";
+  keyword: string;
+  yearInscribedFrom: string;
+  yearInscribedTo: string;
+};

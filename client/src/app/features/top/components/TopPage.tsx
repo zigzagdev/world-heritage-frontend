@@ -1,8 +1,7 @@
-import type { WorldHeritageVm } from "../../../../domain/types.ts";
+import type { WorldHeritageVm, IdSortOption } from "../../../../domain/types.ts";
 import { HeritageCard } from "../cards/HeritageCard";
 import type { ReactNode } from "react";
 import { Pagination } from "@features/top/components/Pagination.tsx";
-import type { IdSortOption } from "../../../../domain/types.ts";
 import { Map } from "./Map.tsx";
 
 export type TopPageProps = {

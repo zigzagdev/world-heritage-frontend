@@ -9,13 +9,15 @@ import {
 
 import { useHeritageSearchQuery } from "../../search/hooks/use-search-heritage-query";
 import SearchResultsPage from "../components/SearchResultsPage";
-import type { WorldHeritageVm } from "../../../../domain/types";
+import type {
+  ApiWorldHeritageDto,
+  Pagination,
+  SearchValues,
+  WorldHeritageVm,
+} from "../../../../domain/types";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm";
-import type { Pagination } from "../types";
 import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
-import type { SearchValues } from "@features/top/components/HeritageSearchForm";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
-import type { ApiSearchResponse } from "@features/search/apis/search-api";
 
 const fmtRangeText = (pagination: Pagination, count: number): string => {
   if (count === 0) {
@@ -33,7 +35,7 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 
 const isValidListResult = (
   value: unknown,
-): value is { items: ApiSearchResponse[]; pagination: Pagination } => {
+): value is { items: ApiWorldHeritageDto[]; pagination: Pagination } => {
   if (!isObject(value)) {
     return false;
   }

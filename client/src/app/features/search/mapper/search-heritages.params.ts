@@ -7,58 +7,55 @@ import type {
 import { CATEGORIES, STUDY_REGIONS } from "../../../../domain/types.ts";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as defaultSearchParams } from "./search-heritage.types.ts";
 
-const toNullIfEmpty = (v: string | null): string | null => {
-  if (v == null) return null;
-  const s = v.trim();
-  return s === "" ? null : s;
+const toNullIfEmpty = (value: string | null): string | null => {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed;
 };
 
-const toIntOrNull = (v: string | null): number | null => {
-  if (v == null) return null;
-  const s = v.trim();
-  if (s === "") return null;
+const toIntOrNull = (value: string | null): number | null => {
+  if (value == null) return null;
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
 
-  const n = Number(s);
-  if (!Number.isFinite(n)) return null;
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) return null;
 
-  return Math.floor(n);
+  return Math.floor(parsed);
 };
 
-const clampMin = (n: number, min: number): number => {
-  return n < min ? min : n;
+const clampMin = (valueNumber: number, min: number): number => {
+  return valueNumber < min ? min : valueNumber;
 };
 
 const isStudyRegion = (value: string): value is StudyRegion => {
-  return STUDY_REGIONS.includes(value as StudyRegion);
+  return (STUDY_REGIONS as readonly string[]).includes(value);
 };
 
-const toRegionOrNull = (v: string | null): StudyRegion | null => {
-  const s = toNullIfEmpty(v);
-  if (s == null) return null;
-
-  return isStudyRegion(s) ? s : null;
+const toRegionOrNull = (value: string | null): StudyRegion | null => {
+  const trimmed = toNullIfEmpty(value);
+  if (trimmed == null) return null;
+  return isStudyRegion(trimmed) ? trimmed : null;
 };
 
 const isCategory = (value: string): value is Category => {
-  return CATEGORIES.includes(value as Category);
+  return (CATEGORIES as readonly string[]).includes(value);
 };
 
-const toCategoryOrNull = (v: string | null): Category | null => {
-  const s = toNullIfEmpty(v);
-  if (s == null) return null;
-
-  return isCategory(s) ? s : null;
+const toCategoryOrNull = (value: string | null): Category | null => {
+  const trimmed = toNullIfEmpty(value);
+  if (trimmed == null) return null;
+  return isCategory(trimmed) ? trimmed : null;
 };
 
 const isIdSortOption = (value: string): value is IdSortOption => {
   return value === "asc" || value === "desc";
 };
 
-const toOrderOrNull = (v: string | null): IdSortOption | null => {
-  const s = toNullIfEmpty(v);
-  if (s == null) return null;
-
-  return isIdSortOption(s) ? s : null;
+const toOrderOrNull = (value: string | null): IdSortOption | null => {
+  const trimmed = toNullIfEmpty(value);
+  if (trimmed == null) return null;
+  return isIdSortOption(trimmed) ? trimmed : null;
 };
 
 export function parseHeritageSearchParams(search: string): HeritageSearchParams {
@@ -104,43 +101,43 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
   };
 }
 
-export function serializeHeritageSearchParams(p: HeritageSearchParams): string {
+export function serializeHeritageSearchParams(params: HeritageSearchParams): string {
   const searchParams = new URLSearchParams();
 
-  const setStr = (k: string, v: string | null, def: string | null) => {
-    if (v == null) return;
-
-    const s = v.trim();
-    if (s === "") return;
-    if (def != null && s === def) return;
-
-    searchParams.set(k, s);
+  const setStr = (key: string, value: string | null, defaultValue: string | null) => {
+    if (value == null) return;
+    const trimmed = value.trim();
+    if (trimmed === "") return;
+    if (defaultValue != null && trimmed === defaultValue) return;
+    searchParams.set(key, trimmed);
   };
 
-  const setNum = (k: string, v: number | null, def: number | null) => {
-    if (v == null) return;
-    if (!Number.isFinite(v)) return;
-
-    const i = Math.floor(v);
-    if (def != null && i === def) return;
-
-    searchParams.set(k, String(i));
+  const setNum = (key: string, value: number | null, defaultValue: number | null) => {
+    if (value == null) return;
+    if (!Number.isFinite(value)) return;
+    const floored = Math.floor(value);
+    if (defaultValue != null && floored === defaultValue) return;
+    searchParams.set(key, String(floored));
   };
 
-  setStr("search_query", p.search_query, defaultSearchParams.search_query);
-  setStr("country", p.country, defaultSearchParams.country);
-  setStr("region", p.region, defaultSearchParams.region);
-  setStr("category", p.category, defaultSearchParams.category);
+  setStr("search_query", params.search_query, defaultSearchParams.search_query);
+  setStr("country", params.country, defaultSearchParams.country);
+  setStr("region", params.region, defaultSearchParams.region);
+  setStr("category", params.category, defaultSearchParams.category);
 
-  setNum("year_inscribed_from", p.year_inscribed_from, defaultSearchParams.year_inscribed_from);
-  setNum("year_inscribed_to", p.year_inscribed_to, defaultSearchParams.year_inscribed_to);
-  setNum("current_page", p.current_page, defaultSearchParams.current_page);
-  setNum("per_page", p.per_page, defaultSearchParams.per_page);
+  setNum(
+    "year_inscribed_from",
+    params.year_inscribed_from,
+    defaultSearchParams.year_inscribed_from,
+  );
+  setNum("year_inscribed_to", params.year_inscribed_to, defaultSearchParams.year_inscribed_to);
+  setNum("current_page", params.current_page, defaultSearchParams.current_page);
+  setNum("per_page", params.per_page, defaultSearchParams.per_page);
 
-  if (p.order != null && p.order !== defaultSearchParams.order) {
-    searchParams.set("order", p.order);
+  if (params.order != null && params.order !== defaultSearchParams.order) {
+    searchParams.set("order", params.order);
   }
 
-  const qs = searchParams.toString();
-  return qs ? `?${qs}` : "";
+  const queryString = searchParams.toString();
+  return queryString ? `?${queryString}` : "";
 }

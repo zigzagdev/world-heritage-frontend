@@ -1,9 +1,13 @@
 import { useMemo, useState } from "react";
 import { Button } from "@shared/uis/Button";
 import SearchIcon from "@mui/icons-material/Search";
-import { STUDY_REGIONS, CATEGORIES } from "../../../../../domain/types";
-import type { Category, StudyRegion } from "../../../../../domain/types";
-import type { SearchValues } from "@features/top/components/HeritageSearchForm.tsx";
+import {
+  type Category,
+  type StudyRegion,
+  type SearchValues,
+  STUDY_REGIONS,
+  CATEGORIES,
+} from "../../../../../domain/types";
 
 type Props = {
   value?: SearchValues;

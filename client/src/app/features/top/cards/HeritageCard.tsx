@@ -30,15 +30,16 @@ function TagChip({ children }: { children: ReactNode }) {
   );
 }
 
-type HeritageCardProps = {
-  item: WorldHeritageVm;
-  onClickItem?: (id: number) => void;
-};
-
 const DESC_CLAMP = 2;
 const CRITERIA_MAX = 4;
 
-export function HeritageCard({ item, onClickItem }: HeritageCardProps) {
+export function HeritageCard({
+  item,
+  onClickItem,
+}: {
+  item: WorldHeritageVm;
+  onClickItem?: (id: number) => void;
+}) {
   const goDetail = () => {
     if (!onClickItem) return;
     onClickItem(item.id);
