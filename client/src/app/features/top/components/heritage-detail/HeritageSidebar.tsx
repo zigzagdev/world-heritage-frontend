@@ -1,6 +1,7 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 import { HeritageMetadataList } from "./HeritageMetadataList.tsx";
+import { useText } from "@shared/locale/ui-text.ts";
 
 const formatCriteriaInline = (criteria: string[] | undefined) =>
   criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
@@ -19,6 +20,7 @@ const formatLongitude = (lng: number): string => {
 };
 
 export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
+  const t = useText();
   const hasCoord =
     item.latitude != null && item.longitude != null && !isZeroCoord(item.latitude, item.longitude);
 
@@ -60,12 +62,12 @@ export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
               href={item.unescoSiteUrl}
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="View on UNESCO"
+              aria-label={t.viewOnUnesco}
               className="mt-4 inline-flex w-full items-center justify-center rounded-xl
                border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold
                text-sky-900 hover:bg-sky-100"
             >
-              View on UNESCO
+              {t.viewOnUnesco}
             </a>
           )}
         </div>

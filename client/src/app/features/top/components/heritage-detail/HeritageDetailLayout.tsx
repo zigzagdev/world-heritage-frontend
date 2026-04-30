@@ -11,6 +11,7 @@ import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 import { useLocale } from "@shared/locale/LocaleHooks.ts";
+import { useText } from "@shared/locale/ui-text.ts";
 
 const DEFAULT_SEARCH: SearchValues = {
   region: "",
@@ -19,12 +20,6 @@ const DEFAULT_SEARCH: SearchValues = {
   yearInscribedFrom: "",
   yearInscribedTo: "",
 };
-
-const TABS: readonly { label: string; href: `#${string}` }[] = [
-  { label: "Description", href: "#content" },
-  { label: "Maps", href: "#geo-map" },
-  { label: "Gallery", href: "#gallery" },
-] as const;
 
 const formatCriteriaInline = (criteria: string[] | undefined) =>
   criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
@@ -59,30 +54,31 @@ function HeritageDetailTabs({
 
 // Key exam info: visible without scrolling on all screen sizes.
 function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
+  const t = useText();
   return (
     <div className="mx-auto w-full max-w-6xl px-4 mt-4">
       <div className="flex flex-wrap gap-x-6 gap-y-2">
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Region
+            {t.region}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.region ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Category
+            {t.category}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.category ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Year Inscribed
+            {t.yearInscribed}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.yearInscribed ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Criteria
+            {t.criteria}
           </div>
           <div className="text-sm font-semibold text-zinc-900">
             {formatCriteriaInline(item.criteria)}
@@ -98,6 +94,12 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
   const { locale, toggleLocale } = useLocale();
+  const t = useText();
+  const tabs: readonly { label: string; href: `#${string}` }[] = [
+    { label: t.description, href: "#content" },
+    { label: t.maps, href: "#geo-map" },
+    { label: t.gallery, href: "#gallery" },
+  ];
 
   const handleSubmit = (q: Partial<SearchValues>) => {
     const next = { ...search, ...q };
@@ -124,7 +126,7 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8 flex items-center justify-between">
-        <HeritageDetailTabs items={TABS} />
+        <HeritageDetailTabs items={tabs} />
         <button
           onClick={toggleLocale}
           className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 shrink-0"
