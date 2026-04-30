@@ -12,5 +12,15 @@
   "maps": "地図",
   "gallery": "ギャラリー",
   "overview": "概要",
-  "viewOnUnesco": "UNESCO で見る"
+  "viewOnUnesco": "UNESCO で見る",
+  "heritageData": "遺産データ",
+  "country": "国",
+  "stateParty": "締約国",
+  "endangered": "危機遺産",
+  "propertyArea": "遺産の面積",
+  "bufferZone": "緩衝地帯",
+  "latitude": "緯度",
+  "longitude": "経度",
+  "yes": "はい",
+  "no": "いいえ"
 }

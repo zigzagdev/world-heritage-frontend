@@ -12,5 +12,15 @@
   "maps": "Maps",
   "gallery": "Gallery",
   "overview": "Overview",
-  "viewOnUnesco": "View on UNESCO"
+  "viewOnUnesco": "View on UNESCO",
+  "heritageData": "Heritage Data",
+  "country": "Country",
+  "stateParty": "State Party",
+  "endangered": "Endangered",
+  "propertyArea": "Property Area",
+  "bufferZone": "Buffer Zone",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "yes": "Yes",
+  "no": "No"
 }
