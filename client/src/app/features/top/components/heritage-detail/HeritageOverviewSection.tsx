@@ -1,13 +1,9 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { textType } from "@shared/styles/typography.ts";
+import { useLocale } from "@shared/locale/LocaleHooks.ts";
 
-export function HeritageOverViewSection({
-  item,
-  locale,
-}: {
-  item: WorldHeritageDetailVm;
-  locale: string;
-}) {
+export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm }) {
+  const { locale } = useLocale();
   return (
     <section
       id="overview"

@@ -1,30 +1,12 @@
-import { useEffect, useMemo, useContext } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect, useContext } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useWorldHeritageDetail } from "../hooks/use-world-heritage-detail";
 import { HeritageDetailLayout } from "../components/heritage-detail/HeritageDetailLayout";
-import { LOCALES, type Locale } from "../../../../domain/criteria";
 import BreadcrumbContext from "@features/breadcrumbs/BreadCrumbProvider";
-
-function resolveLocale(raw: string | null): Locale {
-  if (!raw) return "en";
-  return (LOCALES as readonly string[]).includes(raw) ? (raw as Locale) : "en";
-}
 
 export function WorldHeritageDetailContainer() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const locale = useMemo(() => resolveLocale(searchParams.get("lang")), [searchParams]);
-
-  const toggleLanguageLocation = () => {
-    const theOther = locale === "ja" ? "en" : "ja";
-    setSearchParams((prev) => {
-      const nowLocal = new URLSearchParams(prev);
-      nowLocal.set("lang", theOther);
-
-      return nowLocal;
-    });
-  };
 
   useEffect(() => {
     if (!id) navigate("/heritages", { replace: true });
@@ -61,5 +43,5 @@ export function WorldHeritageDetailContainer() {
     );
   }
 
-  return <HeritageDetailLayout item={item} locale={locale} toggleLocale={toggleLanguageLocation} />;
+  return <HeritageDetailLayout item={item} />;
 }

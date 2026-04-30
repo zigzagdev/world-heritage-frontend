@@ -1,15 +1,16 @@
 import React, { createContext, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
-import { LOCALES, type Locale } from "../../../domain/criteria.ts";
+import { LOCALES, type Locale } from "../../domain/criteria.ts";
 
-type LocaleContextType = {
-  locale: Locale;
-  setLocale: (locale: Locale) => void;
-  toggleLocale: () => void;
-};
-
-const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
+const LocaleContext = createContext<
+  | {
+      locale: Locale;
+      setLocale: (locale: Locale) => void;
+      toggleLocale: () => void;
+    }
+  | undefined
+>(undefined);
 
 const isLocale = (value: string): value is Locale => LOCALES.some((l) => l === value);
 

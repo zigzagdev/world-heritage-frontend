@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WorldHeritageDetailVm, SearchValues } from "../../../../../domain/types.ts";
-import type { Locale } from "../../../../../domain/criteria";
 import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
 import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
@@ -11,6 +10,7 @@ import { DetailHeritageMap } from "@features/top/components/heritage-detail/Deta
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
+import { useLocale } from "@shared/locale/LocaleHooks.ts";
 
 const DEFAULT_SEARCH: SearchValues = {
   region: "",
@@ -93,18 +93,11 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
   );
 }
 
-export function HeritageDetailLayout({
-  item,
-  locale,
-  toggleLocale,
-}: {
-  item: WorldHeritageDetailVm;
-  locale: Locale;
-  toggleLocale: () => void;
-}) {
+export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
+  const { locale, toggleLocale } = useLocale();
 
   const handleSubmit = (q: Partial<SearchValues>) => {
     const next = { ...search, ...q };
@@ -145,7 +138,7 @@ export function HeritageDetailLayout({
       </div>
 
       {/* Hero image */}
-      <HeritageHero item={item} locale={locale} />
+      <HeritageHero item={item} />
 
       {/* Key exam info: always visible */}
       <KeyExamInfo item={item} />
@@ -159,7 +152,7 @@ export function HeritageDetailLayout({
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           {/* Left: Overview → Gallery */}
           <div className="space-y-8" id="content">
-            <HeritageOverViewSection item={item} locale={locale} />
+            <HeritageOverViewSection item={item} />
             <HeritageGallery images={item.images} />
           </div>
 
