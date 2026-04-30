@@ -140,6 +140,8 @@ export type WorldHeritageVm = {
   images: WorldHeritageImageVm[];
   title: string;
   subtitle: string;
+  displaySubName: string | null;
+  displayDescription: string;
   areaText: string;
   bufferText: string;
   criteriaText: string;

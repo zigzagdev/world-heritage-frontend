@@ -14,6 +14,11 @@ jest.mock("@features/heritages/mappers/to-world-heritage-detail-vm", () => ({
   toWorldHeritageDetailVm: (x: unknown) => x,
 }));
 
+jest.mock("@shared/locale/LocaleHooks", () => ({
+  __esModule: true,
+  useLocale: () => ({ locale: "en", setLocale: jest.fn(), toggleLocale: jest.fn() }),
+}));
+
 jest.mock("../../apis", () => ({
   fetchWorldHeritageDetail: jest.fn(),
 }));

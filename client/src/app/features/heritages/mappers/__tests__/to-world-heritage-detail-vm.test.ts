@@ -53,7 +53,7 @@ const baseDto = (
 });
 
 describe("toWorldHeritageDetailVm", () => {
-  it("maps base fields and attaches sorted image VMs", () => {
+  it("en: maps base fields and attaches sorted image VMs", () => {
     const dto = baseDto({
       images: [
         img({
@@ -68,13 +68,15 @@ describe("toWorldHeritageDetailVm", () => {
       ],
     });
 
-    const vm: WorldHeritageDetailVm = toWorldHeritageDetailVm(dto);
+    const vm: WorldHeritageDetailVm = toWorldHeritageDetailVm(dto, "en");
 
     expect(vm.id).toBe(dto.id);
-    expect(vm.title).toBe(dto.official_name);
+    expect(vm.title).toBe(dto.name);
     expect(vm.country).toBe(dto.country);
     expect(vm.countryNameJp).toBe(dto.country_name_jp);
     expect(vm.region).toBe(dto.region);
+    expect(vm.displayDescription).toBe(dto.short_description);
+    expect(vm.displaySubName).toBeNull();
 
     // detail
     expect(vm.primaryStatePartyCode).toBe("JPN");
@@ -97,12 +99,23 @@ describe("toWorldHeritageDetailVm", () => {
     expect(vm.images[1].alt).toBe("custom alt 2");
   });
 
+  it("ja: title falls back to heritage_name_jp and displaySubName carries the English name", () => {
+    const dto = baseDto({ images: [] });
+
+    const vm = toWorldHeritageDetailVm(dto, "ja");
+
+    expect(vm.title).toBe(dto.heritage_name_jp);
+    expect(vm.displaySubName).toBe(dto.name);
+    expect(vm.displayDescription).toBe(dto.short_description_jp);
+    expect(vm.country).toBe(dto.country_name_jp);
+  });
+
   it("is stable when images is empty array", () => {
     const dto = baseDto({ images: [] });
 
-    const vm = toWorldHeritageDetailVm(dto);
+    const vm = toWorldHeritageDetailVm(dto, "en");
 
     expect(vm.images).toEqual([]);
-    expect(vm.title).toBe(dto.official_name);
+    expect(vm.title).toBe(dto.name);
   });
 });

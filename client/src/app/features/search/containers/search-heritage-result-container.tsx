@@ -18,6 +18,7 @@ import type {
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm";
 import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
+import { useLocale } from "@shared/locale/LocaleHooks";
 
 const fmtRangeText = (pagination: Pagination, count: number): string => {
   if (count === 0) {
@@ -98,6 +99,7 @@ function useHeritageSearchDraft(params: HeritageSearchParams) {
 export function SearchHeritageResultsContainer(): React.ReactElement {
   const location = useLocation();
   const navigate = useNavigate();
+  const { locale } = useLocale();
 
   const params = React.useMemo<HeritageSearchParams>(
     () => parseHeritageSearchParams(location.search),
@@ -199,7 +201,7 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
     );
   }
 
-  const items = toWorldHeritageListVm(data.items);
+  const items = toWorldHeritageListVm(data.items, locale);
   const pagination = data.pagination;
   const rangeText = fmtRangeText(pagination, items.length);
 

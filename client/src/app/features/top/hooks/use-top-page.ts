@@ -9,6 +9,7 @@ import type {
   WorldHeritageVm,
 } from "../../../../domain/types";
 import { fetchTopPage } from "@features/top/apis";
+import { useLocale } from "@shared/locale/LocaleHooks.ts";
 
 type State = {
   data: WorldHeritageVm[];
@@ -36,6 +37,7 @@ const initialPagination: Pagination = {
 
 export function useTopPage(args: { currentPage: number; perPage: number; order?: IdSortOption }) {
   const { currentPage, perPage, order = "asc" } = args;
+  const { locale } = useLocale();
 
   const [state, setState] = React.useState<State>({
     data: [],
@@ -81,7 +83,7 @@ export function useTopPage(args: { currentPage: number; perPage: number; order?:
           if (!mountedRef.current) return;
           if (abortController.signal.aborted) return;
 
-          const vmList = toWorldHeritageListVm(res.items);
+          const vmList = toWorldHeritageListVm(res.items, locale);
 
           setState({
             data: vmList,
@@ -109,7 +111,7 @@ export function useTopPage(args: { currentPage: number; perPage: number; order?:
           }));
         });
     },
-    [],
+    [locale],
   );
 
   React.useEffect(() => {

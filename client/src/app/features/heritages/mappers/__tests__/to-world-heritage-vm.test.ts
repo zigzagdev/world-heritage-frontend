@@ -28,8 +28,8 @@ const base: ApiWorldHeritageDto = {
 };
 
 describe("toWorldHeritageVm", () => {
-  it("maps core fields + derived values correctly (DTO shape: thumbnail string)", () => {
-    const vm = toWorldHeritageVm(base);
+  it("ja: maps core fields + derived values using Japanese labels", () => {
+    const vm = toWorldHeritageVm(base, "ja");
 
     expect(vm).toMatchObject({
       id: 663,
@@ -54,6 +54,7 @@ describe("toWorldHeritageVm", () => {
       criteriaText: "ix, x",
       title: "白神山地",
       subtitle: "日本 · Asia",
+      displayDescription: "ダミー",
       areaText: "442 ha",
       bufferText: "320 ha",
       statePartyCodes: ["日本"],
@@ -63,26 +64,46 @@ describe("toWorldHeritageVm", () => {
     });
 
     expect(vm.criteria).toStrictEqual(["ix", "x"]);
+    // 英名 (Shirakami-Sanchi) は日本語タイトル (白神山地) と異なるので併記対象
+    expect(vm.displaySubName).toBe("Shirakami-Sanchi");
   });
 
-  it("if official_name is empty, uses name as title", () => {
-    const vm = toWorldHeritageVm({ ...base, official_name: "" });
+  it("en: title/country/description fall back to English fields", () => {
+    const vm = toWorldHeritageVm(base, "en");
+
+    expect(vm.title).toBe("Shirakami-Sanchi");
+    expect(vm.country).toBe("Japan");
+    expect(vm.subtitle).toBe("Japan · Asia");
+    expect(vm.displayDescription).toBe("desc");
+    expect(vm.displaySubName).toBeNull();
+  });
+
+  it("ja: if official_name is empty, falls back to heritage_name_jp for title", () => {
+    const vm = toWorldHeritageVm({ ...base, official_name: "" }, "ja");
     expect(vm.title).toBe("白神山地");
   });
 
+  it("ja: if Japanese description is missing, falls back to English short_description", () => {
+    const vm = toWorldHeritageVm({ ...base, short_description_jp: null }, "ja");
+    expect(vm.displayDescription).toBe("desc");
+  });
+
   it("when area/buffer are null, text becomes —", () => {
-    const vm = toWorldHeritageVm({
-      ...base,
-      area_hectares: null,
-      buffer_zone_hectares: null,
-    });
+    const vm = toWorldHeritageVm(
+      {
+        ...base,
+        area_hectares: null,
+        buffer_zone_hectares: null,
+      },
+      "ja",
+    );
 
     expect(vm.areaText).toBe("—");
     expect(vm.bufferText).toBe("—");
   });
 
   it("when thumbnail is null, thumbnailUrl is null", () => {
-    const vm = toWorldHeritageVm({ ...base, thumbnail: null });
+    const vm = toWorldHeritageVm({ ...base, thumbnail: null }, "ja");
     expect(vm.thumbnailUrl).toBeNull();
   });
 
@@ -90,21 +111,21 @@ describe("toWorldHeritageVm", () => {
     const dto: ApiWorldHeritageDto = { ...base, criteria: ["x", "ix", "ix"] };
     const snapshot = [...dto.criteria];
 
-    const vm = toWorldHeritageVm(dto);
+    const vm = toWorldHeritageVm(dto, "ja");
 
     expect(dto.criteria).toStrictEqual(snapshot);
     expect(vm.criteria).toStrictEqual(["ix", "x"]);
   });
 
   it("unesco_site_url can be null (mapper should not crash)", () => {
-    const vm = toWorldHeritageVm({ ...base, unesco_site_url: null });
+    const vm = toWorldHeritageVm({ ...base, unesco_site_url: null }, "ja");
     expect(vm.unescoSiteUrl).toBeNull();
   });
 });
 
 describe("toWorldHeritageListVm", () => {
   it("maps dto array into view model array", () => {
-    const vms = toWorldHeritageListVm([base, { ...base, id: 661 }]);
+    const vms = toWorldHeritageListVm([base, { ...base, id: 661 }], "ja");
     expect(vms).toHaveLength(2);
     expect(vms[0].id).toBe(663);
     expect(vms[1].id).toBe(661);

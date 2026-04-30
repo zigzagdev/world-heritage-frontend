@@ -97,10 +97,10 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const viewModel = toHeritageSearchResultVm(response);
+    const viewModel = toHeritageSearchResultVm(response, "en");
 
     expect(mockedToWorldHeritageListVm).toHaveBeenCalledTimes(1);
-    expect(mockedToWorldHeritageListVm).toHaveBeenCalledWith(response.data.items);
+    expect(mockedToWorldHeritageListVm).toHaveBeenCalledWith(response.data.items, "en");
 
     expect(viewModel.items).toBe(mappedItems);
     expect(viewModel.pagination).toEqual(response.data.pagination);
@@ -116,7 +116,7 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const viewModel = toHeritageSearchResultVm(response);
+    const viewModel = toHeritageSearchResultVm(response, "en");
 
     expect(viewModel.isFirstPage).toBe(true);
     expect(viewModel.isLastPage).toBe(true);
@@ -132,7 +132,7 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const viewModel = toHeritageSearchResultVm(response);
+    const viewModel = toHeritageSearchResultVm(response, "en");
 
     expect(viewModel.isLastPage).toBe(true);
     expect(viewModel.isFirstPage).toBe(false);
@@ -152,7 +152,7 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const viewModel = toHeritageSearchResultVm(response);
+    const viewModel = toHeritageSearchResultVm(response, "en");
 
     expect(viewModel.rangeText).toBe("31–60 of 2,345");
   });
@@ -167,7 +167,7 @@ describe("toHeritageSearchResultVm", () => {
       },
     });
 
-    const viewModel = toHeritageSearchResultVm(response);
+    const viewModel = toHeritageSearchResultVm(response, "en");
 
     expect(viewModel.rangeText).toBe("0 of 2,345");
   });

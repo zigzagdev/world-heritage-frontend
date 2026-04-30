@@ -153,6 +153,8 @@ describe("WorldHeritageDetailContainer", () => {
       thumbnailUrl: null,
       title: "Kyoto",
       subtitle: "Japan · Asia",
+      displaySubName: null,
+      displayDescription: "dummy",
       areaText: "—",
       bufferText: "—",
       criteriaText: "",

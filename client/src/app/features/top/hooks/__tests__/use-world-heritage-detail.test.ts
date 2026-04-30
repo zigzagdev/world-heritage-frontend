@@ -10,6 +10,11 @@ jest.mock("@features/heritages/mappers/to-world-heritage-detail-vm", () => ({
   toWorldHeritageDetailVm: jest.fn(),
 }));
 
+jest.mock("@shared/locale/LocaleHooks", () => ({
+  __esModule: true,
+  useLocale: () => ({ locale: "en", setLocale: jest.fn(), toggleLocale: jest.fn() }),
+}));
+
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, test, expect, beforeEach } from "@jest/globals";
 import { useWorldHeritageDetail } from "../use-world-heritage-detail";
@@ -44,7 +49,7 @@ type FetchFn = (id: string, opts?: { signal?: AbortSignal }) => Promise<unknown>
 const fetchWorldHeritageDetailMock =
   fetchWorldHeritageDetail as unknown as jest.MockedFunction<FetchFn>;
 
-type MapFn = (dto: unknown) => WorldHeritageDetailVm;
+type MapFn = (dto: unknown, locale: "en" | "ja") => WorldHeritageDetailVm;
 const toWorldHeritageDetailVmMock =
   toWorldHeritageDetailVm as unknown as jest.MockedFunction<MapFn>;
 
@@ -133,6 +138,8 @@ describe("useWorldHeritageDetail", () => {
       images: [],
       title: raw.official_name,
       subtitle: "Japan · Asia",
+      displaySubName: null,
+      displayDescription: raw.short_description,
       areaText: "—",
       bufferText: "—",
       criteriaText: "ii, iv",
@@ -164,7 +171,7 @@ describe("useWorldHeritageDetail", () => {
       }),
     );
     expect(toWorldHeritageDetailVmMock).toHaveBeenCalledTimes(1);
-    expect(toWorldHeritageDetailVmMock).toHaveBeenCalledWith(raw);
+    expect(toWorldHeritageDetailVmMock).toHaveBeenCalledWith(raw, "en");
   });
 
   test("id が null の場合: errorにせず、API は呼ばれない", async () => {
@@ -237,6 +244,8 @@ describe("useWorldHeritageDetail", () => {
       images: [],
       title: "Ok",
       subtitle: "Japan · Asia",
+      displaySubName: null,
+      displayDescription: "dummy",
       areaText: "—",
       bufferText: "—",
       criteriaText: "",
