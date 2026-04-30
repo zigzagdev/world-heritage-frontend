@@ -43,7 +43,7 @@ export function HeritageCard({
   onClickItem?: (id: number) => void;
 }) {
   const { locale } = useLocale();
-  const t = useText();
+  const text = useText();
 
   const goDetail = () => {
     if (!onClickItem) return;
@@ -79,7 +79,7 @@ export function HeritageCard({
             />
           ) : (
             <div className="grid h-56 w-full place-items-center bg-zinc-100 text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 sm:h-64 lg:h-72">
-              {t.noImage}
+              {text.noImage}
             </div>
           )}
 
@@ -88,7 +88,7 @@ export function HeritageCard({
           {item.isEndangered && (
             <div className="absolute right-3 bottom-3">
               <span className="inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-bold text-white shadow-sm">
-                {t.danger}
+                {text.danger}
               </span>
             </div>
           )}
@@ -106,7 +106,7 @@ export function HeritageCard({
             {item.category && (
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-bold">
-                  {t.heritageCategory}
+                  {text.heritageCategory}
                 </span>
                 <div>
                   <TagChip>{item.category}</TagChip>
@@ -117,7 +117,7 @@ export function HeritageCard({
             {criteria.length > 0 && (
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-bold">
-                  {t.criteria}
+                  {text.criteria}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {criteria.map((c: CriteriaCode) => (
@@ -139,7 +139,7 @@ export function HeritageCard({
               {desc}
             </p>
           ) : (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{t.noOverview}</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">{text.noOverview}</p>
           )}
           <div className="mt-auto flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
             <span className="text-xs text-zinc-500 dark:text-zinc-400" aria-hidden="true">
@@ -150,7 +150,7 @@ export function HeritageCard({
               onClick={handleViewDetailClick}
               className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
             >
-              {t.viewDetails} <span>→</span>
+              {text.viewDetails} <span>→</span>
             </button>
           </div>
         </div>
