@@ -1,8 +1,10 @@
 import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import { useLocale } from "@shared/locale/LocaleHooks.ts";
+import { useText } from "@shared/locale/ui-text.ts";
 
 export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
   const { locale } = useLocale();
+  const t = useText();
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
@@ -57,7 +59,7 @@ export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
                     rel="noreferrer"
                     className="shrink-0 font-semibold text-zinc-700 hover:underline"
                   >
-                    View on UNESCO
+                    {t.viewOnUnesco}
                   </a>
                 )}
               </figcaption>
