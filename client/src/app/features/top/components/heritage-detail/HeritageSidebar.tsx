@@ -25,19 +25,19 @@ export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
     item.latitude != null && item.longitude != null && !isZeroCoord(item.latitude, item.longitude);
 
   const metadataItems = [
-    { label: "Country", value: item.country ?? "—" },
-    ...(item.stateParty ? [{ label: "State Party", value: item.stateParty }] : []),
-    { label: "Category", value: item.category ?? "—" },
-    { label: "Endangered", value: item.isEndangered ? "Yes" : "No" },
-    { label: "Region", value: item.region ?? "—" },
-    { label: "Year Inscribed", value: item.yearInscribed ?? "—" },
-    { label: "Criteria", value: formatCriteriaInline(item.criteria) },
-    { label: "Property Area", value: item.areaText ?? "—" },
-    { label: "Buffer Zone", value: item.bufferText ?? "—" },
+    { label: t.country, value: item.country ?? "—" },
+    ...(item.stateParty ? [{ label: t.stateParty, value: item.stateParty }] : []),
+    { label: t.category, value: item.category ?? "—" },
+    { label: t.endangered, value: item.isEndangered ? t.yes : t.no },
+    { label: t.region, value: item.region ?? "—" },
+    { label: t.yearInscribed, value: item.yearInscribed ?? "—" },
+    { label: t.criteria, value: formatCriteriaInline(item.criteria) },
+    { label: t.propertyArea, value: item.areaText ?? "—" },
+    { label: t.bufferZone, value: item.bufferText ?? "—" },
     ...(hasCoord
       ? [
-          { label: "Latitude", value: formatLatitude(item.latitude!) },
-          { label: "Longitude", value: formatLongitude(item.longitude!) },
+          { label: t.latitude, value: formatLatitude(item.latitude!) },
+          { label: t.longitude, value: formatLongitude(item.longitude!) },
         ]
       : []),
   ];
@@ -51,7 +51,7 @@ export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
       {/* Heritage Data */}
       <div className="rounded-3xl border border-zinc-200 bg-white/80 shadow-sm backdrop-blur overflow-hidden">
         <div className="px-5 py-4 text-base font-extrabold tracking-tight text-zinc-900">
-          Heritage Data
+          {t.heritageData}
         </div>
 
         <div className="border-t border-zinc-100 px-5 py-4 space-y-3">
