@@ -1,10 +1,8 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { textType } from "@shared/styles/typography.ts";
-import { useLocale } from "@shared/locale/LocaleHooks.ts";
 import { useText } from "@shared/locale/ui-text.ts";
 
 export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm }) {
-  const { locale } = useLocale();
   const t = useText();
   return (
     <section
@@ -29,11 +27,9 @@ export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm 
         )}
       </div>
 
-      {item.shortDescription ? (
+      {item.displayDescription ? (
         <p className={`${textType.body} ${textType.measure} mt-4 whitespace-pre-wrap`}>
-          {locale === "ja" && item.shortDescriptionJp
-            ? item.shortDescriptionJp
-            : item.shortDescription}
+          {item.displayDescription}
         </p>
       ) : (
         <p className={`${textType.body} mt-4 text-zinc-400`}>—</p>

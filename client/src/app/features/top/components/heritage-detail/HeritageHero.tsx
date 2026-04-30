@@ -1,9 +1,7 @@
 import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
-import { useLocale } from "@shared/locale/LocaleHooks.ts";
 import { useText } from "@shared/locale/ui-text.ts";
 
 export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
-  const { locale } = useLocale();
   const t = useText();
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
@@ -12,10 +10,10 @@ export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
     <header className="mx-auto w-full max-w-6xl px-4 pt-10 pb-6">
       <div className="mb-5 md:mb-6">
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
-          {locale === "ja" && item.heritageNameJp ? item.heritageNameJp : item.name}
-          {locale === "ja" && item.heritageNameJp && item.name && (
+          {item.title}
+          {item.displaySubName && (
             <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
-              （{item.name}）
+              （{item.displaySubName}）
             </span>
           )}
         </h1>

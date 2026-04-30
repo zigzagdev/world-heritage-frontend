@@ -1,7 +1,6 @@
 import type { ReactNode, MouseEvent } from "react";
 import type { WorldHeritageVm, CriteriaCode } from "../../../../domain/types.ts";
 import { BaseCard } from "@shared/uis/BaseCard.tsx";
-import { useLocale } from "@shared/locale/LocaleHooks.ts";
 import { useText } from "@shared/locale/ui-text.ts";
 
 function MetaChip({ children }: { children: ReactNode }) {
@@ -42,7 +41,6 @@ export function HeritageCard({
   item: WorldHeritageVm;
   onClickItem?: (id: number) => void;
 }) {
-  const { locale } = useLocale();
   const text = useText();
 
   const goDetail = () => {
@@ -59,9 +57,9 @@ export function HeritageCard({
     goDetail();
   };
 
-  const title = locale === "ja" && item.heritageNameJp ? item.heritageNameJp : item.name;
+  const title = item.title;
   const subtitle = item.subtitle ?? "";
-  const desc = (item.shortDescription ?? "").trim();
+  const desc = item.displayDescription.trim();
 
   const criteria = (item.criteria ?? []).slice(0, CRITERIA_MAX);
   const hasMoreCriteria = (item.criteria?.length ?? 0) > CRITERIA_MAX;
