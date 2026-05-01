@@ -2,7 +2,7 @@ import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../..
 import { useText } from "@shared/locale/ui-text.ts";
 
 export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
-  const t = useText();
+  const text = useText();
   const primaryImage: WorldHeritageImageVm | undefined =
     item.images.find((img) => img.isPrimary) ?? item.images[0];
 
@@ -57,7 +57,7 @@ export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
                     rel="noreferrer"
                     className="shrink-0 font-semibold text-zinc-700 hover:underline"
                   >
-                    {t.viewOnUnesco}
+                    {text.viewOnUnesco}
                   </a>
                 )}
               </figcaption>
