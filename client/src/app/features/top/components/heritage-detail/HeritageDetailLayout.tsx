@@ -107,10 +107,10 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
 
     const params = new URLSearchParams();
     if (next.keyword) params.set("search_query", next.keyword);
-    if (nextext.region) params.set("region", nextext.region);
-    if (nextext.category) params.set("category", nextext.category);
-    if (nextext.yearInscribedFrom) params.set("year_inscribed_from", nextext.yearInscribedFrom);
-    if (nextext.yearInscribedTo) params.set("year_inscribed_to", nextext.yearInscribedTo);
+    if (next.region) params.set("region", next.region);
+    if (next.category) params.set("category", next.category);
+    if (next.yearInscribedFrom) params.set("year_inscribed_from", next.yearInscribedFrom);
+    if (next.yearInscribedTo) params.set("year_inscribed_to", next.yearInscribedTo);
 
     navigate(`/heritages/results?${params.toString()}`);
   };
