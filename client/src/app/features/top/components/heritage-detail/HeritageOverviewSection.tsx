@@ -3,7 +3,7 @@ import { textType } from "@shared/styles/typography.ts";
 import { useText } from "@shared/locale/ui-text.ts";
 
 export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm }) {
-  const t = useText();
+  const text = useText();
   return (
     <section
       id="overview"
@@ -11,7 +11,7 @@ export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm 
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className={`${textType.h2} text-zinc-900`}>{t.overview}</h2>
+          <h2 className={`${textType.h2} text-zinc-900`}>{text.overview}</h2>
         </div>
 
         {item.unescoSiteUrl && (
@@ -22,7 +22,7 @@ export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm 
             className="shrink-0 rounded-full border border-sky-200 bg-sky-50
             px-3 py-1.5 text-xs font-semibold text-sky-900 hover:bg-sky-100"
           >
-            {t.viewOnUnesco}
+            {text.viewOnUnesco}
           </a>
         )}
       </div>
