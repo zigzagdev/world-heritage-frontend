@@ -54,31 +54,31 @@ function HeritageDetailTabs({
 
 // Key exam info: visible without scrolling on all screen sizes.
 function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
-  const t = useText();
+  const text = useText();
   return (
     <div className="mx-auto w-full max-w-6xl px-4 mt-4">
       <div className="flex flex-wrap gap-x-6 gap-y-2">
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            {t.region}
+            {text.region}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.region ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            {t.category}
+            {text.category}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.category ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            {t.yearInscribed}
+            {text.yearInscribed}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.yearInscribed ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            {t.criteria}
+            {text.criteria}
           </div>
           <div className="text-sm font-semibold text-zinc-900">
             {formatCriteriaInline(item.criteria)}
@@ -94,11 +94,11 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
   const { locale, toggleLocale } = useLocale();
-  const t = useText();
+  const text = useText();
   const tabs: readonly { label: string; href: `#${string}` }[] = [
-    { label: t.description, href: "#content" },
-    { label: t.maps, href: "#geo-map" },
-    { label: t.gallery, href: "#gallery" },
+    { label: text.description, href: "#content" },
+    { label: text.maps, href: "#geo-map" },
+    { label: text.gallery, href: "#gallery" },
   ];
 
   const handleSubmit = (q: Partial<SearchValues>) => {
@@ -107,10 +107,10 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
 
     const params = new URLSearchParams();
     if (next.keyword) params.set("search_query", next.keyword);
-    if (next.region) params.set("region", next.region);
-    if (next.category) params.set("category", next.category);
-    if (next.yearInscribedFrom) params.set("year_inscribed_from", next.yearInscribedFrom);
-    if (next.yearInscribedTo) params.set("year_inscribed_to", next.yearInscribedTo);
+    if (nextext.region) params.set("region", nextext.region);
+    if (nextext.category) params.set("category", nextext.category);
+    if (nextext.yearInscribedFrom) params.set("year_inscribed_from", nextext.yearInscribedFrom);
+    if (nextext.yearInscribedTo) params.set("year_inscribed_to", nextext.yearInscribedTo);
 
     navigate(`/heritages/results?${params.toString()}`);
   };
