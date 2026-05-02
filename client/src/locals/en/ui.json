@@ -23,6 +23,12 @@
   "longitude": "Longitude",
   "yes": "Yes",
   "no": "No",
+  "all": "All",
+  "keyword": "Keyword",
+  "keywordPlaceholder": "Name / Country",
+  "yearFrom": "From",
+  "yearTo": "To",
+  "search": "Search",
   "categoryLabels": {
     "Cultural": "Cultural",
     "Natural": "Natural",

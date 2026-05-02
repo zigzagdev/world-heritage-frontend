@@ -23,6 +23,12 @@
   "longitude": "経度",
   "yes": "はい",
   "no": "いいえ",
+  "all": "すべて",
+  "keyword": "キーワード",
+  "keywordPlaceholder": "名称・国名",
+  "yearFrom": "から",
+  "yearTo": "まで",
+  "search": "検索",
   "categoryLabels": {
     "Cultural": "文化遺産",
     "Natural": "自然遺産",
