@@ -31,10 +31,10 @@ export function TopPageTitleBar({
               shadow-sm hover:bg-zinc-50
               focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300
             "
-            aria-label="Sort by ID"
+            aria-label={text.sortById}
           >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
+            <option value="asc">{text.ascending}</option>
+            <option value="desc">{text.descending}</option>
           </select>
 
           {onReload && (
@@ -47,7 +47,7 @@ export function TopPageTitleBar({
                 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 focus:ring-offset-white
               "
             >
-              Reload
+              {text.reload}
             </button>
           )}
 
