@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WorldHeritageDetailVm, SearchValues } from "../../../../../domain/types.ts";
-import type { Locale } from "../../../../../domain/criteria";
 import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
 import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
@@ -11,6 +10,8 @@ import { DetailHeritageMap } from "@features/top/components/heritage-detail/Deta
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
+import { useText } from "@shared/locale/ui-text.ts";
+import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 
 const DEFAULT_SEARCH: SearchValues = {
   region: "",
@@ -19,12 +20,6 @@ const DEFAULT_SEARCH: SearchValues = {
   yearInscribedFrom: "",
   yearInscribedTo: "",
 };
-
-const TABS: readonly { label: string; href: `#${string}` }[] = [
-  { label: "Description", href: "#content" },
-  { label: "Maps", href: "#geo-map" },
-  { label: "Gallery", href: "#gallery" },
-] as const;
 
 const formatCriteriaInline = (criteria: string[] | undefined) =>
   criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
@@ -59,30 +54,35 @@ function HeritageDetailTabs({
 
 // Key exam info: visible without scrolling on all screen sizes.
 function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
+  const text = useText();
   return (
     <div className="mx-auto w-full max-w-6xl px-4 mt-4">
       <div className="flex flex-wrap gap-x-6 gap-y-2">
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Region
+            {text.region}
           </div>
-          <div className="text-sm font-semibold text-zinc-900">{item.region ?? "—"}</div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {text.regionLabels[item.region] ?? "—"}
+          </div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Category
+            {text.category}
           </div>
-          <div className="text-sm font-semibold text-zinc-900">{item.category ?? "—"}</div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {text.categoryLabels[item.category] ?? "—"}
+          </div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Year Inscribed
+            {text.yearInscribed}
           </div>
           <div className="text-sm font-semibold text-zinc-900">{item.yearInscribed ?? "—"}</div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
-            Criteria
+            {text.criteria}
           </div>
           <div className="text-sm font-semibold text-zinc-900">
             {formatCriteriaInline(item.criteria)}
@@ -93,18 +93,16 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
   );
 }
 
-export function HeritageDetailLayout({
-  item,
-  locale,
-  toggleLocale,
-}: {
-  item: WorldHeritageDetailVm;
-  locale: Locale;
-  toggleLocale: () => void;
-}) {
+export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
+  const text = useText();
+  const tabs: readonly { label: string; href: `#${string}` }[] = [
+    { label: text.description, href: "#content" },
+    { label: text.maps, href: "#geo-map" },
+    { label: text.gallery, href: "#gallery" },
+  ];
 
   const handleSubmit = (q: Partial<SearchValues>) => {
     const next = { ...search, ...q };
@@ -131,13 +129,8 @@ export function HeritageDetailLayout({
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8 flex items-center justify-between">
-        <HeritageDetailTabs items={TABS} />
-        <button
-          onClick={toggleLocale}
-          className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 shrink-0"
-        >
-          {locale === "ja" ? "🇯🇵" : "🇬🇧"}
-        </button>
+        <HeritageDetailTabs items={tabs} />
+        <LocaleToggle />
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-4">
@@ -145,7 +138,7 @@ export function HeritageDetailLayout({
       </div>
 
       {/* Hero image */}
-      <HeritageHero item={item} locale={locale} />
+      <HeritageHero item={item} />
 
       {/* Key exam info: always visible */}
       <KeyExamInfo item={item} />
@@ -159,7 +152,7 @@ export function HeritageDetailLayout({
         <div className="grid gap-6 lg:gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           {/* Left: Overview → Gallery */}
           <div className="space-y-8" id="content">
-            <HeritageOverViewSection item={item} locale={locale} />
+            <HeritageOverViewSection item={item} />
             <HeritageGallery images={item.images} />
           </div>
 

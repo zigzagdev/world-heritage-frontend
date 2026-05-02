@@ -1,13 +1,9 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { textType } from "@shared/styles/typography.ts";
+import { useText } from "@shared/locale/ui-text.ts";
 
-export function HeritageOverViewSection({
-  item,
-  locale,
-}: {
-  item: WorldHeritageDetailVm;
-  locale: string;
-}) {
+export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm }) {
+  const text = useText();
   return (
     <section
       id="overview"
@@ -15,7 +11,7 @@ export function HeritageOverViewSection({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className={`${textType.h2} text-zinc-900`}>Overview</h2>
+          <h2 className={`${textType.h2} text-zinc-900`}>{text.overview}</h2>
         </div>
 
         {item.unescoSiteUrl && (
@@ -26,16 +22,14 @@ export function HeritageOverViewSection({
             className="shrink-0 rounded-full border border-sky-200 bg-sky-50
             px-3 py-1.5 text-xs font-semibold text-sky-900 hover:bg-sky-100"
           >
-            View on UNESCO
+            {text.viewOnUnesco}
           </a>
         )}
       </div>
 
-      {item.shortDescription ? (
+      {item.displayDescription ? (
         <p className={`${textType.body} ${textType.measure} mt-4 whitespace-pre-wrap`}>
-          {locale === "ja" && item.shortDescriptionJp
-            ? item.shortDescriptionJp
-            : item.shortDescription}
+          {item.displayDescription}
         </p>
       ) : (
         <p className={`${textType.body} mt-4 text-zinc-400`}>—</p>

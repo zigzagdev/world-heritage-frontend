@@ -3,6 +3,7 @@ import {
   type WorldHeritageVm,
   type CriteriaCode,
 } from "../../../../domain/types.ts";
+import type { Locale } from "../../../../domain/criteria.ts";
 import { statePartyLabels } from "@features/constants/state-party-labels.ts";
 import { CRITERIA } from "../../../../domain/types.ts";
 
@@ -19,14 +20,33 @@ const normalizeCriteria = (values: readonly (string | CriteriaCode)[]): Criteria
 const fmtHa = (value: number | null): string =>
   value == null ? "—" : `${Number(value).toLocaleString("en-CA")} ha`;
 
-const titleOf = (data: ApiWorldHeritageDto): string =>
-  data.heritage_name_jp || data.official_name || data.name;
+const titleOf = (data: ApiWorldHeritageDto, locale: Locale): string =>
+  locale === "ja"
+    ? data.heritage_name_jp || data.official_name || data.name
+    : data.name || data.official_name || data.heritage_name_jp;
 
-const countryLabelOf = (data: ApiWorldHeritageDto): string | null =>
-  data.country_name_jp || data.country || null;
+const countryLabelOf = (data: ApiWorldHeritageDto, locale: Locale): string | null =>
+  locale === "ja"
+    ? data.country_name_jp || data.country || null
+    : data.country || data.country_name_jp || null;
 
-const subtitleOf = (data: ApiWorldHeritageDto): string =>
-  [countryLabelOf(data), data.region].filter(Boolean).join(" · ");
+const subtitleOf = (data: ApiWorldHeritageDto, locale: Locale): string =>
+  [countryLabelOf(data, locale), data.region].filter(Boolean).join(" · ");
+
+// ja の時だけ、日本語名の脇に併記する英名を返す（一致や不在なら null）
+const subNameOf = (data: ApiWorldHeritageDto, locale: Locale): string | null => {
+  if (locale !== "ja") return null;
+  if (!data.heritage_name_jp || !data.name) return null;
+  if (data.heritage_name_jp === data.name) return null;
+  return data.name;
+};
+
+const descriptionOf = (data: ApiWorldHeritageDto, locale: Locale): string => {
+  if (locale === "ja") {
+    return data.short_description_jp || data.short_description || "";
+  }
+  return data.short_description || "";
+};
 
 const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
   codes.map((code) => statePartyLabels[code]).filter((label): label is string => Boolean(label));
@@ -49,7 +69,7 @@ const normalizeStatePartiesMeta = (
   );
 };
 
-export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
+export function toWorldHeritageVm(data: ApiWorldHeritageDto, locale: Locale): WorldHeritageVm {
   const criteriaCodes = normalizeCriteria(data.criteria);
   const statePartyCodesRaw = data.state_party_codes ?? [];
   const statePartyLabelsJp = toStatePartyLabelsJp(statePartyCodesRaw);
@@ -66,7 +86,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     name: data.name,
     heritageNameJp: data.heritage_name_jp,
 
-    country: data.country_name_jp,
+    country: countryLabelOf(data, locale) ?? "",
     countryNameJp: data.country_name_jp,
     region: data.region,
     stateParty,
@@ -86,8 +106,10 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
     statePartiesMeta: normalizeStatePartiesMeta(data.state_parties_meta),
     primaryStatePartyCode: null,
 
-    title: titleOf(data),
-    subtitle: subtitleOf(data),
+    title: titleOf(data, locale),
+    subtitle: subtitleOf(data, locale),
+    displaySubName: subNameOf(data, locale),
+    displayDescription: descriptionOf(data, locale),
     areaText: fmtHa(data.area_hectares),
     bufferText: fmtHa(data.buffer_zone_hectares),
     criteriaText: criteriaCodes.join(", "),
@@ -97,5 +119,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto): WorldHeritageVm {
   };
 }
 
-export const toWorldHeritageListVm = (list: ApiWorldHeritageDto[]): WorldHeritageVm[] =>
-  list.map(toWorldHeritageVm);
+export const toWorldHeritageListVm = (
+  list: ApiWorldHeritageDto[],
+  locale: Locale,
+): WorldHeritageVm[] => list.map((data) => toWorldHeritageVm(data, locale));

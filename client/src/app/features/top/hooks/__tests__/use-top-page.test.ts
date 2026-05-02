@@ -16,6 +16,11 @@ jest.mock("@features/heritages/mappers/to-world-heritage-vm", () => ({
   toWorldHeritageListVm: jest.fn(),
 }));
 
+jest.mock("@shared/locale/LocaleHooks", () => ({
+  __esModule: true,
+  useLocale: () => ({ locale: "en", setLocale: jest.fn(), toggleLocale: jest.fn() }),
+}));
+
 type Deferred<T> = {
   promise: Promise<T>;
   resolve: (v: T) => void;
@@ -57,7 +62,7 @@ const fetchTopPageMock = fetchTopPage as unknown as jest.MockedFunction<
   (args: FetchArgs) => Promise<ListResult<unknown>>
 >;
 const toWorldHeritageListVmMock = toWorldHeritageListVm as unknown as jest.MockedFunction<
-  (dtoList: unknown[]) => unknown[]
+  (dtoList: unknown[], locale: "en" | "ja") => unknown[]
 >;
 
 describe("useTopPage", () => {
@@ -117,7 +122,7 @@ describe("useTopPage", () => {
     expect(call.signal).toBeDefined();
 
     expect(toWorldHeritageListVmMock).toHaveBeenCalledTimes(1);
-    expect(toWorldHeritageListVmMock).toHaveBeenCalledWith(rawItems);
+    expect(toWorldHeritageListVmMock).toHaveBeenCalledWith(rawItems, "en");
   });
 
   test("reload は in-flight リクエストを abort して再度発火する（1本目は pending のまま）", async () => {

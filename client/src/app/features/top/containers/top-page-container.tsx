@@ -3,12 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import TopPage from "../components/TopPage";
 import { useTopPage } from "../hooks/use-top-page";
 import { SearchHeritageFormContainer } from "@features/search/containers/search-heritage-form-container";
+import { TopPageTitleBar } from "../components/TopPageTitleBar";
+import { HeritageList } from "../components/HeritageList";
+import { TopPagePagination } from "../components/TopPagePagination";
 import type { IdSortOption } from "../../../../domain/types";
 import { parseHeritageSearchParams } from "@features/search/mapper/search-heritages.params";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "@features/search/mapper/search-heritage.types";
 
 const DEFAULT_TOP_PER_PAGE = 30;
 const DEFAULT_ORDER: IdSortOption = "asc";
+const PER_PAGE_OPTIONS = [10, 30, 50, 70] as const;
 
 export default function TopPageContainer(): React.ReactElement {
   const location = useLocation();
@@ -111,19 +115,22 @@ export default function TopPageContainer(): React.ReactElement {
 
   return (
     <TopPage
+      titleBar={
+        <TopPageTitleBar order={order} onChangeOrder={handleChangeOrder} onReload={reload} />
+      }
       header={header}
-      items={items}
-      onClickItem={handleClickItem}
-      onReload={reload}
-      currentPage={currentPage}
-      perPage={perPage}
-      order={order}
-      onChangeOrder={handleChangeOrder}
-      lastPage={pagination.last_page}
-      onChangePage={handleChangePage}
-      paginationDisabled={isLoading}
-      onChangePerPage={handleChangePerPage}
-      perPageOptions={[10, 30, 50, 70]}
+      content={<HeritageList items={items} onClickItem={handleClickItem} />}
+      pagination={
+        <TopPagePagination
+          currentPage={currentPage}
+          perPage={perPage}
+          lastPage={pagination.last_page}
+          onChangePage={handleChangePage}
+          onChangePerPage={handleChangePerPage}
+          perPageOptions={PER_PAGE_OPTIONS}
+          disabled={isLoading}
+        />
+      }
     />
   );
 }

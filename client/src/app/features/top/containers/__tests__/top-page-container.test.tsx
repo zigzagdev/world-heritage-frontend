@@ -24,30 +24,54 @@ jest.mock("../../components/HeritageSubHeader", () => ({
   },
 }));
 
+jest.mock("../../components/HeritageList", () => ({
+  __esModule: true,
+  HeritageList: function MockHeritageList(props: {
+    items: ReadonlyArray<WorldHeritageVm>;
+    onClickItem?: (id: number) => void;
+  }) {
+    return (
+      <ul>
+        {props.items.map((it) => (
+          <li key={it.id}>
+            <button type="button" onClick={() => props.onClickItem?.(it.id)}>
+              {it.title}
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  },
+}));
+
+jest.mock("../../components/TopPageTitleBar", () => ({
+  __esModule: true,
+  TopPageTitleBar: function MockTopPageTitleBar() {
+    return <div data-testid="title-bar" />;
+  },
+}));
+
+jest.mock("../../components/TopPagePagination", () => ({
+  __esModule: true,
+  TopPagePagination: function MockTopPagePagination() {
+    return null;
+  },
+}));
+
 jest.mock("../../components/TopPage", () => ({
   __esModule: true,
   default: function MockTopPage(props: {
-    header: React.ReactNode;
-    items: ReadonlyArray<WorldHeritageVm>;
-    onClickItem: (id: number) => void;
-    onReload: () => void;
-    currentPage: number;
-    lastPage: number;
-    onChangePage: (p: number) => void;
-    paginationDisabled?: boolean;
+    titleBar: React.ReactNode;
+    header?: React.ReactNode;
+    content: React.ReactNode;
+    pagination?: React.ReactNode;
   }) {
     return (
       <div>
+        {props.titleBar}
         <div data-testid="header">{props.header}</div>
-        <ul>
-          {props.items.map((it) => (
-            <li key={it.id}>
-              <button type="button" onClick={() => props.onClickItem(it.id)}>
-                {it.title}
-              </button>
-            </li>
-          ))}
-        </ul>
+        {props.content}
+        {props.pagination}
       </div>
     );
   },

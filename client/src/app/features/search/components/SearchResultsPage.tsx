@@ -8,7 +8,7 @@ import { Pagination } from "@features/top/components/Pagination.tsx";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 import { SearchResultMapComponent } from "@features/search/components/SearchResultMapComponent.tsx";
 
-export type SearchResultsPageProps = {
+type Props = {
   header?: ReactNode;
   items: WorldHeritageVm[];
   pagination: SearchResultsPagination | null;
@@ -30,7 +30,7 @@ export default function SearchResultsPage({
   errorMessage,
   onPageChange,
   onBackToAllSites,
-}: SearchResultsPageProps) {
+}: Props) {
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur">

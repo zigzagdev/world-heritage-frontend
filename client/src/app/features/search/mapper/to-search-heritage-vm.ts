@@ -1,4 +1,5 @@
 import type { ApiWorldHeritageDto, Pagination, WorldHeritageVm } from "../../../../domain/types";
+import type { Locale } from "../../../../domain/criteria";
 import type { HeritageSearchResponse } from "../types";
 import { toWorldHeritageListVm } from "../../heritages/mappers/to-world-heritage-vm";
 
@@ -54,9 +55,10 @@ const formatRangeText = (pagination: Pagination, count: number): string => {
 
 export const toHeritageSearchResultVm = (
   response: HeritageSearchResponse | FlatSuccess,
+  locale: Locale,
 ): HeritageSearchResultVm => {
   if (isPagedSuccess(response)) {
-    const items = toWorldHeritageListVm(response.data.items);
+    const items = toWorldHeritageListVm(response.data.items, locale);
     const pagination = response.data.pagination;
 
     return {
@@ -69,7 +71,7 @@ export const toHeritageSearchResultVm = (
   }
 
   if (isFlatSuccess(response)) {
-    const items = toWorldHeritageListVm(response.data);
+    const items = toWorldHeritageListVm(response.data, locale);
     const total = response.data.length;
 
     const pagination: Pagination = {

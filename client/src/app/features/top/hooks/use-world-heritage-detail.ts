@@ -2,6 +2,7 @@ import * as React from "react";
 import { toWorldHeritageDetailVm } from "@features/heritages/mappers/to-world-heritage-detail-vm";
 import type { WorldHeritageDetailVm } from "../../../../domain/types.ts";
 import { fetchWorldHeritageDetail } from "../apis";
+import { useLocale } from "@shared/locale/LocaleHooks.ts";
 
 function isAbortError(err: unknown): boolean {
   if (typeof err !== "object" || err === null) return false;
@@ -12,6 +13,7 @@ function isAbortError(err: unknown): boolean {
 }
 
 export function useWorldHeritageDetail(id: string | null | undefined) {
+  const { locale } = useLocale();
   const [state, setState] = React.useState<{
     data: WorldHeritageDetailVm | null;
     loading: boolean;
@@ -45,7 +47,7 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
     setState((state) => ({ ...state, loading: true, error: null }));
 
     fetchWorldHeritageDetail(id, { signal: controller.signal })
-      .then(toWorldHeritageDetailVm)
+      .then((dto) => toWorldHeritageDetailVm(dto, locale))
       .then((vm) => {
         // prepare for the next request
         if (reqId !== reqIdRef.current) return;
@@ -56,7 +58,7 @@ export function useWorldHeritageDetail(id: string | null | undefined) {
         if (reqId !== reqIdRef.current) return;
         setState({ data: null, loading: false, error: err });
       });
-  }, [id]);
+  }, [id, locale]);
 
   React.useEffect(() => {
     load();

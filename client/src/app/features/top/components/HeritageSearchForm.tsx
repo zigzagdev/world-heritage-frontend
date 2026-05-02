@@ -7,6 +7,7 @@ import {
   type SearchValues,
   type StudyRegion,
 } from "../../../../domain/types.ts";
+import { useText } from "@shared/locale/ui-text.ts";
 
 type Props = {
   value?: SearchValues;
@@ -28,24 +29,8 @@ const toCategoryOrEmpty = (value: string): Category | "" => {
   return isCategory(value) ? value : "";
 };
 
-const REGION_LABELS: Record<StudyRegion | "", string> = {
-  "": "All",
-  Africa: "Africa",
-  Asia: "Asia",
-  Europe: "Europe",
-  "North America": "North America",
-  "South America": "South America",
-  Oceania: "Oceania",
-};
-
-const CATEGORY_LABELS: Record<Category | "", string> = {
-  "": "All",
-  Cultural: "Cultural",
-  Natural: "Natural",
-  Mixed: "Mixed",
-};
-
 export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
+  const text = useText();
   const regionOptions: readonly (StudyRegion | "")[] = ["", ...STUDY_REGIONS];
   const categoryOptions: readonly (Category | "")[] = ["", ...CATEGORIES];
 
@@ -85,7 +70,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
     >
       {/* Region チップ */}
       <div className="px-4 pt-3 pb-2 border-b border-zinc-100">
-        <div className="text-[11px] font-semibold text-zinc-400 mb-2">Region</div>
+        <div className="text-[11px] font-semibold text-zinc-400 mb-2">{text.region}</div>
         <div className="flex flex-wrap gap-2">
           {regionOptions.map((opt) => {
             const isActive = searchValues.region === opt;
@@ -103,7 +88,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
                   }
                 `}
               >
-                {REGION_LABELS[opt]}
+                {opt === "" ? text.all : text.regionLabels[opt]}
               </button>
             );
           })}
@@ -112,7 +97,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
 
       {/* Category チップ */}
       <div className="px-4 pt-3 pb-2 border-b border-zinc-100">
-        <div className="text-[11px] font-semibold text-zinc-400 mb-2">Category</div>
+        <div className="text-[11px] font-semibold text-zinc-400 mb-2">{text.category}</div>
         <div className="flex flex-wrap gap-2">
           {categoryOptions.map((opt) => {
             const isActive = searchValues.category === opt;
@@ -130,7 +115,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
                   }
                 `}
               >
-                {CATEGORY_LABELS[opt]}
+                {opt === "" ? text.all : text.categoryLabels[opt]}
               </button>
             );
           })}
@@ -142,16 +127,16 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
         {/* Year */}
         <div className="flex items-center gap-3 px-4 py-3 sm:border-r sm:border-zinc-100 sm:w-[220px] shrink-0">
           <div className="flex-1 min-w-0">
-            <div className="text-[11px] font-semibold text-zinc-500">Year Inscribed</div>
+            <div className="text-[11px] font-semibold text-zinc-500">{text.yearInscribed}</div>
             <div className="flex items-center gap-1">
               <input
                 type="number"
                 inputMode="numeric"
                 value={searchValues.yearInscribedFrom}
                 onChange={(e) => set({ yearInscribedFrom: e.target.value })}
-                placeholder="From"
+                placeholder={text.yearFrom}
                 className="w-full bg-transparent text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none"
-                aria-label="Year inscribed from"
+                aria-label={`${text.yearInscribed} ${text.yearFrom}`}
               />
               <span className="text-zinc-300">–</span>
               <input
@@ -159,9 +144,9 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
                 inputMode="numeric"
                 value={searchValues.yearInscribedTo}
                 onChange={(e) => set({ yearInscribedTo: e.target.value })}
-                placeholder="To"
+                placeholder={text.yearTo}
                 className="w-full bg-transparent text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none"
-                aria-label="Year inscribed to"
+                aria-label={`${text.yearInscribed} ${text.yearTo}`}
               />
             </div>
           </div>
@@ -169,13 +154,13 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
         {/* Keyword + Submit */}
         <div className="flex flex-1 items-center gap-3 px-4 py-3">
           <div className="flex-1 min-w-0">
-            <div className="text-[11px] font-semibold text-zinc-500">Keyword</div>
+            <div className="text-[11px] font-semibold text-zinc-500">{text.keyword}</div>
             <input
               value={searchValues.keyword}
               onChange={(e) => set({ keyword: e.target.value })}
-              placeholder="Name / Country"
+              placeholder={text.keywordPlaceholder}
               className="w-full bg-transparent text-sm font-semibold text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:outline-none"
-              aria-label="Keyword"
+              aria-label={text.keyword}
             />
           </div>
 
@@ -187,10 +172,10 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
               hover:bg-rose-700 transition-colors
               focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400
             "
-            aria-label="Search"
+            aria-label={text.search}
           >
             <SearchIcon fontSize="small" />
-            <span>Search</span>
+            <span>{text.search}</span>
           </button>
         </div>
       </div>

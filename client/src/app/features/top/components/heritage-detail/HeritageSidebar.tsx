@@ -1,6 +1,7 @@
 import type { WorldHeritageDetailVm } from "../../../../../domain/types.ts";
 import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 import { HeritageMetadataList } from "./HeritageMetadataList.tsx";
+import { useText } from "@shared/locale/ui-text.ts";
 
 const formatCriteriaInline = (criteria: string[] | undefined) =>
   criteria?.length ? criteria.map((c) => `(${c})`).join("") : "—";
@@ -19,23 +20,24 @@ const formatLongitude = (lng: number): string => {
 };
 
 export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
+  const text = useText();
   const hasCoord =
     item.latitude != null && item.longitude != null && !isZeroCoord(item.latitude, item.longitude);
 
   const metadataItems = [
-    { label: "Country", value: item.country ?? "—" },
-    ...(item.stateParty ? [{ label: "State Party", value: item.stateParty }] : []),
-    { label: "Category", value: item.category ?? "—" },
-    { label: "Endangered", value: item.isEndangered ? "Yes" : "No" },
-    { label: "Region", value: item.region ?? "—" },
-    { label: "Year Inscribed", value: item.yearInscribed ?? "—" },
-    { label: "Criteria", value: formatCriteriaInline(item.criteria) },
-    { label: "Property Area", value: item.areaText ?? "—" },
-    { label: "Buffer Zone", value: item.bufferText ?? "—" },
+    { label: text.country, value: item.country ?? "—" },
+    ...(item.stateParty ? [{ label: text.stateParty, value: item.stateParty }] : []),
+    { label: text.category, value: text.categoryLabels[item.category] ?? "—" },
+    { label: text.endangered, value: item.isEndangered ? text.yes : text.no },
+    { label: text.region, value: text.regionLabels[item.region] ?? "—" },
+    { label: text.yearInscribed, value: item.yearInscribed ?? "—" },
+    { label: text.criteria, value: formatCriteriaInline(item.criteria) },
+    { label: text.propertyArea, value: item.areaText ?? "—" },
+    { label: text.bufferZone, value: item.bufferText ?? "—" },
     ...(hasCoord
       ? [
-          { label: "Latitude", value: formatLatitude(item.latitude!) },
-          { label: "Longitude", value: formatLongitude(item.longitude!) },
+          { label: text.latitude, value: formatLatitude(item.latitude!) },
+          { label: text.longitude, value: formatLongitude(item.longitude!) },
         ]
       : []),
   ];
@@ -49,7 +51,7 @@ export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
       {/* Heritage Data */}
       <div className="rounded-3xl border border-zinc-200 bg-white/80 shadow-sm backdrop-blur overflow-hidden">
         <div className="px-5 py-4 text-base font-extrabold tracking-tight text-zinc-900">
-          Heritage Data
+          {text.heritageData}
         </div>
 
         <div className="border-t border-zinc-100 px-5 py-4 space-y-3">
@@ -60,12 +62,12 @@ export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
               href={item.unescoSiteUrl}
               target="_blank"
               rel="noreferrer noopener"
-              aria-label="View on UNESCO"
+              aria-label={text.viewOnUnesco}
               className="mt-4 inline-flex w-full items-center justify-center rounded-xl
                border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold
                text-sky-900 hover:bg-sky-100"
             >
-              View on UNESCO
+              {text.viewOnUnesco}
             </a>
           )}
         </div>
