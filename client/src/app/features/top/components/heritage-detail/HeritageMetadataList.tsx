@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import "./heritage-detail.css";
 
-export type MetadataItem = {
+type MetadataItem = {
   label: string;
   value: ReactNode;
   hidden?: boolean;
