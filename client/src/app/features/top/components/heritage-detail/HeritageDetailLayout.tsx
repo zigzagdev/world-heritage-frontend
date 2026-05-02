@@ -62,13 +62,17 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
             {text.region}
           </div>
-          <div className="text-sm font-semibold text-zinc-900">{item.region ?? "—"}</div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {text.regionLabels[item.region] ?? "—"}
+          </div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
             {text.category}
           </div>
-          <div className="text-sm font-semibold text-zinc-900">{item.category ?? "—"}</div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {text.categoryLabels[item.category] ?? "—"}
+          </div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
