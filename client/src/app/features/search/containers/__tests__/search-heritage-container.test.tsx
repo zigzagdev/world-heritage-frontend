@@ -56,30 +56,58 @@ jest.mock("@features/top/components/HeritageSubHeader.tsx", () => ({
   },
 }));
 
-type TopPageProps = {
-  header: React.ReactNode;
-  items: unknown[];
-  onClickItem: (id: number) => void;
-  onReload: () => void;
-  currentPage: number;
-  perPage: number;
+type TitleBarProps = {
   order: IdSortOption;
   onChangeOrder: (order: IdSortOption) => void;
-  lastPage: number;
-  onChangePage: (page: number) => void;
-  paginationDisabled: boolean;
-  onChangePerPage: (perPage: number) => void;
-  perPageOptions: number[];
+  onReload?: () => void;
 };
 
-let lastTopPageProps: TopPageProps | null = null;
+type PaginationProps = {
+  currentPage: number;
+  perPage: number;
+  lastPage: number;
+  onChangePage: (page: number) => void;
+  onChangePerPage?: (perPage: number) => void;
+  perPageOptions?: readonly number[];
+  disabled?: boolean;
+};
+
+let lastTitleBarProps: TitleBarProps | null = null;
+let lastPaginationProps: PaginationProps | null = null;
+
+jest.mock("@features/top/components/TopPageTitleBar.tsx", () => ({
+  TopPageTitleBar: (props: TitleBarProps) => {
+    lastTitleBarProps = props;
+    return null;
+  },
+}));
+
+jest.mock("@features/top/components/TopPagePagination.tsx", () => ({
+  TopPagePagination: (props: PaginationProps) => {
+    lastPaginationProps = props;
+    return null;
+  },
+}));
+
+jest.mock("@features/top/components/HeritageList.tsx", () => ({
+  HeritageList: () => null,
+}));
 
 jest.mock("@features/top/components/TopPage.tsx", () => ({
   __esModule: true,
-  default: (props: TopPageProps) => {
-    lastTopPageProps = props;
-    return <>{props.header}</>;
-  },
+  default: (props: {
+    titleBar: React.ReactNode;
+    header?: React.ReactNode;
+    content: React.ReactNode;
+    pagination?: React.ReactNode;
+  }) => (
+    <>
+      {props.titleBar}
+      {props.header}
+      {props.content}
+      {props.pagination}
+    </>
+  ),
 }));
 
 const parseMock = parseHeritageSearchParams as jest.MockedFunction<
@@ -126,7 +154,8 @@ describe("TopPageContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     lastSubHeaderProps = null;
-    lastTopPageProps = null;
+    lastTitleBarProps = null;
+    lastPaginationProps = null;
 
     currentLocation = location(
       "?region=Africa&search_query=Kyoto&current_page=3&per_page=30&order=asc",
@@ -183,10 +212,10 @@ describe("TopPageContainer", () => {
       order: "asc",
     });
 
-    expect(lastTopPageProps).not.toBeNull();
-    expect(lastTopPageProps!.currentPage).toBe(3);
-    expect(lastTopPageProps!.perPage).toBe(30);
-    expect(lastTopPageProps!.order).toBe("asc");
+    expect(lastPaginationProps).not.toBeNull();
+    expect(lastPaginationProps!.currentPage).toBe(3);
+    expect(lastPaginationProps!.perPage).toBe(30);
+    expect(lastTitleBarProps!.order).toBe("asc");
   });
 
   test("onSubmit serialises merged search params and navigates to results", async () => {
@@ -280,10 +309,10 @@ describe("TopPageContainer", () => {
 
     render(<TopPageContainer />);
 
-    await waitFor(() => expect(lastTopPageProps).not.toBeNull());
+    await waitFor(() => expect(lastPaginationProps).not.toBeNull());
 
     act(() => {
-      lastTopPageProps!.onChangePage(4);
+      lastPaginationProps!.onChangePage(4);
     });
 
     expect(navigateMock).toHaveBeenCalledWith(
@@ -306,10 +335,10 @@ describe("TopPageContainer", () => {
 
     render(<TopPageContainer />);
 
-    await waitFor(() => expect(lastTopPageProps).not.toBeNull());
+    await waitFor(() => expect(lastPaginationProps).not.toBeNull());
 
     act(() => {
-      lastTopPageProps!.onChangePerPage(50);
+      lastPaginationProps!.onChangePerPage!(50);
     });
 
     expect(navigateMock).toHaveBeenCalledWith(
@@ -332,10 +361,10 @@ describe("TopPageContainer", () => {
 
     render(<TopPageContainer />);
 
-    await waitFor(() => expect(lastTopPageProps).not.toBeNull());
+    await waitFor(() => expect(lastTitleBarProps).not.toBeNull());
 
     act(() => {
-      lastTopPageProps!.onChangeOrder("desc");
+      lastTitleBarProps!.onChangeOrder("desc");
     });
 
     expect(navigateMock).toHaveBeenCalledWith(
