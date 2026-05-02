@@ -22,5 +22,18 @@
   "latitude": "Latitude",
   "longitude": "Longitude",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "categoryLabels": {
+    "Cultural": "Cultural",
+    "Natural": "Natural",
+    "Mixed": "Mixed"
+  },
+  "regionLabels": {
+    "Africa": "Africa",
+    "Asia": "Asia",
+    "Europe": "Europe",
+    "North America": "North America",
+    "South America": "South America",
+    "Oceania": "Oceania"
+  }
 }

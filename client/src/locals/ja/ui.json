@@ -22,5 +22,18 @@
   "latitude": "緯度",
   "longitude": "経度",
   "yes": "はい",
-  "no": "いいえ"
+  "no": "いいえ",
+  "categoryLabels": {
+    "Cultural": "文化遺産",
+    "Natural": "自然遺産",
+    "Mixed": "複合遺産"
+  },
+  "regionLabels": {
+    "Africa": "アフリカ",
+    "Asia": "アジア",
+    "Europe": "ヨーロッパ",
+    "North America": "北アメリカ",
+    "South America": "南アメリカ",
+    "Oceania": "オセアニア"
+  }
 }
