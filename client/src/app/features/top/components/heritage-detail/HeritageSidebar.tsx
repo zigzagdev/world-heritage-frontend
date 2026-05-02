@@ -27,9 +27,9 @@ export function HeritageSidebar({ item }: { item: WorldHeritageDetailVm }) {
   const metadataItems = [
     { label: text.country, value: item.country ?? "—" },
     ...(item.stateParty ? [{ label: text.stateParty, value: item.stateParty }] : []),
-    { label: text.category, value: item.category ?? "—" },
+    { label: text.category, value: text.categoryLabels[item.category] ?? "—" },
     { label: text.endangered, value: item.isEndangered ? text.yes : text.no },
-    { label: text.region, value: item.region ?? "—" },
+    { label: text.region, value: text.regionLabels[item.region] ?? "—" },
     { label: text.yearInscribed, value: item.yearInscribed ?? "—" },
     { label: text.criteria, value: formatCriteriaInline(item.criteria) },
     { label: text.propertyArea, value: item.areaText ?? "—" },

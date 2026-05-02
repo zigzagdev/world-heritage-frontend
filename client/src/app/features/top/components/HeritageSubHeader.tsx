@@ -1,7 +1,7 @@
 import { HeritageSearchForm } from "./HeritageSearchForm";
 import { type SearchValues } from "../../../../domain/types.ts";
 
-export type Props = {
+type Props = {
   value: SearchValues;
   onSubmit: (q: Partial<SearchValues>) => void;
   onChange?: (v: SearchValues) => void;

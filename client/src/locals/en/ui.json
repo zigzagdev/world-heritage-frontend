@@ -22,5 +22,30 @@
   "latitude": "Latitude",
   "longitude": "Longitude",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "appTitle": "World Heritage",
+  "appTagline": "Learn by searching and comparing sites.",
+  "ascending": "Ascending",
+  "descending": "Descending",
+  "reload": "Reload",
+  "sortById": "Sort by ID",
+  "all": "All",
+  "keyword": "Keyword",
+  "keywordPlaceholder": "Name / Country",
+  "yearFrom": "From",
+  "yearTo": "To",
+  "search": "Search",
+  "categoryLabels": {
+    "Cultural": "Cultural",
+    "Natural": "Natural",
+    "Mixed": "Mixed"
+  },
+  "regionLabels": {
+    "Africa": "Africa",
+    "Asia": "Asia",
+    "Europe": "Europe",
+    "North America": "North America",
+    "South America": "South America",
+    "Oceania": "Oceania"
+  }
 }

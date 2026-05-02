@@ -10,8 +10,8 @@ import { DetailHeritageMap } from "@features/top/components/heritage-detail/Deta
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
-import { useLocale } from "@shared/locale/LocaleHooks.ts";
 import { useText } from "@shared/locale/ui-text.ts";
+import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 
 const DEFAULT_SEARCH: SearchValues = {
   region: "",
@@ -62,13 +62,17 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
             {text.region}
           </div>
-          <div className="text-sm font-semibold text-zinc-900">{item.region ?? "—"}</div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {text.regionLabels[item.region] ?? "—"}
+          </div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
             {text.category}
           </div>
-          <div className="text-sm font-semibold text-zinc-900">{item.category ?? "—"}</div>
+          <div className="text-sm font-semibold text-zinc-900">
+            {text.categoryLabels[item.category] ?? "—"}
+          </div>
         </div>
         <div>
           <div className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide">
@@ -93,7 +97,6 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
-  const { locale, toggleLocale } = useLocale();
   const text = useText();
   const tabs: readonly { label: string; href: `#${string}` }[] = [
     { label: text.description, href: "#content" },
@@ -127,12 +130,7 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8 flex items-center justify-between">
         <HeritageDetailTabs items={tabs} />
-        <button
-          onClick={toggleLocale}
-          className="rounded-full border border-zinc-200 px-3 py-1.5 text-xs font-semibold text-zinc-700 hover:bg-zinc-100 shrink-0"
-        >
-          {locale === "ja" ? "🇯🇵" : "🇬🇧"}
-        </button>
+        <LocaleToggle />
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-4">
