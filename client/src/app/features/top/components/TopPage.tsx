@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { Pagination } from "@features/top/components/Pagination.tsx";
 import { Map } from "./Map.tsx";
 
-export type TopPageProps = {
+type Props = {
   items: ReadonlyArray<WorldHeritageVm>;
   onClickItem?: (id: number) => void;
   onReload?: () => void;
@@ -34,7 +34,7 @@ export default function TopPage({
   onChangePerPage,
   perPageOptions,
   paginationDisabled,
-}: TopPageProps) {
+}: Props) {
   const options = (perPageOptions ?? [10, 30, 50, 70]) as readonly number[];
 
   const showPagination =
