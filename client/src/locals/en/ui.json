@@ -23,6 +23,8 @@
   "longitude": "Longitude",
   "yes": "Yes",
   "no": "No",
+  "appTitle": "World Heritage",
+  "appTagline": "Learn by searching and comparing sites.",
   "all": "All",
   "keyword": "Keyword",
   "keywordPlaceholder": "Name / Country",
