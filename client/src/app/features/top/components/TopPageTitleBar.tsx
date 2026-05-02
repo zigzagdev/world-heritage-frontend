@@ -1,4 +1,5 @@
 import type { IdSortOption } from "../../../../domain/types.ts";
+import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 
 export function TopPageTitleBar({
   order,
@@ -47,6 +48,8 @@ export function TopPageTitleBar({
               Reload
             </button>
           )}
+
+          <LocaleToggle />
         </div>
       </div>
     </div>
