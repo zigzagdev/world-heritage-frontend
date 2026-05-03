@@ -50,7 +50,8 @@ const hasSearchParams = (params: HeritageSearchParams): boolean =>
   params.region !== null ||
   params.category !== null ||
   params.year_inscribed_from !== null ||
-  params.year_inscribed_to !== null;
+  params.year_inscribed_to !== null ||
+  params.is_endangered === true;
 
 const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   region: params.region ?? "",
@@ -58,6 +59,7 @@ const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   keyword: params.search_query ?? "",
   yearInscribedFrom: params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
   yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
+  isEndangered: params.is_endangered === true,
 });
 
 const toSearchParams = (draft: SearchValues): HeritageSearchParams => ({
@@ -67,6 +69,7 @@ const toSearchParams = (draft: SearchValues): HeritageSearchParams => ({
   category: draft.category || null,
   year_inscribed_from: draft.yearInscribedFrom ? Number(draft.yearInscribedFrom) : null,
   year_inscribed_to: draft.yearInscribedTo ? Number(draft.yearInscribedTo) : null,
+  is_endangered: draft.isEndangered ? true : null,
   current_page: 1,
 });
 
@@ -76,7 +79,17 @@ const mergeDraft = (currentDraft: SearchValues, partial: Partial<SearchValues>):
   keyword: partial.keyword ?? currentDraft.keyword,
   yearInscribedFrom: partial.yearInscribedFrom ?? currentDraft.yearInscribedFrom,
   yearInscribedTo: partial.yearInscribedTo ?? currentDraft.yearInscribedTo,
+  isEndangered: partial.isEndangered ?? currentDraft.isEndangered,
 });
+
+// 現在の URL に lang=ja があれば、遷移先 search にも持たせる (en はデフォルトなので付けない)
+const preserveLang = (nextSearch: string, currentSearch: string): string => {
+  const currentLang = new URLSearchParams(currentSearch).get("lang");
+  if (currentLang !== "ja") return nextSearch;
+  const params = new URLSearchParams(nextSearch.startsWith("?") ? nextSearch.slice(1) : nextSearch);
+  params.set("lang", "ja");
+  return `?${params.toString()}`;
+};
 
 function useHeritageSearchDraft(params: HeritageSearchParams) {
   const [draft, setDraft] = React.useState<SearchValues>(() => toDraftValues(params));
@@ -121,9 +134,10 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
 
   const handleClickItem = React.useCallback(
     (id: number) => {
-      navigate(`/heritages/${id}`);
+      const search = preserveLang("", location.search);
+      navigate(`/heritages/${id}${search}`);
     },
-    [navigate],
+    [navigate, location.search],
   );
 
   const handlePageChange = React.useCallback(
@@ -133,7 +147,7 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
         current_page: page,
       };
 
-      const search = serializeHeritageSearchParams(nextParams);
+      const search = preserveLang(serializeHeritageSearchParams(nextParams), location.search);
 
       navigate(
         {
@@ -143,14 +157,14 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
         { replace: false },
       );
     },
-    [navigate, location.pathname, params],
+    [navigate, location.pathname, location.search, params],
   );
 
   const handleSubmit = React.useCallback(
     (partial: Partial<SearchValues>) => {
       const nextDraft = mergeDraft(draft, partial);
       const nextParams = toSearchParams(nextDraft);
-      const search = serializeHeritageSearchParams(nextParams);
+      const search = preserveLang(serializeHeritageSearchParams(nextParams), location.search);
 
       navigate(
         {
@@ -162,13 +176,14 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
 
       setDraft(nextDraft);
     },
-    [draft, navigate, setDraft],
+    [draft, navigate, setDraft, location.search],
   );
 
   // Hooks must be called at the top level before any early returns.
   const handleBackToAllSites = React.useCallback(() => {
-    navigate("/heritages", { replace: true });
-  }, [navigate]);
+    const search = preserveLang("", location.search);
+    navigate(`/heritages${search}`, { replace: true });
+  }, [navigate, location.search]);
 
   const header = (
     <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />

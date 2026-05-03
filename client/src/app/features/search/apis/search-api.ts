@@ -16,6 +16,7 @@ export type SearchParams = {
   category?: string;
   yearInscribedFrom?: number;
   yearInscribedTo?: number;
+  isEndangered?: boolean;
   currentPage?: number;
   perPage?: number;
 };
@@ -72,6 +73,7 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
     if (category) queryParams.set("category", category);
     if (yearInscribedFrom) queryParams.set("year_inscribed_from", yearInscribedFrom);
     if (yearInscribedTo) queryParams.set("year_inscribed_to", yearInscribedTo);
+    if (params.isEndangered === true) queryParams.set("is_endangered", "true");
     if (params.currentPage != null) queryParams.set("current_page", String(params.currentPage));
     if (params.perPage != null) queryParams.set("per_page", String(params.perPage));
 

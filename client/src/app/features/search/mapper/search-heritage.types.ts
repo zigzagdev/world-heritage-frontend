@@ -7,6 +7,7 @@ export const DEFAULT_HERITAGE_SEARCH_PARAMS: HeritageSearchParams = {
   category: null,
   year_inscribed_from: null,
   year_inscribed_to: null,
+  is_endangered: null,
   current_page: 1,
   per_page: 30,
   order: ID_SORT_OPTIONS.ASC,

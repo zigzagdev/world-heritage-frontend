@@ -36,6 +36,7 @@ const toSearchValues = (params: HeritageSearchParams): SearchValues => ({
   keyword: params.search_query ?? "",
   yearInscribedFrom: params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
   yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
+  isEndangered: params.is_endangered === true,
 });
 
 export function SearchHeritageFormContainer() {
@@ -71,6 +72,7 @@ export function SearchHeritageFormContainer() {
         keyword: query.keyword ?? draft.keyword,
         yearInscribedFrom: query.yearInscribedFrom ?? draft.yearInscribedFrom,
         yearInscribedTo: query.yearInscribedTo ?? draft.yearInscribedTo,
+        isEndangered: query.isEndangered ?? draft.isEndangered,
       };
 
       const nextParams: HeritageSearchParams = {
@@ -80,17 +82,26 @@ export function SearchHeritageFormContainer() {
         category: toCategoryOrNull(merged.category),
         year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
         year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
+        is_endangered: merged.isEndangered ? true : null,
         current_page: 1,
         per_page: params.per_page ?? DEFAULT_TOP_PER_PAGE,
         order: params.order ?? DEFAULT_ORDER,
         country: null,
       };
 
-      const search = serializeHeritageSearchParams(nextParams);
+      const baseSearch = serializeHeritageSearchParams(nextParams);
+      const currentLang = new URLSearchParams(location.search).get("lang");
+      const finalParams = new URLSearchParams(
+        baseSearch.startsWith("?") ? baseSearch.slice(1) : baseSearch,
+      );
+      if (currentLang === "ja") finalParams.set("lang", "ja");
+      const finalQueryString = finalParams.toString();
+      const search = finalQueryString ? `?${finalQueryString}` : "";
+
       navigate({ pathname: "/heritages/results", search }, { replace: false });
       setDraft(merged);
     },
-    [draft, navigate, params.per_page, params.order],
+    [draft, navigate, params.per_page, params.order, location.search],
   );
 
   return <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />;
