@@ -14,6 +14,7 @@ const toSearchParams = (params: HeritageSearchParams): SearchParams => ({
   category: params.category ?? undefined,
   yearInscribedFrom: params.year_inscribed_from ?? undefined,
   yearInscribedTo: params.year_inscribed_to ?? undefined,
+  isEndangered: params.is_endangered === true ? true : undefined,
   currentPage: params.current_page,
   perPage: params.per_page,
 });
