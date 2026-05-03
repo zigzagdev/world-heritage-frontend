@@ -31,6 +31,8 @@
   "sortById": "Sort by ID",
   "all": "All",
   "endangeredOnly": "Endangered only",
+  "backToAllSites": "Back to all sites",
+  "noSitesFound": "No sites found.",
   "keyword": "Keyword",
   "keywordPlaceholder": "Name / Country",
   "yearFrom": "From",
