@@ -42,6 +42,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
     yearInscribedFrom: value?.yearInscribedFrom ?? "",
     yearInscribedTo: value?.yearInscribedTo ?? "",
     isEndangered: value?.isEndangered ?? false,
+    criteria: value?.criteria ?? [],
   });
 
   const searchValues = value ?? internal;

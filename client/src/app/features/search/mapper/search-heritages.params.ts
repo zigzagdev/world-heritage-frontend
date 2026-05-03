@@ -1,10 +1,11 @@
 import type {
   Category,
+  CriteriaCode,
   HeritageSearchParams,
   IdSortOption,
   StudyRegion,
 } from "../../../../domain/types.ts";
-import { CATEGORIES, STUDY_REGIONS } from "../../../../domain/types.ts";
+import { CATEGORIES, CRITERIA, STUDY_REGIONS } from "../../../../domain/types.ts";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as defaultSearchParams } from "./search-heritage.types.ts";
 
 const toNullIfEmpty = (value: string | null): string | null => {
@@ -65,6 +66,20 @@ const toEndangeredOrNull = (value: string | null): boolean | null => {
   return trimmed === "true" ? true : null;
 };
 
+const isCriteriaCode = (value: string): value is CriteriaCode =>
+  (CRITERIA as readonly string[]).includes(value);
+
+// comma-separated を CriteriaCode[] にデコード。重複除去 + CRITERIA 順に正規化、不正値は捨てる。
+const toCriteriaCodes = (value: string | null): CriteriaCode[] => {
+  if (value == null) return [];
+  const parts = value
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  const unique = Array.from(new Set(parts)).filter(isCriteriaCode);
+  return unique.sort((a, b) => CRITERIA.indexOf(a) - CRITERIA.indexOf(b));
+};
+
 export function parseHeritageSearchParams(search: string): HeritageSearchParams {
   const searchParams = new URLSearchParams(search);
 
@@ -98,6 +113,8 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
   const is_endangered =
     toEndangeredOrNull(searchParams.get("is_endangered")) ?? defaultSearchParams.is_endangered;
 
+  const criteria = toCriteriaCodes(searchParams.get("criteria"));
+
   return {
     search_query,
     country,
@@ -106,6 +123,7 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
     year_inscribed_from,
     year_inscribed_to,
     is_endangered,
+    criteria,
     current_page,
     per_page,
     order,
@@ -152,6 +170,11 @@ export function serializeHeritageSearchParams(params: HeritageSearchParams): str
   // 危機遺産: true のときだけ URL に乗せる (false / null は省略 = no filter)
   if (params.is_endangered === true) {
     searchParams.set("is_endangered", "true");
+  }
+
+  // criteria: 非空のときだけ comma-separated で URL に乗せる
+  if (params.criteria.length > 0) {
+    searchParams.set("criteria", params.criteria.join(","));
   }
 
   const queryString = searchParams.toString();

@@ -20,6 +20,7 @@ const DEFAULT_SEARCH: SearchValues = {
   yearInscribedFrom: "",
   yearInscribedTo: "",
   isEndangered: false,
+  criteria: [],
 };
 
 const formatCriteriaInline = (criteria: string[] | undefined) =>
@@ -116,6 +117,7 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
     if (next.yearInscribedFrom) params.set("year_inscribed_from", next.yearInscribedFrom);
     if (next.yearInscribedTo) params.set("year_inscribed_to", next.yearInscribedTo);
     if (next.isEndangered) params.set("is_endangered", "true");
+    if (next.criteria.length > 0) params.set("criteria", next.criteria.join(","));
 
     navigate(`/heritages/results?${params.toString()}`);
   };

@@ -63,3 +63,62 @@ describe("round-trip", () => {
     expect(parsed.is_endangered).toBeNull();
   });
 });
+
+describe("parseHeritageSearchParams (criteria)", () => {
+  it("parses comma-separated criteria values", () => {
+    const params = parseHeritageSearchParams("?criteria=ii,iv");
+    expect(params.criteria).toStrictEqual(["ii", "iv"]);
+  });
+
+  it("missing criteria defaults to []", () => {
+    const params = parseHeritageSearchParams("?region=Asia");
+    expect(params.criteria).toStrictEqual([]);
+  });
+
+  it("empty criteria value defaults to []", () => {
+    const params = parseHeritageSearchParams("?criteria=");
+    expect(params.criteria).toStrictEqual([]);
+  });
+
+  it("filters out invalid codes", () => {
+    const params = parseHeritageSearchParams("?criteria=ii,xx,iv");
+    expect(params.criteria).toStrictEqual(["ii", "iv"]);
+  });
+
+  it("dedupes and sorts by CRITERIA order", () => {
+    const params = parseHeritageSearchParams("?criteria=v,ii,ii,i");
+    expect(params.criteria).toStrictEqual(["i", "ii", "v"]);
+  });
+});
+
+describe("serializeHeritageSearchParams (criteria)", () => {
+  it("emits criteria as comma-separated when non-empty", () => {
+    const queryString = serializeHeritageSearchParams(baseParams({ criteria: ["ii", "iv"] }));
+    expect(queryString).toContain("criteria=ii%2Civ");
+  });
+
+  it("omits criteria when empty", () => {
+    const queryString = serializeHeritageSearchParams(baseParams({ criteria: [] }));
+    expect(queryString).not.toContain("criteria");
+  });
+});
+
+describe("round-trip (criteria)", () => {
+  it("preserves single value", () => {
+    const queryString = serializeHeritageSearchParams(baseParams({ criteria: ["iii"] }));
+    const parsed = parseHeritageSearchParams(queryString);
+    expect(parsed.criteria).toStrictEqual(["iii"]);
+  });
+
+  it("preserves multiple values in canonical order", () => {
+    const queryString = serializeHeritageSearchParams(baseParams({ criteria: ["v", "ii", "i"] }));
+    const parsed = parseHeritageSearchParams(queryString);
+    expect(parsed.criteria).toStrictEqual(["i", "ii", "v"]);
+  });
+
+  it("preserves empty array", () => {
+    const queryString = serializeHeritageSearchParams(baseParams({ criteria: [] }));
+    const parsed = parseHeritageSearchParams(queryString);
+    expect(parsed.criteria).toStrictEqual([]);
+  });
+});
