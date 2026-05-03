@@ -89,11 +89,19 @@ export function SearchHeritageFormContainer() {
         country: null,
       };
 
-      const search = serializeHeritageSearchParams(nextParams);
+      const baseSearch = serializeHeritageSearchParams(nextParams);
+      const currentLang = new URLSearchParams(location.search).get("lang");
+      const finalParams = new URLSearchParams(
+        baseSearch.startsWith("?") ? baseSearch.slice(1) : baseSearch,
+      );
+      if (currentLang === "ja") finalParams.set("lang", "ja");
+      const finalQueryString = finalParams.toString();
+      const search = finalQueryString ? `?${finalQueryString}` : "";
+
       navigate({ pathname: "/heritages/results", search }, { replace: false });
       setDraft(merged);
     },
-    [draft, navigate, params.per_page, params.order],
+    [draft, navigate, params.per_page, params.order, location.search],
   );
 
   return <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />;
