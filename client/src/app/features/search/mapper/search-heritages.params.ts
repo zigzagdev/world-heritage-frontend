@@ -58,6 +58,13 @@ const toOrderOrNull = (value: string | null): IdSortOption | null => {
   return isIdSortOption(trimmed) ? trimmed : null;
 };
 
+// "true" だけ true。それ以外 (空 / 不正値 / "false") は null = フィルタなし扱い。
+const toEndangeredOrNull = (value: string | null): boolean | null => {
+  const trimmed = toNullIfEmpty(value);
+  if (trimmed == null) return null;
+  return trimmed === "true" ? true : null;
+};
+
 export function parseHeritageSearchParams(search: string): HeritageSearchParams {
   const searchParams = new URLSearchParams(search);
 
@@ -88,6 +95,9 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
 
   const order = toOrderOrNull(searchParams.get("order")) ?? defaultSearchParams.order;
 
+  const is_endangered =
+    toEndangeredOrNull(searchParams.get("is_endangered")) ?? defaultSearchParams.is_endangered;
+
   return {
     search_query,
     country,
@@ -95,6 +105,7 @@ export function parseHeritageSearchParams(search: string): HeritageSearchParams 
     category,
     year_inscribed_from,
     year_inscribed_to,
+    is_endangered,
     current_page,
     per_page,
     order,
@@ -136,6 +147,11 @@ export function serializeHeritageSearchParams(params: HeritageSearchParams): str
 
   if (params.order != null && params.order !== defaultSearchParams.order) {
     searchParams.set("order", params.order);
+  }
+
+  // 危機遺産: true のときだけ URL に乗せる (false / null は省略 = no filter)
+  if (params.is_endangered === true) {
+    searchParams.set("is_endangered", "true");
   }
 
   const queryString = searchParams.toString();

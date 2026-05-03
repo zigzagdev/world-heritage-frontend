@@ -50,7 +50,8 @@ const hasSearchParams = (params: HeritageSearchParams): boolean =>
   params.region !== null ||
   params.category !== null ||
   params.year_inscribed_from !== null ||
-  params.year_inscribed_to !== null;
+  params.year_inscribed_to !== null ||
+  params.is_endangered === true;
 
 const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   region: params.region ?? "",
@@ -58,6 +59,7 @@ const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   keyword: params.search_query ?? "",
   yearInscribedFrom: params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
   yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
+  isEndangered: params.is_endangered === true,
 });
 
 const toSearchParams = (draft: SearchValues): HeritageSearchParams => ({
@@ -67,6 +69,7 @@ const toSearchParams = (draft: SearchValues): HeritageSearchParams => ({
   category: draft.category || null,
   year_inscribed_from: draft.yearInscribedFrom ? Number(draft.yearInscribedFrom) : null,
   year_inscribed_to: draft.yearInscribedTo ? Number(draft.yearInscribedTo) : null,
+  is_endangered: draft.isEndangered ? true : null,
   current_page: 1,
 });
 
@@ -76,6 +79,7 @@ const mergeDraft = (currentDraft: SearchValues, partial: Partial<SearchValues>):
   keyword: partial.keyword ?? currentDraft.keyword,
   yearInscribedFrom: partial.yearInscribedFrom ?? currentDraft.yearInscribedFrom,
   yearInscribedTo: partial.yearInscribedTo ?? currentDraft.yearInscribedTo,
+  isEndangered: partial.isEndangered ?? currentDraft.isEndangered,
 });
 
 function useHeritageSearchDraft(params: HeritageSearchParams) {

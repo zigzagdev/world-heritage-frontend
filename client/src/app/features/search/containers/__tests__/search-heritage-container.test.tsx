@@ -39,6 +39,7 @@ type SearchValues = {
   keyword: string;
   yearInscribedFrom: string;
   yearInscribedTo: string;
+  isEndangered: boolean;
 };
 
 type HeritageSubHeaderProps = {
@@ -144,6 +145,7 @@ const makeParsedParams = (overrides: Partial<HeritageSearchParams> = {}): Herita
   category: null,
   year_inscribed_from: null,
   year_inscribed_to: null,
+  is_endangered: null,
   current_page: 1,
   per_page: 30,
   order: "asc",
@@ -203,6 +205,7 @@ describe("TopPageContainer", () => {
         keyword: "Kyoto",
         yearInscribedFrom: "",
         yearInscribedTo: "",
+        isEndangered: false,
       });
     });
 
@@ -252,6 +255,7 @@ describe("TopPageContainer", () => {
       category: "Cultural",
       year_inscribed_from: 1990,
       year_inscribed_to: null,
+      is_endangered: null,
       current_page: 1,
       per_page: 30,
       order: "asc",

@@ -40,6 +40,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
     keyword: value?.keyword ?? "",
     yearInscribedFrom: value?.yearInscribedFrom ?? "",
     yearInscribedTo: value?.yearInscribedTo ?? "",
+    isEndangered: value?.isEndangered ?? false,
   });
 
   const searchValues = value ?? internal;
