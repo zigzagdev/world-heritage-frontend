@@ -1,5 +1,6 @@
 import type {
   ApiWorldHeritageDto,
+  CriteriaCode,
   ListResult,
   Pagination,
   StudyRegion,
@@ -17,6 +18,7 @@ export type SearchParams = {
   yearInscribedFrom?: number;
   yearInscribedTo?: number;
   isEndangered?: boolean;
+  criteria?: readonly CriteriaCode[];
   currentPage?: number;
   perPage?: number;
 };
@@ -74,6 +76,9 @@ export const createSearchApi = ({ apiBase, fetchImpl = fetch }: SearchApiDeps) =
     if (yearInscribedFrom) queryParams.set("year_inscribed_from", yearInscribedFrom);
     if (yearInscribedTo) queryParams.set("year_inscribed_to", yearInscribedTo);
     if (params.isEndangered === true) queryParams.set("is_endangered", "true");
+    if (params.criteria && params.criteria.length > 0) {
+      queryParams.set("criteria", params.criteria.join(","));
+    }
     if (params.currentPage != null) queryParams.set("current_page", String(params.currentPage));
     if (params.perPage != null) queryParams.set("per_page", String(params.perPage));
 
