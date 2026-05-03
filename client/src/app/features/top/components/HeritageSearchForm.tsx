@@ -18,6 +18,7 @@ type Props = {
     keyword?: string;
     yearInscribedFrom?: string;
     yearInscribedTo?: string;
+    isEndangered?: boolean;
   }) => void;
 };
 
@@ -58,6 +59,7 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
       keyword: searchValues.keyword.trim() || undefined,
       yearInscribedFrom: searchValues.yearInscribedFrom || undefined,
       yearInscribedTo: searchValues.yearInscribedTo || undefined,
+      isEndangered: searchValues.isEndangered || undefined,
     });
   };
 
@@ -121,6 +123,19 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
             );
           })}
         </div>
+      </div>
+
+      {/* 危機遺産フラグ */}
+      <div className="px-4 py-2 border-b border-zinc-100">
+        <label className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={searchValues.isEndangered}
+            onChange={(e) => set({ isEndangered: e.target.checked })}
+            className="h-4 w-4 rounded border-zinc-300 text-rose-600 focus:ring-rose-400"
+          />
+          {text.endangeredOnly}
+        </label>
       </div>
 
       {/* Year + Keyword + Submit */}

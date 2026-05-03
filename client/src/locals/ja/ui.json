@@ -30,6 +30,7 @@
   "reload": "再読み込み",
   "sortById": "ID で並び替え",
   "all": "すべて",
+  "endangeredOnly": "危機遺産のみ表示",
   "keyword": "キーワード",
   "keywordPlaceholder": "名称・国名",
   "yearFrom": "から",

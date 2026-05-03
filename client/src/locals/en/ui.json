@@ -30,6 +30,7 @@
   "reload": "Reload",
   "sortById": "Sort by ID",
   "all": "All",
+  "endangeredOnly": "Endangered only",
   "keyword": "Keyword",
   "keywordPlaceholder": "Name / Country",
   "yearFrom": "From",
