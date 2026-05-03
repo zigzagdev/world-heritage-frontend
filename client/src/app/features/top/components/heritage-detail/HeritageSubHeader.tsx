@@ -30,6 +30,7 @@ export function HeritageSubHeader({ value, onChange, onSubmit }: Props): React.J
     keyword: value?.keyword ?? "",
     yearInscribedFrom: value?.yearInscribedFrom ?? "",
     yearInscribedTo: value?.yearInscribedTo ?? "",
+    isEndangered: value?.isEndangered ?? false,
   });
 
   const current = value ?? internal;
