@@ -183,6 +183,7 @@ export interface HeritageSearchParams {
   year_inscribed_from: number | null;
   year_inscribed_to: number | null;
   is_endangered: boolean | null;
+  criteria: CriteriaCode[];
   current_page: number;
   per_page: number;
   order: IdSortOption | null;
@@ -200,4 +201,5 @@ export type SearchValues = {
   yearInscribedFrom: string;
   yearInscribedTo: string;
   isEndangered: boolean;
+  criteria: CriteriaCode[];
 };

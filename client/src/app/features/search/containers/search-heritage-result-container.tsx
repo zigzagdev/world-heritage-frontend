@@ -51,7 +51,8 @@ const hasSearchParams = (params: HeritageSearchParams): boolean =>
   params.category !== null ||
   params.year_inscribed_from !== null ||
   params.year_inscribed_to !== null ||
-  params.is_endangered === true;
+  params.is_endangered === true ||
+  params.criteria.length > 0;
 
 const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   region: params.region ?? "",
@@ -60,6 +61,7 @@ const toDraftValues = (params: HeritageSearchParams): SearchValues => ({
   yearInscribedFrom: params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
   yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
   isEndangered: params.is_endangered === true,
+  criteria: params.criteria,
 });
 
 const toSearchParams = (draft: SearchValues): HeritageSearchParams => ({
@@ -70,6 +72,7 @@ const toSearchParams = (draft: SearchValues): HeritageSearchParams => ({
   year_inscribed_from: draft.yearInscribedFrom ? Number(draft.yearInscribedFrom) : null,
   year_inscribed_to: draft.yearInscribedTo ? Number(draft.yearInscribedTo) : null,
   is_endangered: draft.isEndangered ? true : null,
+  criteria: draft.criteria,
   current_page: 1,
 });
 
@@ -80,6 +83,7 @@ const mergeDraft = (currentDraft: SearchValues, partial: Partial<SearchValues>):
   yearInscribedFrom: partial.yearInscribedFrom ?? currentDraft.yearInscribedFrom,
   yearInscribedTo: partial.yearInscribedTo ?? currentDraft.yearInscribedTo,
   isEndangered: partial.isEndangered ?? currentDraft.isEndangered,
+  criteria: partial.criteria ?? currentDraft.criteria,
 });
 
 // 現在の URL に lang=ja があれば、遷移先 search にも持たせる (en はデフォルトなので付けない)

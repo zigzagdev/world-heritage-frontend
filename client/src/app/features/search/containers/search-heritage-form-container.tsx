@@ -37,6 +37,7 @@ const toSearchValues = (params: HeritageSearchParams): SearchValues => ({
   yearInscribedFrom: params.year_inscribed_from !== null ? String(params.year_inscribed_from) : "",
   yearInscribedTo: params.year_inscribed_to !== null ? String(params.year_inscribed_to) : "",
   isEndangered: params.is_endangered === true,
+  criteria: params.criteria,
 });
 
 export function SearchHeritageFormContainer() {
@@ -73,6 +74,7 @@ export function SearchHeritageFormContainer() {
         yearInscribedFrom: query.yearInscribedFrom ?? draft.yearInscribedFrom,
         yearInscribedTo: query.yearInscribedTo ?? draft.yearInscribedTo,
         isEndangered: query.isEndangered ?? draft.isEndangered,
+        criteria: query.criteria ?? draft.criteria,
       };
 
       const nextParams: HeritageSearchParams = {
@@ -83,6 +85,7 @@ export function SearchHeritageFormContainer() {
         year_inscribed_from: toSearchYearOrNull(merged.yearInscribedFrom),
         year_inscribed_to: toSearchYearOrNull(merged.yearInscribedTo),
         is_endangered: merged.isEndangered ? true : null,
+        criteria: merged.criteria,
         current_page: 1,
         per_page: params.per_page ?? DEFAULT_TOP_PER_PAGE,
         order: params.order ?? DEFAULT_ORDER,

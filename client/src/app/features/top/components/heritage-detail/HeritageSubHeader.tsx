@@ -31,6 +31,7 @@ export function HeritageSubHeader({ value, onChange, onSubmit }: Props): React.J
     yearInscribedFrom: value?.yearInscribedFrom ?? "",
     yearInscribedTo: value?.yearInscribedTo ?? "",
     isEndangered: value?.isEndangered ?? false,
+    criteria: value?.criteria ?? [],
   });
 
   const current = value ?? internal;

@@ -40,6 +40,7 @@ type SearchValues = {
   yearInscribedFrom: string;
   yearInscribedTo: string;
   isEndangered: boolean;
+  criteria: string[];
 };
 
 type HeritageSubHeaderProps = {
@@ -146,6 +147,7 @@ const makeParsedParams = (overrides: Partial<HeritageSearchParams> = {}): Herita
   year_inscribed_from: null,
   year_inscribed_to: null,
   is_endangered: null,
+  criteria: [],
   current_page: 1,
   per_page: 30,
   order: "asc",
@@ -206,6 +208,7 @@ describe("TopPageContainer", () => {
         yearInscribedFrom: "",
         yearInscribedTo: "",
         isEndangered: false,
+        criteria: [],
       });
     });
 
@@ -256,6 +259,7 @@ describe("TopPageContainer", () => {
       year_inscribed_from: 1990,
       year_inscribed_to: null,
       is_endangered: null,
+      criteria: [],
       current_page: 1,
       per_page: 30,
       order: "asc",
