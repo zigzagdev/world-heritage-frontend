@@ -2,8 +2,10 @@ import { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   CATEGORIES,
+  CRITERIA,
   STUDY_REGIONS,
   type Category,
+  type CriteriaCode,
   type SearchValues,
   type StudyRegion,
 } from "../../../../domain/types.ts";
@@ -18,6 +20,8 @@ type Props = {
     keyword?: string;
     yearInscribedFrom?: string;
     yearInscribedTo?: string;
+    isEndangered?: boolean;
+    criteria?: CriteriaCode[];
   }) => void;
 };
 
@@ -40,6 +44,8 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
     keyword: value?.keyword ?? "",
     yearInscribedFrom: value?.yearInscribedFrom ?? "",
     yearInscribedTo: value?.yearInscribedTo ?? "",
+    isEndangered: value?.isEndangered ?? false,
+    criteria: value?.criteria ?? [],
   });
 
   const searchValues = value ?? internal;
@@ -50,6 +56,14 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
     onChange?.(next);
   };
 
+  const toggleCriterion = (code: CriteriaCode) => {
+    const current = searchValues.criteria;
+    const next = current.includes(code)
+      ? current.filter((c) => c !== code)
+      : [...current, code].sort((a, b) => CRITERIA.indexOf(a) - CRITERIA.indexOf(b));
+    set({ criteria: next });
+  };
+
   const submit = () => {
     onSubmit?.({
       region: searchValues.region || undefined,
@@ -57,6 +71,8 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
       keyword: searchValues.keyword.trim() || undefined,
       yearInscribedFrom: searchValues.yearInscribedFrom || undefined,
       yearInscribedTo: searchValues.yearInscribedTo || undefined,
+      isEndangered: searchValues.isEndangered || undefined,
+      criteria: searchValues.criteria.length > 0 ? searchValues.criteria : undefined,
     });
   };
 
@@ -120,6 +136,47 @@ export function HeritageSearchForm({ value, onChange, onSubmit }: Props) {
             );
           })}
         </div>
+      </div>
+
+      {/* Criteria チップ (multi-select) */}
+      <div className="px-4 pt-3 pb-2 border-b border-zinc-100">
+        <div className="text-[11px] font-semibold text-zinc-400 mb-2">{text.criteria}</div>
+        <div className="flex flex-wrap gap-2">
+          {CRITERIA.map((code) => {
+            const isActive = searchValues.criteria.includes(code);
+            return (
+              <button
+                key={code}
+                type="button"
+                onClick={() => toggleCriterion(code)}
+                aria-pressed={isActive}
+                className={`
+                  px-3 py-1.5 rounded-full text-xs font-semibold border transition-all
+                  ${
+                    isActive
+                      ? "bg-zinc-900 text-white border-zinc-900"
+                      : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+                  }
+                `}
+              >
+                {code}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 危機遺産フラグ */}
+      <div className="px-4 py-2 border-b border-zinc-100">
+        <label className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-700 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={searchValues.isEndangered}
+            onChange={(e) => set({ isEndangered: e.target.checked })}
+            className="h-4 w-4 rounded border-zinc-300 text-rose-600 focus:ring-rose-400"
+          />
+          {text.endangeredOnly}
+        </label>
       </div>
 
       {/* Year + Keyword + Submit */}

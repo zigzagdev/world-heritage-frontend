@@ -7,6 +7,8 @@ import { HeritageCard } from "@features/top/cards/HeritageCard";
 import { Pagination } from "@features/top/components/Pagination.tsx";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 import { SearchResultMapComponent } from "@features/search/components/SearchResultMapComponent.tsx";
+import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
+import { useText } from "@shared/locale/ui-text.ts";
 
 type Props = {
   header?: ReactNode;
@@ -31,6 +33,7 @@ export default function SearchResultsPage({
   onPageChange,
   onBackToAllSites,
 }: Props) {
+  const text = useText();
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
       <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur">
@@ -69,11 +72,12 @@ export default function SearchResultsPage({
                   h-9 rounded-xl border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700
                   shadow-sm transition hover:bg-zinc-50
                 "
-                aria-label="Back to all sites"
+                aria-label={text.backToAllSites}
               >
-                Back to all sites
+                {text.backToAllSites}
               </button>
             ) : null}
+            <LocaleToggle />
           </div>
         </div>
       </div>
@@ -87,7 +91,7 @@ export default function SearchResultsPage({
 
         {items.length === 0 ? (
           <div className="py-20 text-center">
-            <p className="text-sm text-zinc-600">No sites found.</p>
+            <p className="text-sm text-zinc-600">{text.noSitesFound}</p>
           </div>
         ) : (
           <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
