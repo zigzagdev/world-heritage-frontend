@@ -24,7 +24,7 @@ const base: ApiWorldHeritageDto = {
   state_party: "JPN",
   state_party_codes: ["JPN"],
   state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-  thumbnail: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
+  thumbnail_url: "https://whc.unesco.org/document/209295/site_0661_0026.jpg",
 };
 
 describe("toWorldHeritageVm", () => {
@@ -59,7 +59,7 @@ describe("toWorldHeritageVm", () => {
       bufferText: "320 ha",
       statePartyCodes: ["日本"],
       statePartiesMeta: { JPN: { isPrimary: true, inscriptionYear: 1993 } },
-      thumbnailUrl: base.thumbnail,
+      thumbnailUrl: base.thumbnail_url,
       images: [],
     });
 
@@ -102,8 +102,8 @@ describe("toWorldHeritageVm", () => {
     expect(vm.bufferText).toBe("—");
   });
 
-  it("when thumbnail is null, thumbnailUrl is null", () => {
-    const vm = toWorldHeritageVm({ ...base, thumbnail: null }, "ja");
+  it("when thumbnail_url is null, thumbnailUrl is null", () => {
+    const vm = toWorldHeritageVm({ ...base, thumbnail_url: null }, "ja");
     expect(vm.thumbnailUrl).toBeNull();
   });
 

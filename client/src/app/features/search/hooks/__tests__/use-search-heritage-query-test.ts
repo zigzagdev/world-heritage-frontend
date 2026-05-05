@@ -87,7 +87,7 @@ const OK: ApiSearchResponse = {
         unesco_site_url: "https://whc.unesco.org/en/list/661",
         state_party_codes: ["JPN"],
         state_parties_meta: { JPN: { is_primary: true, inscription_year: 1993 } },
-        thumbnail: null,
+        thumbnail_url: null,
       },
     ],
     pagination: { current_page: 1, per_page: 30, total: 1, last_page: 1 },

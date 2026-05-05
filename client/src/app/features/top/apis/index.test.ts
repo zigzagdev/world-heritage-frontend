@@ -48,7 +48,7 @@ const makeDto = (overrides: Partial<ApiWorldHeritageDto> = {}): ApiWorldHeritage
   state_party: null,
   state_party_codes: ["JPN"],
   state_parties_meta: {},
-  thumbnail: null,
+  thumbnail_url: null,
   ...overrides,
 });
 

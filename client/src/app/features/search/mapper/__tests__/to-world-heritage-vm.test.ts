@@ -41,7 +41,7 @@ const makeWorldHeritageDto = (
     state_party: null,
     state_party_codes: ["JP"],
     state_parties_meta: {},
-    thumbnail: null,
+    thumbnail_url: null,
   } satisfies ApiWorldHeritageDto;
 
   return { ...base, ...overrides };

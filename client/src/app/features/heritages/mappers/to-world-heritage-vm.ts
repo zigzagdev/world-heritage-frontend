@@ -114,7 +114,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto, locale: Locale): Wo
     bufferText: fmtHa(data.buffer_zone_hectares),
     criteriaText: criteriaCodes.join(", "),
 
-    thumbnailUrl: data.thumbnail,
+    thumbnailUrl: data.thumbnail_url,
     images: [],
   };
 }
