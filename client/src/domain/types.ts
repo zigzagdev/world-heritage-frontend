@@ -63,7 +63,7 @@ export type ApiWorldHeritageDto = {
   state_party: string | null;
   state_party_codes: string[];
   state_parties_meta: StatePartiesMetaDto;
-  thumbnail: string | null;
+  thumbnail_url: string | null;
 };
 
 /**
