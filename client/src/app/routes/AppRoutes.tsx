@@ -4,17 +4,23 @@ import { WorldHeritageDetailContainer } from "@features/top/containers/world-her
 import { SearchHeritageResultsContainer } from "@features/search/containers/search-heritage-result-container.tsx";
 import { BreadcrumbProvider } from "@features/breadcrumbs/BreadCrumbProvider.tsx";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
+import { AppFooter } from "@shared/layout/AppFooter.tsx";
 
 export function AppRoutes() {
   return (
     <LocaleProvider>
       <BreadcrumbProvider>
-        <Routes>
-          <Route path="/heritages" element={<TopPageContainer />} />
-          <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
-          <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
-          <Route path="*" element={<Navigate to="/heritages" replace />} />
-        </Routes>
+        <div className="flex min-h-screen flex-col">
+          <div className="flex-1">
+            <Routes>
+              <Route path="/heritages" element={<TopPageContainer />} />
+              <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
+              <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
+              <Route path="*" element={<Navigate to="/heritages" replace />} />
+            </Routes>
+          </div>
+          <AppFooter />
+        </div>
       </BreadcrumbProvider>
     </LocaleProvider>
   );
