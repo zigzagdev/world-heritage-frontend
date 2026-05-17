@@ -50,5 +50,8 @@
     "North America": "North America",
     "South America": "South America",
     "Oceania": "Oceania"
-  }
+  },
+  "footerTagline": "Every site has a story. Start yours.",
+  "quickExplore": "Quick Explore",
+  "dataSource": "Data source: UNESCO World Heritage Centre"
 }

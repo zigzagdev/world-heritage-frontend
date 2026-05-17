@@ -50,5 +50,8 @@
     "North America": "北アメリカ",
     "South America": "南アメリカ",
     "Oceania": "オセアニア"
-  }
+  },
+  "footerTagline": "すべての遺産に、物語がある。あなたの探索を始めよう。",
+  "quickExplore": "地域から探す",
+  "dataSource": "データ提供: ユネスコ世界遺産センター"
 }
