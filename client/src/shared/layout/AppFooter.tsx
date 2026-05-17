@@ -36,6 +36,20 @@ export function AppFooter() {
             ))}
           </div>
         </div>
+
+        <hr className="border-zinc-800" />
+
+        <div className="flex flex-col gap-1">
+          <a
+            href="https://whc.unesco.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors w-fit"
+          >
+            {text.dataSource}
+          </a>
+          <p className="text-xs text-zinc-600">© 2026 World Heritage Explorer</p>
+        </div>
       </div>
     </footer>
   );
