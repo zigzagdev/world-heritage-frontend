@@ -53,5 +53,9 @@
   },
   "footerTagline": "Every site has a story. Start yours.",
   "quickExplore": "Quick Explore",
-  "dataSource": "Data source: UNESCO World Heritage Centre"
+  "dataSource": "Data source: UNESCO World Heritage Centre",
+  "exploreRegions": "Explore by Region",
+  "heroHeadline": "1,100+ UNESCO World Heritage Sites",
+  "heroSubheadline": "Search and compare sites from across the globe.",
+  "heroCtaLabel": "Start Exploring"
 }
