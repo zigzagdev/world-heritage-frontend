@@ -11,7 +11,6 @@ import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
-import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 
 const DEFAULT_SEARCH: SearchValues = {
   region: "",
@@ -132,9 +131,8 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
       <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
 
-      <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8 flex items-center justify-between">
+      <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8">
         <HeritageDetailTabs items={tabs} />
-        <LocaleToggle />
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-4">
