@@ -1,5 +1,4 @@
 import type { IdSortOption } from "../../../../domain/types.ts";
-import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
 
 export function TopPageTitleBar({
@@ -50,8 +49,6 @@ export function TopPageTitleBar({
               {text.reload}
             </button>
           )}
-
-          <LocaleToggle />
         </div>
       </div>
     </div>
