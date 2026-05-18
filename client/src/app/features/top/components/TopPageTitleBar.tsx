@@ -12,7 +12,7 @@ export function TopPageTitleBar({
 }) {
   const text = useText();
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 pb-4 pt-4 backdrop-blur">
+    <div className="sticky top-[49px] z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 pb-4 pt-4 backdrop-blur">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-3xl font-extrabold tracking-tight text-indigo-700">
