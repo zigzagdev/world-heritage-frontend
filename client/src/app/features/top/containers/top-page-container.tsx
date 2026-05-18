@@ -4,6 +4,7 @@ import TopPage from "../components/TopPage";
 import { useTopPage } from "../hooks/use-top-page";
 import { SearchHeritageFormContainer } from "@features/search/containers/search-heritage-form-container";
 import { TopPageTitleBar } from "../components/TopPageTitleBar";
+import { TopPageHero } from "../components/TopPageHero";
 import { HeritageList } from "../components/HeritageList";
 import { TopPagePagination } from "../components/TopPagePagination";
 import type { IdSortOption } from "../../../../domain/types";
@@ -115,6 +116,7 @@ export default function TopPageContainer(): React.ReactElement {
 
   return (
     <TopPage
+      hero={<TopPageHero />}
       titleBar={
         <TopPageTitleBar order={order} onChangeOrder={handleChangeOrder} onReload={reload} />
       }
