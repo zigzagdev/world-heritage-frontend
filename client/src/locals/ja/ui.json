@@ -53,5 +53,9 @@
   },
   "footerTagline": "すべての遺産に、物語がある。あなたの探索を始めよう。",
   "quickExplore": "地域から探す",
-  "dataSource": "データ提供: ユネスコ世界遺産センター"
+  "dataSource": "データ提供: ユネスコ世界遺産センター",
+  "exploreRegions": "地域から探す",
+  "heroHeadline": "ユネスコ世界遺産1,100件以上",
+  "heroSubheadline": "世界中の遺産を検索・比較しよう。",
+  "heroCtaLabel": "探索を始める"
 }
