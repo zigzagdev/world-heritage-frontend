@@ -37,9 +37,11 @@ const CRITERIA_MAX = 4;
 export function HeritageCard({
   item,
   onClickItem,
+  isSpotlight = false,
 }: {
   item: WorldHeritageVm;
   onClickItem?: (id: number) => void;
+  isSpotlight?: boolean;
 }) {
   const text = useText();
 
@@ -73,7 +75,7 @@ export function HeritageCard({
               alt={item.thumbnailUrl ?? title}
               referrerPolicy="no-referrer"
               loading="lazy"
-              className="h-56 w-full object-cover sm:h-64 lg:h-72 transition-transform duration-300 group-hover:scale-105"
+              className={`w-full object-cover transition-transform duration-300 group-hover:scale-105 ${isSpotlight ? "h-64 sm:h-80 lg:h-96" : "h-56 sm:h-64 lg:h-72"}`}
             />
           ) : (
             <div className="grid h-56 w-full place-items-center bg-gradient-to-br from-indigo-50 to-zinc-100 sm:h-64 lg:h-72 dark:from-indigo-950 dark:to-zinc-800">
@@ -110,7 +112,9 @@ export function HeritageCard({
           )}
 
           <div className="absolute inset-x-0 bottom-0 p-4">
-            <h3 className="text-white text-lg font-semibold break-words leading-snug line-clamp-2">
+            <h3
+              className={`text-white font-semibold break-words leading-snug line-clamp-2 ${isSpotlight ? "text-xl lg:text-2xl" : "text-lg"}`}
+            >
               {title}
             </h3>
             {subtitle && <p className="mt-0.5 text-sm text-white/80 line-clamp-1">{subtitle}</p>}
