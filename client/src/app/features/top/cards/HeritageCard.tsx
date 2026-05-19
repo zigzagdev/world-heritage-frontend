@@ -139,16 +139,22 @@ export function HeritageCard({
           ) : (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">{text.noOverview}</p>
           )}
-          <div className="mt-auto flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
-            <span className="text-xs text-zinc-500 dark:text-zinc-400" aria-hidden="true">
-              &nbsp;
-            </span>
+          <div className="mt-auto border-t border-zinc-100 pt-2 dark:border-zinc-800">
             <button
               type="button"
               onClick={handleViewDetailClick}
-              className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+              className="
+                group/cta inline-flex w-full items-center justify-center gap-1.5
+                rounded-full px-3 py-2
+                text-sm font-semibold text-indigo-600
+                transition-colors hover:bg-indigo-50
+                dark:text-indigo-400 dark:hover:bg-indigo-950/40
+              "
             >
-              {text.viewDetails} <span>→</span>
+              {text.viewDetails}
+              <span className="transition-transform duration-200 group-hover/cta:translate-x-1">
+                →
+              </span>
             </button>
           </div>
         </div>
