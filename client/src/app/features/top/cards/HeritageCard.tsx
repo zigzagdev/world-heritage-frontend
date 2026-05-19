@@ -73,7 +73,7 @@ export function HeritageCard({
               alt={item.thumbnailUrl ?? title}
               referrerPolicy="no-referrer"
               loading="lazy"
-              className="h-56 w-full object-cover sm:h-64 lg:h-72"
+              className="h-56 w-full object-cover sm:h-64 lg:h-72 transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="grid h-56 w-full place-items-center bg-zinc-100 text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 sm:h-64 lg:h-72">
