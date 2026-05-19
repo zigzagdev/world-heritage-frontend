@@ -76,8 +76,26 @@ export function HeritageCard({
               className="h-56 w-full object-cover sm:h-64 lg:h-72 transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
-            <div className="grid h-56 w-full place-items-center bg-zinc-100 text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 sm:h-64 lg:h-72">
-              {text.noImage}
+            <div className="grid h-56 w-full place-items-center bg-gradient-to-br from-indigo-50 to-zinc-100 sm:h-64 lg:h-72 dark:from-indigo-950 dark:to-zinc-800">
+              <div className="flex flex-col items-center gap-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-14 w-14 text-indigo-200 dark:text-indigo-800"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+                <span className="px-4 text-center text-xs font-medium text-zinc-400 dark:text-zinc-500 line-clamp-2">
+                  {title}
+                </span>
+              </div>
             </div>
           )}
 
