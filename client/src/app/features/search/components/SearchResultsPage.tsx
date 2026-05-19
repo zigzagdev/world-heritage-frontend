@@ -95,9 +95,9 @@ export default function SearchResultsPage({
           </div>
         ) : (
           <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((it) => (
-              <li key={it.id} className="list-none">
-                <HeritageCard item={it} onClickItem={onClickItem} />
+            {items.map((it, index) => (
+              <li key={it.id} className={`list-none ${index === 0 ? "lg:col-span-2" : ""}`}>
+                <HeritageCard item={it} onClickItem={onClickItem} isSpotlight={index === 0} />
               </li>
             ))}
           </ul>
