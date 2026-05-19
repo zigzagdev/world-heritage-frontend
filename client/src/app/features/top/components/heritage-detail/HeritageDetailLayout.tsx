@@ -96,6 +96,7 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
 
 export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
   const text = useText();
@@ -129,7 +130,40 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900">
-      <HeritageSubHeader value={search} onChange={setSearch} onSubmit={handleSubmit} />
+      {isSearchOpen ? (
+        <HeritageSubHeader
+          value={search}
+          onChange={setSearch}
+          onSubmit={handleSubmit}
+          onClose={() => setIsSearchOpen(false)}
+        />
+      ) : (
+        <div className="border-b border-zinc-200/70 bg-white/95 backdrop-blur">
+          <div className="mx-auto w-full max-w-6xl px-4 py-2">
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              {text.searchOtherSites}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto w-full max-w-6xl px-4 mt-6 md:mt-8">
         <HeritageDetailTabs items={tabs} />
