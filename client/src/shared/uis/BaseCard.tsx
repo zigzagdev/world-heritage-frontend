@@ -24,11 +24,14 @@ export function BaseCard({
 
   return (
     <Wrapper
-      className="
+      className={`
         group h-full overflow-hidden rounded-2xl border border-zinc-200/70
-        bg-white/70 shadow-sm backdrop-blur transition hover:shadow-md
+        bg-white/70 shadow-sm backdrop-blur
+        transition-all duration-200
+        hover:shadow-xl hover:-translate-y-1
         dark:border-zinc-800 dark:bg-zinc-900/70
-      "
+        ${isInteractive ? "cursor-pointer" : ""}
+      `}
       {...(isInteractive ? { role: "button", tabIndex: 0, onClick, onKeyDown: handleKeyDown } : {})}
     >
       {children}
