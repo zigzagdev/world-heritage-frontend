@@ -10,6 +10,9 @@ import type {
 } from "../../../../domain/types";
 import { fetchTopPage } from "@features/top/apis";
 import { useLocale } from "@shared/locale/LocaleHooks.ts";
+import { getCached, setCached } from "@shared/cache/api-cache.ts";
+
+const CACHE_MAX_AGE_MS = 60_000;
 
 type State = {
   data: WorldHeritageVm[];
@@ -67,11 +70,22 @@ export function useTopPage(args: { currentPage: number; perPage: number; order?:
       const abortController = new AbortController();
       abortRef.current = abortController;
 
-      setState((prev) => ({
-        ...prev,
-        loading: true,
-        error: null,
-      }));
+      const cacheKey = `top:${targetPage}:${targetPerPage}:${targetOrder}:${locale}`;
+      const cached = getCached<{ vmList: WorldHeritageVm[]; pagination: Pagination }>(
+        cacheKey,
+        CACHE_MAX_AGE_MS,
+      );
+
+      if (cached) {
+        setState({
+          data: cached.vmList,
+          pagination: cached.pagination,
+          loading: false,
+          error: null,
+        });
+      } else {
+        setState((prev) => ({ ...prev, loading: true, error: null }));
+      }
 
       fetchTopPage({
         currentPage: targetPage,
@@ -84,13 +98,9 @@ export function useTopPage(args: { currentPage: number; perPage: number; order?:
           if (abortController.signal.aborted) return;
 
           const vmList = toWorldHeritageListVm(res.items, locale);
+          setCached(cacheKey, { vmList, pagination: res.pagination });
 
-          setState({
-            data: vmList,
-            pagination: res.pagination,
-            loading: false,
-            error: null,
-          });
+          setState({ data: vmList, pagination: res.pagination, loading: false, error: null });
         })
         .catch((e: unknown) => {
           if (!mountedRef.current) return;
@@ -104,11 +114,7 @@ export function useTopPage(args: { currentPage: number; perPage: number; order?:
             return;
           }
 
-          setState((prev) => ({
-            ...prev,
-            loading: false,
-            error: e,
-          }));
+          setState((prev) => ({ ...prev, loading: false, error: e }));
         });
     },
     [locale],
