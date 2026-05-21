@@ -5,9 +5,11 @@ import { useText } from "@shared/locale/ui-text.ts";
 export function HeritageCard({
   item,
   onClickItem,
+  isPriority = false,
 }: {
   item: WorldHeritageVm;
   onClickItem?: (id: number) => void;
+  isPriority?: boolean;
 }) {
   const text = useText();
 
@@ -25,7 +27,11 @@ export function HeritageCard({
             src={item.thumbnailUrl}
             alt={title}
             referrerPolicy="no-referrer"
-            loading="lazy"
+            loading={isPriority ? "eager" : "lazy"}
+            fetchPriority={isPriority ? "high" : "auto"}
+            decoding="async"
+            width={400}
+            height={320}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
