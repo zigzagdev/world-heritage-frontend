@@ -3,6 +3,9 @@ import type { HeritageSearchParams } from "../../../../domain/types.ts";
 import { fetchSearchHeritagesResult } from "../apis";
 import type { SearchParams } from "../apis/search-api";
 import type { ApiWorldHeritageDto, ListResult } from "../../../../domain/types";
+import { getCached, setCached } from "@shared/cache/api-cache.ts";
+
+const CACHE_MAX_AGE_MS = 60_000;
 
 const isAbortError = (e: unknown): boolean => {
   return e instanceof DOMException && e.name === "AbortError";
@@ -44,12 +47,20 @@ export function useHeritageSearchQuery(
     }
 
     const abortController = new AbortController();
+    const cacheKey = `search:${JSON.stringify(request)}`;
+    const cached = getCached<ListResult<ApiWorldHeritageDto>>(cacheKey, CACHE_MAX_AGE_MS);
 
-    setLoading(true);
+    if (cached) {
+      setData(cached);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
     setError(null);
 
     fetchSearchHeritagesResult(request, { signal: abortController.signal })
       .then((res) => {
+        setCached(cacheKey, res);
         setData(res);
       })
       .catch((e: unknown) => {
