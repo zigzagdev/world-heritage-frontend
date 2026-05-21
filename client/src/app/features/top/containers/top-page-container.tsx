@@ -89,17 +89,6 @@ export default function TopPageContainer(): React.ReactElement {
 
   const header = <SearchHeritageFormContainer />;
 
-  if (isLoading) {
-    return (
-      <>
-        {header}
-        <main className="p-6">
-          <div>Loading…</div>
-        </main>
-      </>
-    );
-  }
-
   if (isError) {
     return (
       <>
@@ -121,7 +110,7 @@ export default function TopPageContainer(): React.ReactElement {
         <TopPageTitleBar order={order} onChangeOrder={handleChangeOrder} onReload={reload} />
       }
       header={header}
-      content={<HeritageList items={items} onClickItem={handleClickItem} />}
+      content={<HeritageList items={items} onClickItem={handleClickItem} isLoading={isLoading} />}
       pagination={
         <TopPagePagination
           currentPage={currentPage}
