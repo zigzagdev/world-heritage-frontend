@@ -105,9 +105,9 @@ export default function SearchResultsPage({
           </div>
         ) : (
           <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((it, index) => (
+            {items.map((it) => (
               <li key={it.id} className="list-none">
-                <HeritageCard item={it} onClickItem={onClickItem} isPriority={index < 3} />
+                <HeritageCard item={it} onClickItem={onClickItem} />
               </li>
             ))}
           </ul>
