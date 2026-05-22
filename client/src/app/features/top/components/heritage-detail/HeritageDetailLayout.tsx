@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import type { WorldHeritageDetailVm, SearchValues } from "../../../../../domain/types.ts";
 import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
@@ -6,7 +6,11 @@ import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
-import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
+const DetailHeritageMap = lazy(() =>
+  import("@features/top/components/heritage-detail/DetailHeritageMap.tsx").then((m) => ({
+    default: m.DetailHeritageMap,
+  })),
+);
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
@@ -181,7 +185,9 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
 
       {/* Map: mobile only (PC shows in sidebar) */}
       <div className="mx-auto w-full max-w-6xl px-4 mt-6 lg:hidden" id="geo-map">
-        <DetailHeritageMap latitude={item.latitude} longitude={item.longitude} />
+        <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-zinc-100" />}>
+          <DetailHeritageMap latitude={item.latitude} longitude={item.longitude} />
+        </Suspense>
       </div>
 
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-8">

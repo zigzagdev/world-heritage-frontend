@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
-import { Map } from "./Map.tsx";
+import { lazy, Suspense, type ReactNode } from "react";
+
+const Map = lazy(() => import("./Map.tsx").then((m) => ({ default: m.Map })));
 
 export default function TopPage({
   hero,
@@ -23,7 +24,9 @@ export default function TopPage({
         <div>{header}</div>
 
         <div className="mt-4">
-          <Map />
+          <Suspense fallback={<div className="h-[400px] animate-pulse rounded-xl bg-zinc-100" />}>
+            <Map />
+          </Suspense>
         </div>
 
         <div className="pt-8">
