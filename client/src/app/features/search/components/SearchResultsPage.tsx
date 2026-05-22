@@ -8,6 +8,9 @@ import { Pagination } from "@features/top/components/Pagination.tsx";
 import { BreadcrumbList } from "@shared/components/BreadcrumbList.tsx";
 import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
+import { HeritageCardSkeleton } from "@shared/uis/HeritageCardSkeleton.tsx";
+
+const SKELETON_COUNT = 6;
 
 type Props = {
   header?: ReactNode;
@@ -20,6 +23,7 @@ type Props = {
   errorMessage?: string;
   onPageChange?: (page: number) => void;
   onBackToAllSites?: () => void;
+  isLoading?: boolean;
 };
 
 export default function SearchResultsPage({
@@ -31,6 +35,7 @@ export default function SearchResultsPage({
   errorMessage,
   onPageChange,
   onBackToAllSites,
+  isLoading = false,
 }: Props) {
   const text = useText();
   return (
@@ -86,15 +91,23 @@ export default function SearchResultsPage({
       <div className="pt-8">
         <BreadcrumbList />
 
-        {items.length === 0 ? (
+        {isLoading ? (
+          <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+              <li key={i} className="list-none">
+                <HeritageCardSkeleton />
+              </li>
+            ))}
+          </ul>
+        ) : items.length === 0 ? (
           <div className="py-20 text-center">
             <p className="text-sm text-zinc-600">{text.noSitesFound}</p>
           </div>
         ) : (
           <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((it) => (
+            {items.map((it, index) => (
               <li key={it.id} className="list-none">
-                <HeritageCard item={it} onClickItem={onClickItem} />
+                <HeritageCard item={it} onClickItem={onClickItem} isPriority={index < 3} />
               </li>
             ))}
           </ul>

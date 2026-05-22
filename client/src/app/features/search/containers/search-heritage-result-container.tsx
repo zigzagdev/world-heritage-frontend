@@ -201,7 +201,7 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
   };
 
   if (isLoading) {
-    return <SearchResultsPage {...baseProps} pagination={null} rangeText="Loading…" />;
+    return <SearchResultsPage {...baseProps} pagination={null} rangeText="" isLoading />;
   }
 
   if (error) {
