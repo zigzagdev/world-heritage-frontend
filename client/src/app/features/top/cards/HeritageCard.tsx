@@ -26,9 +26,6 @@ export function HeritageCard({
             alt={title}
             referrerPolicy="no-referrer"
             loading="lazy"
-            decoding="async"
-            width={400}
-            height={320}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
