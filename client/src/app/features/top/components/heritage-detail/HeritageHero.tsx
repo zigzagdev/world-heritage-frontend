@@ -53,7 +53,7 @@ export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
                   <a
                     href={item.unescoSiteUrl}
                     target="_blank"
-                    rel="noreferrer"
+                    referrerPolicy="no-referrer"
                     className="shrink-0 font-semibold text-zinc-700 hover:underline"
                   >
                     {text.viewOnUnesco}

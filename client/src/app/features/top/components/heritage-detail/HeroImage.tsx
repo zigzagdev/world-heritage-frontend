@@ -7,7 +7,7 @@ export const HeroImage: FC<{
   unescoUrl?: string | null;
 }> = ({ src, alt, credit, unescoUrl }) => (
   <figure className="heritage-detail__hero">
-    <img src={src} alt={alt} className="heritage-detail__hero-image" />
+    <img src={src} alt={alt} className="heritage-detail__hero-image" referrerPolicy="no-referrer" />
 
     {(credit || unescoUrl) && (
       <figcaption className="heritage-detail__hero-caption">

@@ -29,8 +29,7 @@ export function CriteriaTags({
           <li key={code}>
             <a
               href={href}
-              target="_blank"
-              rel="noreferrer"
+              referrerPolicy="no-referrer"
               title={description ? `${title} — ${description}` : title}
               className="inline-flex items-center rounded bg-gray-200 px-2 py-1 text-sm hover:bg-gray-300"
             >

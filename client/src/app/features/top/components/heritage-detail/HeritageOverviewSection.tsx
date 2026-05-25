@@ -18,7 +18,7 @@ export function HeritageOverViewSection({ item }: { item: WorldHeritageDetailVm 
           <a
             href={item.unescoSiteUrl}
             target="_blank"
-            rel="noreferrer"
+            referrerPolicy="no-referrer"
             className="shrink-0 rounded-full border border-sky-200 bg-sky-50
             px-3 py-1.5 text-xs font-semibold text-sky-900 hover:bg-sky-100"
           >
