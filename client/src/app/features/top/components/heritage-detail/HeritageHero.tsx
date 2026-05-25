@@ -31,7 +31,6 @@ export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
                 src={primaryImage.url}
                 alt={primaryImage.alt ?? ""}
                 referrerPolicy="no-referrer"
-                loading="lazy"
                 className="h-72 w-full object-cover md:h-[600px]"
               />
               {/* subtle gradient overlay */}

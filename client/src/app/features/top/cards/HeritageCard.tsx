@@ -24,9 +24,8 @@ export function HeritageCard({
           <img
             src={item.thumbnailUrl}
             alt={title}
-            referrerPolicy="no-referrer"
-            loading="lazy"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-zinc-100 dark:from-indigo-950 dark:to-zinc-800">
