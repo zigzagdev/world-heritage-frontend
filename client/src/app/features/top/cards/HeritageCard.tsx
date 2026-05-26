@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { BaseCard } from "@shared/uis/BaseCard.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
@@ -11,25 +10,22 @@ export function HeritageCard({
   onClickItem?: (id: number) => void;
 }) {
   const text = useText();
-  const [isImgError, setIsImgError] = useState(false);
 
   const handleCardClick = () => {
     if (onClickItem) onClickItem(item.id);
   };
 
   const title = item.title;
-  const proxyUrl = `${import.meta.env.VITE_API_BASE_URL}/api/v1/heritage-image/${item.id}`;
 
   return (
     <BaseCard onClick={handleCardClick}>
       <div className="relative h-64 overflow-hidden rounded-2xl sm:h-72 lg:h-80">
-        {!isImgError ? (
+        {item.thumbnailUrl ? (
           <img
-            src={proxyUrl}
+            src={item.thumbnailUrl}
             alt={title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            crossOrigin="anonymous"
-            onError={() => setIsImgError(true)}
+            referrerPolicy="no-referrer"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-50 to-zinc-100 dark:from-indigo-950 dark:to-zinc-800">
