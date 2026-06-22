@@ -19,6 +19,7 @@ import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heri
 import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
 import { useLocale } from "@shared/locale/LocaleHooks";
+import { Spinner } from "@shared/uis/Spinner.tsx";
 
 const fmtRangeText = (pagination: Pagination, count: number): string => {
   if (count === 0) {
@@ -201,7 +202,12 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
   };
 
   if (isLoading) {
-    return <SearchResultsPage {...baseProps} pagination={null} rangeText="Loading…" />;
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-12">
+        {header}
+        <Spinner />
+      </main>
+    );
   }
 
   if (error) {
