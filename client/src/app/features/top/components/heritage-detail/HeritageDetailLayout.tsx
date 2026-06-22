@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import type {
-  WorldHeritageDetailVm,
-  WorldHeritageImageVm,
-  SearchValues,
-} from "../../../../../domain/types.ts";
+import type { WorldHeritageDetailVm, SearchValues } from "../../../../../domain/types.ts";
 import { HeritageSubHeader } from "../HeritageSubHeader.tsx";
 import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
@@ -102,10 +98,7 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
 export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [lightboxImage, setLightboxImage] = useState<Pick<
-    WorldHeritageImageVm,
-    "id" | "url" | "alt" | "credit"
-  > | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
   const text = useText();
@@ -198,7 +191,7 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
           {/* Left: Overview → Gallery */}
           <div className="space-y-8" id="content">
             <HeritageOverViewSection item={item} />
-            <HeritageGallery images={item.images} onSelectImage={setLightboxImage} />
+            <HeritageGallery images={item.images} onSelectImage={setLightboxIndex} />
           </div>
 
           {/* Right: Sidebar (PC only) */}
@@ -208,7 +201,12 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
         </div>
       </main>
 
-      <Lightbox image={lightboxImage} onClose={() => setLightboxImage(null)} />
+      <Lightbox
+        images={item.images}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onNavigate={setLightboxIndex}
+      />
     </div>
   );
 }

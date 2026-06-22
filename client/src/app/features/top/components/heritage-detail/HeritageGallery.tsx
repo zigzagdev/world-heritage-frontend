@@ -10,7 +10,7 @@ export function HeritageGallery({
   images: WorldHeritageImageVm[];
   previewCount?: number;
   onOpenGallery?: () => void;
-  onSelectImage?: (img: Pick<WorldHeritageImageVm, "id" | "url" | "alt" | "credit">) => void;
+  onSelectImage?: (index: number) => void;
 }) {
   if (!images?.length) return null;
 
@@ -44,13 +44,11 @@ export function HeritageGallery({
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {preview.map((img) => (
+        {preview.map((img, index) => (
           <button
             key={img.id}
             type="button"
-            onClick={() =>
-              onSelectImage?.({ id: img.id, url: img.url, alt: img.alt, credit: img.credit })
-            }
+            onClick={() => onSelectImage?.(index)}
             className="group text-left"
             aria-label={img.alt ? `Open photo: ${img.alt}` : "Open photo"}
             title={img.alt ?? "Open photo"}

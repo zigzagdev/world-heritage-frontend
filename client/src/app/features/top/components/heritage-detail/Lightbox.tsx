@@ -1,20 +1,38 @@
 import { useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import IconButton from "@shared/uis/Icon-Button.tsx";
 import type { WorldHeritageImageVm } from "../../../../../domain/types.ts";
 
 type LightboxImage = Pick<WorldHeritageImageVm, "id" | "url" | "alt" | "credit">;
 
-export function Lightbox({ image, onClose }: { image: LightboxImage | null; onClose: () => void }) {
+export function Lightbox({
+  images,
+  index,
+  onClose,
+  onNavigate,
+}: {
+  images: LightboxImage[];
+  index: number | null;
+  onClose: () => void;
+  onNavigate: (index: number) => void;
+}) {
+  const image = index !== null ? images[index] : null;
+  const hasPrev = index !== null && index > 0;
+  const hasNext = index !== null && index < images.length - 1;
+
   useEffect(() => {
     if (!image) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft" && hasPrev) onNavigate(index! - 1);
+      if (e.key === "ArrowRight" && hasNext) onNavigate(index! + 1);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [image, onClose]);
+  }, [image, index, hasPrev, hasNext, onClose, onNavigate]);
 
   if (!image) return null;
 
@@ -32,6 +50,32 @@ export function Lightbox({ image, onClose }: { image: LightboxImage | null; onCl
       >
         <CloseIcon />
       </IconButton>
+
+      {hasPrev && (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            onNavigate(index! - 1);
+          }}
+          aria-label="Previous photo"
+          className="!absolute !left-4 !top-1/2 !-translate-y-1/2 !text-white"
+        >
+          <NavigateBeforeIcon />
+        </IconButton>
+      )}
+
+      {hasNext && (
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            onNavigate(index! + 1);
+          }}
+          aria-label="Next photo"
+          className="!absolute !right-4 !top-1/2 !-translate-y-1/2 !text-white"
+        >
+          <NavigateNextIcon />
+        </IconButton>
+      )}
 
       <figure className="max-h-full max-w-full" onClick={(e) => e.stopPropagation()}>
         <img
