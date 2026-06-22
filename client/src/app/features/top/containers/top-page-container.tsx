@@ -10,6 +10,7 @@ import { TopPagePagination } from "../components/TopPagePagination";
 import type { IdSortOption } from "../../../../domain/types";
 import { parseHeritageSearchParams } from "@features/search/mapper/search-heritages.params";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "@features/search/mapper/search-heritage.types";
+import { Spinner } from "@shared/uis/Spinner.tsx";
 
 const DEFAULT_TOP_PER_PAGE = 30;
 const DEFAULT_ORDER: IdSortOption = "asc";
@@ -94,7 +95,7 @@ export default function TopPageContainer(): React.ReactElement {
       <>
         {header}
         <main className="p-6">
-          <div>Loading…</div>
+          <Spinner />
         </main>
       </>
     );

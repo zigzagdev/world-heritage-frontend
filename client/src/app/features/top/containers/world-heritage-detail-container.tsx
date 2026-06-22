@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useWorldHeritageDetail } from "../hooks/use-world-heritage-detail";
 import { HeritageDetailLayout } from "../components/heritage-detail/HeritageDetailLayout";
 import BreadcrumbContext from "@features/breadcrumbs/BreadCrumbProvider";
+import { Spinner } from "@shared/uis/Spinner.tsx";
 
 export function WorldHeritageDetailContainer() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ export function WorldHeritageDetailContainer() {
     setLabel("/heritages/:id", label);
   }, [setLabel, isLoading, isError, item?.name]);
 
-  if (isLoading) return <p>Loading…</p>;
+  if (isLoading) return <Spinner />;
 
   if (isError) {
     return (
