@@ -33,7 +33,7 @@ export default function SearchResultsPage({
   const text = useText();
   return (
     <main className="mx-auto max-w-7xl px-4 py-12">
-      <div className="sticky top-0 z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-[49px] z-20 -mx-4 border-b border-zinc-200 bg-white/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-3">
