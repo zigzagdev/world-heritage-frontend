@@ -6,6 +6,7 @@ import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
+import { Lightbox } from "./Lightbox.tsx";
 import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
@@ -97,6 +98,7 @@ function KeyExamInfo({ item }: { item: WorldHeritageDetailVm }) {
 export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) {
   const [search, setSearch] = useState<SearchValues>(DEFAULT_SEARCH);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const setLabel = useSetBreadcrumbLabel();
   const navigate = useNavigate();
   const text = useText();
@@ -189,7 +191,7 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
           {/* Left: Overview → Gallery */}
           <div className="space-y-8" id="content">
             <HeritageOverViewSection item={item} />
-            <HeritageGallery images={item.images} />
+            <HeritageGallery images={item.images} onSelectImage={setLightboxIndex} />
           </div>
 
           {/* Right: Sidebar (PC only) */}
@@ -198,6 +200,13 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
           </div>
         </div>
       </main>
+
+      <Lightbox
+        images={item.images}
+        index={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onNavigate={setLightboxIndex}
+      />
     </div>
   );
 }
