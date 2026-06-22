@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "./Icon-Button.tsx";
 import type { WorldHeritageImageVm } from "../../domain/types.ts";
@@ -5,12 +6,23 @@ import type { WorldHeritageImageVm } from "../../domain/types.ts";
 type LightboxImage = Pick<WorldHeritageImageVm, "id" | "url" | "alt" | "credit">;
 
 export function Lightbox({ image, onClose }: { image: LightboxImage | null; onClose: () => void }) {
+  useEffect(() => {
+    if (!image) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [image, onClose]);
+
   if (!image) return null;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
+      onClick={onClose}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
     >
       <IconButton
@@ -21,7 +33,7 @@ export function Lightbox({ image, onClose }: { image: LightboxImage | null; onCl
         <CloseIcon />
       </IconButton>
 
-      <figure className="max-h-full max-w-full">
+      <figure className="max-h-full max-w-full" onClick={(e) => e.stopPropagation()}>
         <img
           src={image.url}
           alt={image.alt ?? ""}
