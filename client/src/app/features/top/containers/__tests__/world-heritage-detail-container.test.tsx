@@ -83,7 +83,7 @@ describe("WorldHeritageDetailContainer", () => {
     });
   });
 
-  test("loading の場合 'Loading…' を表示する", () => {
+  test("loading の場合 Spinner を表示する", () => {
     useWorldHeritageDetailMock.mockReturnValue({
       item: null,
       isLoading: true,
@@ -93,10 +93,10 @@ describe("WorldHeritageDetailContainer", () => {
     });
 
     renderWithRoute("/heritages/:id", "/heritages/1");
-    expect(screen.getByText("Loading…")).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
   });
 
-  test("エラーの場合 'Failed to load.' と Back ボタンを表示する", () => {
+  test("エラーの場合 ErrorPanel と Back ボタンを表示する", () => {
     useWorldHeritageDetailMock.mockReturnValue({
       item: null,
       isLoading: false,
@@ -107,7 +107,7 @@ describe("WorldHeritageDetailContainer", () => {
 
     renderWithRoute("/heritages/:id", "/heritages/1");
 
-    expect(screen.getByText("Failed to load.")).toBeInTheDocument();
+    expect(screen.getByText("Failed to load this site.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Back to World Heritages" })).toBeInTheDocument();
   });
 
