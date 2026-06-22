@@ -11,6 +11,7 @@ import type { IdSortOption } from "../../../../domain/types";
 import { parseHeritageSearchParams } from "@features/search/mapper/search-heritages.params";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "@features/search/mapper/search-heritage.types";
 import { Spinner } from "@shared/uis/Spinner.tsx";
+import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 
 const DEFAULT_TOP_PER_PAGE = 30;
 const DEFAULT_ORDER: IdSortOption = "asc";
@@ -105,11 +106,8 @@ export default function TopPageContainer(): React.ReactElement {
     return (
       <>
         {header}
-        <main className="space-y-3 p-6">
-          <div className="text-red-700">Failed to load.</div>
-          <button type="button" onClick={reload} className="underline">
-            Retry
-          </button>
+        <main className="mx-auto max-w-2xl px-4 py-12">
+          <ErrorPanel message="Failed to load World Heritage sites." onRetry={reload} />
         </main>
       </>
     );
