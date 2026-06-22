@@ -17,7 +17,6 @@ type Props = {
   onClickItem?: (id: number) => void;
   onPrev?: () => void;
   onNext?: () => void;
-  errorMessage?: string;
   onPageChange?: (page: number) => void;
   onBackToAllSites?: () => void;
 };
@@ -28,7 +27,6 @@ export default function SearchResultsPage({
   pagination,
   rangeText,
   onClickItem,
-  errorMessage,
   onPageChange,
   onBackToAllSites,
 }: Props) {
@@ -56,10 +54,6 @@ export default function SearchResultsPage({
             <p className="mt-1 text-sm text-zinc-600">
               Use filters to narrow down sites for World Heritage exam study.
             </p>
-
-            {errorMessage ? (
-              <div className="mt-1 text-sm font-semibold text-red-600">{errorMessage}</div>
-            ) : null}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">

@@ -113,7 +113,7 @@ describe("TopPageContainer", () => {
     navigateMock.mockReset();
   });
 
-  it("loading のときは Loading… を表示する", () => {
+  it("loading のときは Spinner を表示する", () => {
     useTopPageMock.mockReturnValue(
       mkHookState({
         isLoading: true,
@@ -127,7 +127,7 @@ describe("TopPageContainer", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText("Loading…")).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
     expect(screen.getByTestId("subheader")).toBeInTheDocument();
   });
 

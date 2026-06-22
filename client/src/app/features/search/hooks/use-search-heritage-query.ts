@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { HeritageSearchParams } from "../../../../domain/types.ts";
 import { fetchSearchHeritagesResult } from "../apis";
 import type { SearchParams } from "../apis/search-api";
@@ -32,8 +32,10 @@ export function useHeritageSearchQuery(
   const [data, setData] = useState<ListResult<ApiWorldHeritageDto> | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  const [reloadToken, setReloadToken] = useState(0);
 
   const request: SearchParams = useMemo(() => toSearchParams(params), [params]);
+  const refetch = useCallback(() => setReloadToken((t) => t + 1), []);
 
   useEffect(() => {
     if (!enabled) {
@@ -59,7 +61,7 @@ export function useHeritageSearchQuery(
       .finally(() => setLoading(false));
 
     return () => abortController.abort();
-  }, [enabled, request]);
+  }, [enabled, request, reloadToken]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch };
 }

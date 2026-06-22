@@ -4,6 +4,7 @@ import { useWorldHeritageDetail } from "../hooks/use-world-heritage-detail";
 import { HeritageDetailLayout } from "../components/heritage-detail/HeritageDetailLayout";
 import BreadcrumbContext from "@features/breadcrumbs/BreadCrumbProvider";
 import { Spinner } from "@shared/uis/Spinner.tsx";
+import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 
 export function WorldHeritageDetailContainer() {
   const { id } = useParams<{ id: string }>();
@@ -13,7 +14,7 @@ export function WorldHeritageDetailContainer() {
     if (!id) navigate("/heritages", { replace: true });
   }, [id, navigate]);
 
-  const { item, isLoading, isError } = useWorldHeritageDetail(id);
+  const { item, reload, isLoading, isError } = useWorldHeritageDetail(id);
   const breadcrumbCtx = useContext(BreadcrumbContext);
   if (!breadcrumbCtx) throw new Error("BreadcrumbProvider is missing");
 
@@ -28,9 +29,11 @@ export function WorldHeritageDetailContainer() {
 
   if (isError) {
     return (
-      <div>
-        <p>Failed to load.</p>
-        <button onClick={() => navigate("/heritages")}>Back to World Heritages</button>
+      <div className="mx-auto max-w-2xl px-4 py-12">
+        <ErrorPanel message="Failed to load this site." onRetry={reload} />
+        <div className="mt-4 text-center">
+          <button onClick={() => navigate("/heritages")}>Back to World Heritages</button>
+        </div>
       </div>
     );
   }

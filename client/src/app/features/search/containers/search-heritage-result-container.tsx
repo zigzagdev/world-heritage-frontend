@@ -9,17 +9,13 @@ import {
 
 import { useHeritageSearchQuery } from "../../search/hooks/use-search-heritage-query";
 import SearchResultsPage from "../components/SearchResultsPage";
-import type {
-  ApiWorldHeritageDto,
-  Pagination,
-  SearchValues,
-  WorldHeritageVm,
-} from "../../../../domain/types";
+import type { ApiWorldHeritageDto, Pagination, SearchValues } from "../../../../domain/types";
 import { toWorldHeritageListVm } from "@features/heritages/mappers/to-world-heritage-vm";
 import { HeritageSubHeader } from "@features/top/components/HeritageSubHeader";
 import { DEFAULT_HERITAGE_SEARCH_PARAMS as SEARCH_PARAMS } from "../mapper/search-heritage.types";
 import { useLocale } from "@shared/locale/LocaleHooks";
 import { Spinner } from "@shared/uis/Spinner.tsx";
+import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 
 const fmtRangeText = (pagination: Pagination, count: number): string => {
   if (count === 0) {
@@ -135,7 +131,9 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
 
   const { draft, setDraft, handleChange } = useHeritageSearchDraft(params);
 
-  const { data, isLoading, error } = useHeritageSearchQuery(params, { enabled: isSearchMode });
+  const { data, isLoading, error, refetch } = useHeritageSearchQuery(params, {
+    enabled: isSearchMode,
+  });
 
   const handleClickItem = React.useCallback(
     (id: number) => {
@@ -194,13 +192,6 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
     <HeritageSubHeader value={draft} onChange={handleChange} onSubmit={handleSubmit} />
   );
 
-  const baseProps = {
-    header,
-    onBackToAllSites: handleBackToAllSites,
-    items: [] as WorldHeritageVm[],
-    pagination: null,
-  };
-
   if (isLoading) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-12">
@@ -211,18 +202,27 @@ export function SearchHeritageResultsContainer(): React.ReactElement {
   }
 
   if (error) {
-    const message = error instanceof Error ? error.message : "Failed";
+    const message = error instanceof Error ? error.message : "Failed to load search results.";
 
-    return <SearchResultsPage {...baseProps} rangeText="Failed to load." errorMessage={message} />;
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-12">
+        {header}
+        <ErrorPanel message={message} onRetry={refetch} />
+      </main>
+    );
   }
 
   if (!data || !isValidListResult(data)) {
     return (
-      <SearchResultsPage
-        {...baseProps}
-        rangeText="Unexpected response."
-        errorMessage={!data ? undefined : "Invalid data structure: items or pagination missing."}
-      />
+      <main className="mx-auto max-w-7xl px-4 py-12">
+        {header}
+        <ErrorPanel
+          message={
+            !data ? "Unexpected response." : "Invalid data structure: items or pagination missing."
+          }
+          onRetry={refetch}
+        />
+      </main>
     );
   }
 
