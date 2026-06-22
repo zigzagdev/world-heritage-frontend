@@ -48,8 +48,15 @@ const descriptionOf = (data: ApiWorldHeritageDto, locale: Locale): string => {
   return data.short_description || "";
 };
 
-const toStatePartyLabelsJp = (codes: readonly string[]): string[] =>
-  codes.map((code) => statePartyLabels[code]).filter((label): label is string => Boolean(label));
+const toStatePartyLabels = (codes: readonly string[], locale: Locale): string[] => {
+  if (locale !== "ja") {
+    return [...codes];
+  }
+
+  return codes
+    .map((code) => statePartyLabels[code])
+    .filter((label): label is string => Boolean(label));
+};
 
 const normalizeStatePartiesMeta = (
   meta: ApiWorldHeritageDto["state_parties_meta"],
@@ -72,12 +79,12 @@ const normalizeStatePartiesMeta = (
 export function toWorldHeritageVm(data: ApiWorldHeritageDto, locale: Locale): WorldHeritageVm {
   const criteriaCodes = normalizeCriteria(data.criteria);
   const statePartyCodesRaw = data.state_party_codes ?? [];
-  const statePartyLabelsJp = toStatePartyLabelsJp(statePartyCodesRaw);
+  const statePartyLabelsLocalized = toStatePartyLabels(statePartyCodesRaw, locale);
 
   let stateParty: string | null = data.state_party;
 
-  if (!stateParty && statePartyLabelsJp.length > 0) {
-    stateParty = statePartyLabelsJp.join(", ");
+  if (!stateParty && statePartyLabelsLocalized.length > 0) {
+    stateParty = statePartyLabelsLocalized.join(", ");
   }
 
   return {
@@ -102,7 +109,7 @@ export function toWorldHeritageVm(data: ApiWorldHeritageDto, locale: Locale): Wo
     shortDescription: data.short_description,
     shortDescriptionJp: data.short_description_jp,
     unescoSiteUrl: data.unesco_site_url,
-    statePartyCodes: statePartyLabelsJp,
+    statePartyCodes: statePartyLabelsLocalized,
     statePartiesMeta: normalizeStatePartiesMeta(data.state_parties_meta),
     primaryStatePartyCode: null,
 
