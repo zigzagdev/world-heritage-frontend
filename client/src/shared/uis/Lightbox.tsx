@@ -20,6 +20,20 @@ export function Lightbox({ image, onClose }: { image: LightboxImage | null; onCl
       >
         <CloseIcon />
       </IconButton>
+
+      <figure className="max-h-full max-w-full">
+        <img
+          src={image.url}
+          alt={image.alt ?? ""}
+          referrerPolicy="no-referrer"
+          className="max-h-[85vh] max-w-full rounded-lg object-contain"
+        />
+        {image.credit && (
+          <figcaption className="mt-2 text-center text-sm text-zinc-300">
+            © {image.credit}
+          </figcaption>
+        )}
+      </figure>
     </div>
   );
 }
