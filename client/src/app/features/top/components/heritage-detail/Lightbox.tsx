@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "./Icon-Button.tsx";
-import type { WorldHeritageImageVm } from "../../domain/types.ts";
+import IconButton from "@shared/uis/Icon-Button.tsx";
+import type { WorldHeritageImageVm } from "../../../../../domain/types.ts";
 
 type LightboxImage = Pick<WorldHeritageImageVm, "id" | "url" | "alt" | "credit">;
 

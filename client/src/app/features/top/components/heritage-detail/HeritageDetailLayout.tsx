@@ -10,7 +10,7 @@ import { HeritageHero } from "./HeritageHero";
 import { HeritageOverViewSection } from "./HeritageOverviewSection";
 import { HeritageSidebar } from "./HeritageSidebar";
 import { HeritageGallery } from "./HeritageGallery";
-import { Lightbox } from "@shared/uis/Lightbox.tsx";
+import { Lightbox } from "./Lightbox.tsx";
 import { DetailHeritageMap } from "@features/top/components/heritage-detail/DetailHeritageMap.tsx";
 import { textType } from "@shared/styles/typography";
 import { useSetBreadcrumbLabel } from "@features/breadcrumbs/BreadCrumbHooks.ts";
