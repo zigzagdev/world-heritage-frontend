@@ -1,9 +1,5 @@
-import {
-  getCriteria,
-  isCriteriaCode,
-  UNESCO_CRITERIA_SOURCE_URL,
-  type Locale,
-} from "../../domain/criteria";
+import { Link } from "react-router-dom";
+import { getCriteria, isCriteriaCode, type Locale } from "../../domain/criteria";
 import type { CriteriaCode } from "../../domain/types.ts";
 
 export function CriteriaTags({
@@ -23,19 +19,17 @@ export function CriteriaTags({
     <ul className="flex flex-wrap gap-2">
       {safeCriteria.map((code) => {
         const { title, description } = getCriteria(code, locale);
-        const href = `${UNESCO_CRITERIA_SOURCE_URL}#${code}`;
 
         return (
           <li key={code}>
-            <a
-              href={href}
-              referrerPolicy="no-referrer"
+            <Link
+              to={`/heritages/criteria/${code}`}
               title={description ? `${title} — ${description}` : title}
               className="inline-flex items-center rounded bg-gray-200 px-2 py-1 text-sm hover:bg-gray-300"
             >
               <span className="font-medium">{title || code}</span>
               <span className="ml-1 opacity-70">({code})</span>
-            </a>
+            </Link>
           </li>
         );
       })}
