@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Map } from "./Map.tsx";
+import { WorldHeritageBasics } from "./WorldHeritageBasics.tsx";
 
 export default function TopPage({
   hero,
@@ -25,6 +26,8 @@ export default function TopPage({
         <div className="mt-4">
           <Map />
         </div>
+
+        <WorldHeritageBasics />
 
         <div className="pt-8">
           {content}

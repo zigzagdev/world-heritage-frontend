@@ -61,5 +61,7 @@
   "searchOtherSites": "他の遺産を検索",
   "exampleSites": "実例",
   "viewAllResults": "すべての結果を見る",
-  "unescoCriteriaSource": "UNESCO 公式の登録基準ページ"
+  "unescoCriteriaSource": "UNESCO 公式の登録基準ページ",
+  "worldHeritageBasics": "世界遺産の基礎知識",
+  "worldHeritageBasicsDescription": "すべての世界遺産は、以下の10個の登録基準のいずれか（または複数）を満たして登録されています。各基準の意味を見てみましょう。"
 }
