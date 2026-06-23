@@ -58,5 +58,8 @@
   "heroHeadline": "1,100+ UNESCO World Heritage Sites",
   "heroSubheadline": "Search and compare sites from across the globe.",
   "heroCtaLabel": "Start Exploring",
-  "searchOtherSites": "Search other sites"
+  "searchOtherSites": "Search other sites",
+  "exampleSites": "Example sites",
+  "viewAllResults": "View all results",
+  "unescoCriteriaSource": "UNESCO official criteria page"
 }
