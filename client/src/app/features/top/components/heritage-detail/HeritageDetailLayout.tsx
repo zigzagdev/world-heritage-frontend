@@ -191,7 +191,11 @@ export function HeritageDetailLayout({ item }: { item: WorldHeritageDetailVm }) 
           {/* Left: Overview → Gallery */}
           <div className="space-y-8" id="content">
             <HeritageOverViewSection item={item} />
-            <HeritageGallery images={item.images} onSelectImage={setLightboxIndex} />
+            <HeritageGallery
+              images={item.images}
+              onSelectImage={setLightboxIndex}
+              onOpenGallery={() => navigate(`/heritages/${item.id}/gallery`)}
+            />
           </div>
 
           {/* Right: Sidebar (PC only) */}
