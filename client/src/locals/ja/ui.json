@@ -69,21 +69,6 @@
   "userLastName": "姓",
   "userEmail": "メールアドレス",
   "userPassword": "パスワード",
-  "userAgeRange": "年齢層",
-  "userAgeRangeLabels": {
-    "teens": "10代",
-    "20s": "20代",
-    "30s": "30代",
-    "40s": "40代",
-    "50s": "50代",
-    "60plus": "60代以上"
-  },
-  "userSubscriptionTier": "サブスクリプション",
-  "userSubscriptionTierLabels": {
-    "free": "無料",
-    "paid": "有料"
-  },
-  "userSubscriptionExpiresAt": "サブスクリプション有効期限",
   "userCreateSubmit": "作成",
   "userCreateSuccess": "ユーザーを作成しました。",
   "userCreateError": "ユーザーの作成に失敗しました。"

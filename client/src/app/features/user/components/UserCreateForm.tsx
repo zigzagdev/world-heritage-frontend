@@ -1,12 +1,9 @@
-import { useMemo } from "react";
 import type { FormEvent } from "react";
 import TextField from "@shared/uis/TextField.tsx";
-import Select from "@shared/uis/Select.tsx";
 import { Button } from "@shared/uis/Button.tsx";
 import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
-import { AGE_RANGES, SUBSCRIPTION_TIERS } from "../types";
-import type { AgeRange, CreateUserFormValues, SubscriptionTier } from "../types";
+import type { CreateUserFormValues } from "../types";
 import type { ApiUserDto } from "../apis/user-api";
 
 type Props = {
@@ -28,31 +25,11 @@ export function UserCreateForm({
 }: Props) {
   const text = useText();
 
-  const ageRangeOptions = useMemo(
-    () => AGE_RANGES.map((v) => ({ value: v, label: text.userAgeRangeLabels[v] })),
-    [text],
-  );
-
-  const subscriptionTierOptions = useMemo(
-    () => SUBSCRIPTION_TIERS.map((v) => ({ value: v, label: text.userSubscriptionTierLabels[v] })),
-    [text],
-  );
-
-  const isPaid = value.subscriptionTier === "paid";
-
   const handleField = <K extends keyof CreateUserFormValues>(
     key: K,
     next: CreateUserFormValues[K],
   ) => {
     onChange({ ...value, [key]: next });
-  };
-
-  const handleSubscriptionTierChange = (next: SubscriptionTier) => {
-    onChange({
-      ...value,
-      subscriptionTier: next,
-      subscriptionExpiresAt: next === "free" ? null : value.subscriptionExpiresAt,
-    });
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -98,30 +75,6 @@ export function UserCreateForm({
         onChange={(e) => handleField("password", e.target.value)}
         required
       />
-      <Select<AgeRange>
-        id="user-age-range"
-        label={text.userAgeRange}
-        value={value.ageRange}
-        onChange={(next) => handleField("ageRange", next)}
-        options={ageRangeOptions}
-      />
-      <Select<SubscriptionTier>
-        id="user-subscription-tier"
-        label={text.userSubscriptionTier}
-        value={value.subscriptionTier}
-        onChange={handleSubscriptionTierChange}
-        options={subscriptionTierOptions}
-      />
-      {isPaid && (
-        <TextField
-          label={text.userSubscriptionExpiresAt}
-          type="date"
-          value={value.subscriptionExpiresAt ?? ""}
-          onChange={(e) => handleField("subscriptionExpiresAt", e.target.value || null)}
-          slotProps={{ inputLabel: { shrink: true } }}
-          required
-        />
-      )}
 
       <Button type="submit" variant="primary" isLoading={isLoading}>
         {text.userCreateSubmit}
