@@ -9,7 +9,4 @@ export type CreateUserFormValues = {
   lastName: string;
   email: string;
   password: string;
-  ageRange: AgeRange;
-  subscriptionTier: SubscriptionTier;
-  subscriptionExpiresAt: string | null;
 };
