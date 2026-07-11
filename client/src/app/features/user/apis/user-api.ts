@@ -10,9 +10,6 @@ export type CreateUserRequest = {
   last_name: string;
   email: string;
   password: string;
-  age_range: AgeRange;
-  subscription_tier: SubscriptionTier;
-  subscription_expires_at: string | null;
 };
 
 export type ApiUserDto = {
