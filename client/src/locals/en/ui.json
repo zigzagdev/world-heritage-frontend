@@ -63,5 +63,28 @@
   "viewAllResults": "View all results",
   "unescoCriteriaSource": "UNESCO official criteria page",
   "worldHeritageBasics": "World Heritage Basics",
-  "worldHeritageBasicsDescription": "Every site is inscribed under one or more of these 10 selection criteria. Explore what each one means."
+  "worldHeritageBasicsDescription": "Every site is inscribed under one or more of these 10 selection criteria. Explore what each one means.",
+  "userCreateTitle": "Create User",
+  "userFirstName": "First Name",
+  "userLastName": "Last Name",
+  "userEmail": "Email",
+  "userPassword": "Password",
+  "userAgeRange": "Age Range",
+  "userAgeRangeLabels": {
+    "teens": "Teens",
+    "20s": "20s",
+    "30s": "30s",
+    "40s": "40s",
+    "50s": "50s",
+    "60plus": "60+"
+  },
+  "userSubscriptionTier": "Subscription",
+  "userSubscriptionTierLabels": {
+    "free": "Free",
+    "paid": "Paid"
+  },
+  "userSubscriptionExpiresAt": "Subscription Expires At",
+  "userCreateSubmit": "Create",
+  "userCreateSuccess": "User created successfully.",
+  "userCreateError": "Failed to create user."
 }
