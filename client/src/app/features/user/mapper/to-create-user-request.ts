@@ -6,7 +6,4 @@ export const toCreateUserRequest = (values: CreateUserFormValues): CreateUserReq
   last_name: values.lastName.trim(),
   email: values.email.trim(),
   password: values.password,
-  age_range: values.ageRange,
-  subscription_tier: values.subscriptionTier,
-  subscription_expires_at: values.subscriptionTier === "paid" ? values.subscriptionExpiresAt : null,
 });
