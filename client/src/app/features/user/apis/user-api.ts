@@ -34,7 +34,7 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
   }
 
   const base = normalizeApiBase(apiBase);
-  const endpoint = `${base}/api/v1/users`;
+  const endpoint = `${base}/api/v1/user/create`;
 
   const withCommonInit = (init?: RequestInit): RequestInit => ({
     ...init,
