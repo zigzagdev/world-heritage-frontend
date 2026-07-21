@@ -63,5 +63,9 @@
   "viewAllResults": "View all results",
   "unescoCriteriaSource": "UNESCO official criteria page",
   "worldHeritageBasics": "World Heritage Basics",
-  "worldHeritageBasicsDescription": "Every site is inscribed under one or more of these 10 selection criteria. Explore what each one means."
+  "worldHeritageBasicsDescription": "Every site is inscribed under one or more of these 10 selection criteria. Explore what each one means.",
+  "userEmail": "Email",
+  "userPassword": "Password",
+  "login": "Login",
+  "loginError": "Failed to log in."
 }
