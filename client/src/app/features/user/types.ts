@@ -10,3 +10,13 @@ export type CreateUserFormValues = {
   email: string;
   password: string;
 };
+
+export type UserProfile = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  ageRange: AgeRange;
+  subscriptionTier: SubscriptionTier;
+  subscriptionExpiresAt: string | null;
+};
