@@ -26,6 +26,10 @@ export type ApiCreateUserResponse =
   | { status: "success"; data: ApiUserDto }
   | { status: "error"; data: unknown };
 
+export type ApiGetUserResponse =
+  | { status: "success"; data: ApiUserDto }
+  | { status: "error"; data: unknown };
+
 const normalizeApiBase = (apiBase: string): string => apiBase.replace(/\/+$/, "");
 
 export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
@@ -48,6 +52,17 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
     signal: init?.signal,
   });
 
+  const withGetInit = (init?: RequestInit): RequestInit => ({
+    ...init,
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      ...(init?.headers ?? {}),
+    },
+    credentials: init?.credentials ?? "omit",
+    signal: init?.signal,
+  });
+
   return {
     async createUser(request: CreateUserRequest, init?: RequestInit): Promise<ApiUserDto> {
       const response = await fetchImpl(endpoint, {
@@ -60,6 +75,21 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
       }
 
       const json = (await response.json()) as ApiCreateUserResponse;
+      if (json.status !== "success") {
+        throw new Error(`API status is not success: ${json.status}`);
+      }
+
+      return json.data;
+    },
+
+    async getUser(id: number, init?: RequestInit): Promise<ApiUserDto> {
+      const response = await fetchImpl(`${endpoint}/${id}`, withGetInit(init));
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const json = (await response.json()) as ApiGetUserResponse;
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }

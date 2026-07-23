@@ -126,6 +126,39 @@ describe("createUserApi", () => {
     });
   });
 
+  describe("getUser", () => {
+    it("gets the user by id", async () => {
+      const user = makeUserDto();
+      fetchSpy.mockResolvedValue(makeOkResponse({ status: "success", data: user }) as Response);
+
+      const out = await api.getUser(1);
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `${ENDPOINT}/1`,
+        expect.objectContaining({
+          method: "GET",
+          headers: expect.objectContaining({ Accept: "application/json" }),
+          credentials: "omit",
+        }),
+      );
+      expect(out).toEqual(user);
+    });
+
+    it("throws on HTTP error", async () => {
+      fetchSpy.mockResolvedValue(makeNgResponse(404) as Response);
+
+      await expect(api.getUser(1)).rejects.toThrow("HTTP 404");
+    });
+
+    it("throws when API status is not success", async () => {
+      fetchSpy.mockResolvedValue(
+        makeOkResponse({ status: "error", data: { message: "not found" } }) as Response,
+      );
+
+      await expect(api.getUser(1)).rejects.toThrow("API status is not success: error");
+    });
+  });
+
   it("throws when apiBase is empty", () => {
     expect(() => createUserApi({ apiBase: "", fetchImpl: fetchSpy })).toThrow(
       "apiBase is required",

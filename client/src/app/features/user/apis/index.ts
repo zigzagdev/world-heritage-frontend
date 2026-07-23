@@ -9,3 +9,4 @@ if (!apiBase) {
 const userApi = createUserApi({ apiBase });
 
 export const createUser = userApi.createUser;
+export const getUser = userApi.getUser;
