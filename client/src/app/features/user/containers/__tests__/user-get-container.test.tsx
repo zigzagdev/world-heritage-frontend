@@ -1,6 +1,5 @@
 /** @jest-environment jsdom */
 
-import { jest } from "@jest/globals";
 import type { UserProfile } from "../../types";
 
 const useGetUserMock = jest.fn();
@@ -10,7 +9,6 @@ jest.mock("../../hooks/use-get-user", () => ({
 }));
 
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "@jest/globals";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { UserGetContainer } from "../user-get-container";
