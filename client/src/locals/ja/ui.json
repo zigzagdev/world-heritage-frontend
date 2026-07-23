@@ -71,5 +71,7 @@
   "userPassword": "パスワード",
   "userCreateSubmit": "作成",
   "userCreateSuccess": "ユーザーを作成しました。",
-  "userCreateError": "ユーザーの作成に失敗しました。"
+  "userCreateError": "ユーザーの作成に失敗しました。",
+  "userProfileTitle": "ユーザープロフィール",
+  "userGetError": "ユーザー情報の取得に失敗しました。"
 }

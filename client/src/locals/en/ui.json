@@ -71,5 +71,7 @@
   "userPassword": "Password",
   "userCreateSubmit": "Create",
   "userCreateSuccess": "User created successfully.",
-  "userCreateError": "Failed to create user."
+  "userCreateError": "Failed to create user.",
+  "userProfileTitle": "User Profile",
+  "userGetError": "Failed to load user."
 }
