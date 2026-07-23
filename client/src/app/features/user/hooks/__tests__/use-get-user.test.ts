@@ -90,7 +90,10 @@ describe("useGetUser", () => {
 
     expect(result.current.data).toEqual(profile);
     expect(result.current.error).toBeNull();
-    expect(getUserMock).toHaveBeenCalledWith(1, expect.objectContaining({ signal: expect.any(Object) }));
+    expect(getUserMock).toHaveBeenCalledWith(
+      1,
+      expect.objectContaining({ signal: expect.any(Object) }),
+    );
     expect(toUserProfileMock).toHaveBeenCalledWith(dto);
   });
 
@@ -156,7 +159,10 @@ describe("useGetUser", () => {
     });
 
     await waitFor(() => expect(result.current.data).toEqual(profile));
-    expect(getUserMock).toHaveBeenLastCalledWith(2, expect.objectContaining({ signal: expect.any(Object) }));
+    expect(getUserMock).toHaveBeenLastCalledWith(
+      2,
+      expect.objectContaining({ signal: expect.any(Object) }),
+    );
   });
 
   test("アンマウント時に現在のリクエストを abort する", () => {
