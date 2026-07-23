@@ -7,7 +7,7 @@ type MockResponse = Pick<Response, "ok" | "status" | "json">;
 let fetchSpy: jest.MockedFunction<typeof fetch>;
 
 const API_BASE = "http://localhost:8700";
-const ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/users`;
+const ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/user/create`;
 
 const makeOkResponse = (body: ApiCreateUserResponse): MockResponse => ({
   ok: true,
