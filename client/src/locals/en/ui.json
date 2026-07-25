@@ -75,5 +75,9 @@
   "userProfileTitle": "User Profile",
   "userGetError": "Failed to load user.",
   "userAgeRange": "Age Range",
-  "userSubscriptionTier": "Subscription"
+  "userSubscriptionTier": "Subscription",
+  "userUpdateEdit": "Edit",
+  "userUpdateSubmit": "Save",
+  "userUpdateCancel": "Cancel",
+  "userUpdateError": "Failed to update user."
 }

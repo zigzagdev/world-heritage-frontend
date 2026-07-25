@@ -1,15 +1,100 @@
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent } from "react";
+import TextField from "@shared/uis/TextField.tsx";
+import { Button } from "@shared/uis/Button.tsx";
+import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
 import type { UserProfile } from "../types";
+import type { UpdateUserFormValues } from "../mapper/to-update-user-request";
 
 type Props = {
   profile: UserProfile;
+  onUpdate: (values: UpdateUserFormValues) => void;
+  isUpdating: boolean;
+  updateError: unknown;
 };
 
 const initials = (firstName: string, lastName: string): string =>
   `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
-export function UserProfileView({ profile }: Props) {
+const toFormValues = (profile: UserProfile): UpdateUserFormValues => ({
+  firstName: profile.firstName,
+  lastName: profile.lastName,
+  email: profile.email,
+});
+
+export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: Props) {
   const text = useText();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formValues, setFormValues] = useState<UpdateUserFormValues>(() => toFormValues(profile));
+  const wasUpdatingRef = useRef(false);
+
+  useEffect(() => {
+    if (wasUpdatingRef.current && !isUpdating && updateError == null) {
+      setIsEditing(false);
+    }
+    wasUpdatingRef.current = isUpdating;
+  }, [isUpdating, updateError]);
+
+  const handleField = <K extends keyof UpdateUserFormValues>(
+    key: K,
+    next: UpdateUserFormValues[K],
+  ) => {
+    setFormValues((prev) => ({ ...prev, [key]: next }));
+  };
+
+  const handleEdit = () => {
+    setFormValues(toFormValues(profile));
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    onUpdate(formValues);
+  };
+
+  if (isEditing) {
+    return (
+      <form onSubmit={handleSubmit} className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-12">
+        <h1 className="text-xl font-bold">{text.userProfileTitle}</h1>
+
+        {updateError != null && <ErrorPanel message={text.userUpdateError} />}
+
+        <TextField
+          label={text.userFirstName}
+          value={formValues.firstName}
+          onChange={(e) => handleField("firstName", e.target.value)}
+          required
+        />
+        <TextField
+          label={text.userLastName}
+          value={formValues.lastName}
+          onChange={(e) => handleField("lastName", e.target.value)}
+          required
+        />
+        <TextField
+          label={text.userEmail}
+          type="email"
+          value={formValues.email}
+          onChange={(e) => handleField("email", e.target.value)}
+          required
+        />
+
+        <div className="flex gap-3">
+          <Button type="submit" variant="primary" isLoading={isUpdating}>
+            {text.userUpdateSubmit}
+          </Button>
+          <Button type="button" variant="secondary" onClick={handleCancel} disabled={isUpdating}>
+            {text.userUpdateCancel}
+          </Button>
+        </div>
+      </form>
+    );
+  }
 
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center gap-6 px-4 py-12">
@@ -31,6 +116,10 @@ export function UserProfileView({ profile }: Props) {
         <ProfileRow label={text.userAgeRange} value={profile.ageRange} />
         <ProfileRow label={text.userSubscriptionTier} value={profile.subscriptionTier} />
       </div>
+
+      <Button type="button" variant="secondary" onClick={handleEdit}>
+        {text.userUpdateEdit}
+      </Button>
     </div>
   );
 }

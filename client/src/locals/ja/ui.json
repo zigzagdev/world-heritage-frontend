@@ -75,5 +75,9 @@
   "userProfileTitle": "ユーザープロフィール",
   "userGetError": "ユーザー情報の取得に失敗しました。",
   "userAgeRange": "年代",
-  "userSubscriptionTier": "サブスクリプション"
+  "userSubscriptionTier": "サブスクリプション",
+  "userUpdateEdit": "編集",
+  "userUpdateSubmit": "保存",
+  "userUpdateCancel": "キャンセル",
+  "userUpdateError": "ユーザー情報の更新に失敗しました。"
 }
