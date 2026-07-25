@@ -12,6 +12,12 @@ export type CreateUserRequest = {
   password: string;
 };
 
+export type UpdateUserRequest = {
+  first_name: string;
+  last_name: string;
+  email: string;
+};
+
 export type ApiUserDto = {
   id: number;
   first_name: string;
@@ -27,6 +33,10 @@ export type ApiCreateUserResponse =
   | { status: "error"; data: unknown };
 
 export type ApiGetUserResponse =
+  | { status: "success"; data: ApiUserDto }
+  | { status: "error"; data: unknown };
+
+export type ApiUpdateUserResponse =
   | { status: "success"; data: ApiUserDto }
   | { status: "error"; data: unknown };
 
@@ -64,6 +74,18 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
     signal: init?.signal,
   });
 
+  const withPatchInit = (init?: RequestInit): RequestInit => ({
+    ...init,
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      ...(init?.headers ?? {}),
+    },
+    credentials: init?.credentials ?? "omit",
+    signal: init?.signal,
+  });
+
   return {
     async createUser(request: CreateUserRequest, init?: RequestInit): Promise<ApiUserDto> {
       const response = await fetchImpl(createEndpoint, {
@@ -91,6 +113,28 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
       }
 
       const json = (await response.json()) as ApiGetUserResponse;
+      if (json.status !== "success") {
+        throw new Error(`API status is not success: ${json.status}`);
+      }
+
+      return json.data;
+    },
+
+    async updateUser(
+      id: number,
+      request: UpdateUserRequest,
+      init?: RequestInit,
+    ): Promise<ApiUserDto> {
+      const response = await fetchImpl(`${usersEndpoint}/${id}`, {
+        ...withPatchInit(init),
+        body: JSON.stringify(request),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const json = (await response.json()) as ApiUpdateUserResponse;
       if (json.status !== "success") {
         throw new Error(`API status is not success: ${json.status}`);
       }
