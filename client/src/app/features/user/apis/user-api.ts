@@ -38,7 +38,8 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
   }
 
   const base = normalizeApiBase(apiBase);
-  const endpoint = `${base}/api/v1/user/create`;
+  const createEndpoint = `${base}/api/v1/user/create`;
+  const usersEndpoint = `${base}/api/v1/users`;
 
   const withCommonInit = (init?: RequestInit): RequestInit => ({
     ...init,
@@ -65,7 +66,7 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
 
   return {
     async createUser(request: CreateUserRequest, init?: RequestInit): Promise<ApiUserDto> {
-      const response = await fetchImpl(endpoint, {
+      const response = await fetchImpl(createEndpoint, {
         ...withCommonInit(init),
         body: JSON.stringify(request),
       });
@@ -83,7 +84,7 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
     },
 
     async getUser(id: number, init?: RequestInit): Promise<ApiUserDto> {
-      const response = await fetchImpl(`${endpoint}/${id}`, withGetInit(init));
+      const response = await fetchImpl(`${usersEndpoint}/${id}`, withGetInit(init));
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);

@@ -8,6 +8,7 @@ let fetchSpy: jest.MockedFunction<typeof fetch>;
 
 const API_BASE = "http://localhost:8700";
 const ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/user/create`;
+const USERS_ENDPOINT = `${API_BASE.replace(/\/+$/, "")}/api/v1/users`;
 
 const makeOkResponse = (body: ApiCreateUserResponse): MockResponse => ({
   ok: true,
@@ -134,7 +135,7 @@ describe("createUserApi", () => {
       const out = await api.getUser(1);
 
       expect(fetchSpy).toHaveBeenCalledWith(
-        `${ENDPOINT}/1`,
+        `${USERS_ENDPOINT}/1`,
         expect.objectContaining({
           method: "GET",
           headers: expect.objectContaining({ Accept: "application/json" }),
