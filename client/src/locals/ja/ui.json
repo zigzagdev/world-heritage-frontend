@@ -73,5 +73,7 @@
   "userCreateSuccess": "ユーザーを作成しました。",
   "userCreateError": "ユーザーの作成に失敗しました。",
   "userProfileTitle": "ユーザープロフィール",
-  "userGetError": "ユーザー情報の取得に失敗しました。"
+  "userGetError": "ユーザー情報の取得に失敗しました。",
+  "userAgeRange": "年代",
+  "userSubscriptionTier": "サブスクリプション"
 }

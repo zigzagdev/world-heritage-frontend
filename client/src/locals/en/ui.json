@@ -73,5 +73,7 @@
   "userCreateSuccess": "User created successfully.",
   "userCreateError": "Failed to create user.",
   "userProfileTitle": "User Profile",
-  "userGetError": "Failed to load user."
+  "userGetError": "Failed to load user.",
+  "userAgeRange": "Age Range",
+  "userSubscriptionTier": "Subscription"
 }
