@@ -1,6 +1,11 @@
 import { describe, it, expect, beforeEach, jest } from "@jest/globals";
 import { createUserApi } from "./user-api";
-import type { ApiCreateUserResponse, ApiUserDto, CreateUserRequest } from "./user-api";
+import type {
+  ApiCreateUserResponse,
+  ApiUserDto,
+  CreateUserRequest,
+  UpdateUserRequest,
+} from "./user-api";
 
 type MockResponse = Pick<Response, "ok" | "status" | "json">;
 
@@ -27,6 +32,13 @@ const makeRequest = (overrides: Partial<CreateUserRequest> = {}): CreateUserRequ
   last_name: "Yamada",
   email: "taro@example.com",
   password: "password123",
+  ...overrides,
+});
+
+const makeUpdateRequest = (overrides: Partial<UpdateUserRequest> = {}): UpdateUserRequest => ({
+  first_name: "Jiro",
+  last_name: "Sato",
+  email: "jiro@example2.com",
   ...overrides,
 });
 
@@ -157,6 +169,50 @@ describe("createUserApi", () => {
       );
 
       await expect(api.getUser(1)).rejects.toThrow("API status is not success: error");
+    });
+  });
+
+  describe("updateUser", () => {
+    it("patches the request body to the users endpoint", async () => {
+      const user = makeUserDto({
+        first_name: "Jiro",
+        last_name: "Sato",
+        email: "jiro@example2.com",
+      });
+      fetchSpy.mockResolvedValue(makeOkResponse({ status: "success", data: user }) as Response);
+
+      const request = makeUpdateRequest();
+      const out = await api.updateUser(1, request);
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `${USERS_ENDPOINT}/1`,
+        expect.objectContaining({
+          method: "PATCH",
+          body: JSON.stringify(request),
+          headers: expect.objectContaining({
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          }),
+          credentials: "omit",
+        }),
+      );
+      expect(out).toEqual(user);
+    });
+
+    it("throws on HTTP error", async () => {
+      fetchSpy.mockResolvedValue(makeNgResponse(422) as Response);
+
+      await expect(api.updateUser(1, makeUpdateRequest())).rejects.toThrow("HTTP 422");
+    });
+
+    it("throws when API status is not success", async () => {
+      fetchSpy.mockResolvedValue(
+        makeOkResponse({ status: "error", data: { message: "invalid" } }) as Response,
+      );
+
+      await expect(api.updateUser(1, makeUpdateRequest())).rejects.toThrow(
+        "API status is not success: error",
+      );
     });
   });
 
