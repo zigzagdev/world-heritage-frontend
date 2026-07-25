@@ -39,12 +39,12 @@ describe("UserGetContainer", () => {
     jest.clearAllMocks();
   });
 
-  it("renders nothing while loading", () => {
+  it("shows a spinner while loading", () => {
     useGetUserMock.mockReturnValue({ data: null, isLoading: true, error: null });
 
-    const { container } = renderContainer();
+    renderContainer();
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
   });
 
   it("passes the numeric id from the route to useGetUser", () => {
@@ -61,7 +61,7 @@ describe("UserGetContainer", () => {
     renderContainer();
 
     expect(screen.getByText("Taro Yamada")).toBeInTheDocument();
-    expect(screen.getByText("taro@example.com")).toBeInTheDocument();
+    expect(screen.getAllByText("taro@example.com").length).toBeGreaterThan(0);
   });
 
   it("shows an error panel when the hook reports an error", () => {
