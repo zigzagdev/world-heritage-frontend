@@ -98,7 +98,7 @@ describe("UserGetContainer", () => {
 
     renderContainer("42");
 
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
     fireEvent.change(screen.getByLabelText(/^First Name/), { target: { value: "Jiro" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
