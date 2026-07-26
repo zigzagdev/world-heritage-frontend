@@ -86,6 +86,17 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
     signal: init?.signal,
   });
 
+  const withDeleteInit = (init?: RequestInit): RequestInit => ({
+    ...init,
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+      ...(init?.headers ?? {}),
+    },
+    credentials: init?.credentials ?? "omit",
+    signal: init?.signal,
+  });
+
   return {
     async createUser(request: CreateUserRequest, init?: RequestInit): Promise<ApiUserDto> {
       const response = await fetchImpl(createEndpoint, {
@@ -140,6 +151,14 @@ export const createUserApi = ({ apiBase, fetchImpl = fetch }: UserApiDeps) => {
       }
 
       return json.data;
+    },
+
+    async deleteUser(id: number, init?: RequestInit): Promise<void> {
+      const response = await fetchImpl(`${usersEndpoint}/${id}`, withDeleteInit(init));
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
     },
   };
 };
