@@ -4,6 +4,7 @@ import type { UserProfile } from "../../types";
 
 const useGetUserMock = jest.fn();
 const useUpdateUserMock = jest.fn();
+const useDeleteUserMock = jest.fn();
 
 jest.mock("../../hooks/use-get-user", () => ({
   useGetUser: (id: number) => useGetUserMock(id),
@@ -11,6 +12,10 @@ jest.mock("../../hooks/use-get-user", () => ({
 
 jest.mock("../../hooks/use-update-user", () => ({
   useUpdateUser: () => useUpdateUserMock(),
+}));
+
+jest.mock("../../hooks/use-delete-user", () => ({
+  useDeleteUser: () => useDeleteUserMock(),
 }));
 
 import { render, screen, fireEvent } from "@testing-library/react";
@@ -34,19 +39,27 @@ const renderContainer = (id = "1") =>
       <LocaleProvider>
         <Routes>
           <Route path="/users/:id" element={<UserGetContainer />} />
+          <Route path="/heritages" element={<div>Heritages Home</div>} />
         </Routes>
       </LocaleProvider>
     </MemoryRouter>,
   );
 
 describe("UserGetContainer", () => {
-  const submitMock = jest.fn();
+  const submitUpdateMock = jest.fn();
+  const submitDeleteMock = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     useUpdateUserMock.mockReturnValue({
-      submit: submitMock,
+      submit: submitUpdateMock,
       data: null,
+      isLoading: false,
+      error: null,
+    });
+    useDeleteUserMock.mockReturnValue({
+      submit: submitDeleteMock,
+      done: false,
       isLoading: false,
       error: null,
     });
@@ -102,7 +115,7 @@ describe("UserGetContainer", () => {
     fireEvent.change(screen.getByLabelText(/^First Name/), { target: { value: "Jiro" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
-    expect(submitMock).toHaveBeenCalledWith(
+    expect(submitUpdateMock).toHaveBeenCalledWith(
       42,
       expect.objectContaining({ firstName: "Jiro", lastName: "Yamada", email: "taro@example.com" }),
     );
@@ -111,7 +124,7 @@ describe("UserGetContainer", () => {
   it("reflects the updated profile immediately once useUpdateUser returns data", () => {
     useGetUserMock.mockReturnValue({ data: profile, isLoading: false, error: null });
     useUpdateUserMock.mockReturnValue({
-      submit: submitMock,
+      submit: submitUpdateMock,
       data: { ...profile, firstName: "Jiro" },
       isLoading: false,
       error: null,
@@ -120,5 +133,30 @@ describe("UserGetContainer", () => {
     renderContainer();
 
     expect(screen.getByText("Jiro Yamada")).toBeInTheDocument();
+  });
+
+  it("calls useDeleteUser's submit with the numeric id after confirming deletion", () => {
+    useGetUserMock.mockReturnValue({ data: profile, isLoading: false, error: null });
+
+    renderContainer("42");
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete User" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete User" }));
+
+    expect(submitDeleteMock).toHaveBeenCalledWith(42);
+  });
+
+  it("navigates to /heritages once useDeleteUser reports done", () => {
+    useGetUserMock.mockReturnValue({ data: profile, isLoading: false, error: null });
+    useDeleteUserMock.mockReturnValue({
+      submit: submitDeleteMock,
+      done: true,
+      isLoading: false,
+      error: null,
+    });
+
+    renderContainer();
+
+    expect(screen.getByText("Heritages Home")).toBeInTheDocument();
   });
 });

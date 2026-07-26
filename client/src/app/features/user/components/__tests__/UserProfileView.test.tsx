@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { UserProfileView } from "../UserProfileView";
@@ -22,6 +22,9 @@ const renderView = (props: Partial<React.ComponentProps<typeof UserProfileView>>
     onUpdate: jest.fn(),
     isUpdating: false,
     updateError: null,
+    onDelete: jest.fn(),
+    isDeleting: false,
+    deleteError: null,
     ...props,
   };
 
@@ -125,7 +128,14 @@ describe("UserProfileView", () => {
     rerender(
       <MemoryRouter>
         <LocaleProvider>
-          <UserProfileView profile={profile} onUpdate={jest.fn()} {...props} />
+          <UserProfileView
+            profile={profile}
+            onUpdate={jest.fn()}
+            onDelete={jest.fn()}
+            isDeleting={false}
+            deleteError={null}
+            {...props}
+          />
         </LocaleProvider>
       </MemoryRouter>,
     );
@@ -149,5 +159,46 @@ describe("UserProfileView", () => {
 
     expect(screen.queryByLabelText(/^First Name/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Edit First Name" })).toBeInTheDocument();
+  });
+
+  it("opens a confirmation dialog when Delete User is clicked", () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete User" }));
+
+    expect(
+      screen.getByText("Are you sure you want to delete this user?", { exact: false }),
+    ).toBeInTheDocument();
+  });
+
+  it("closes the dialog without calling onDelete when Cancel is clicked", async () => {
+    const onDelete = jest.fn();
+    renderView({ onDelete });
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete User" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+
+    expect(onDelete).not.toHaveBeenCalled();
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Are you sure you want to delete this user?", { exact: false }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("calls onDelete when the dialog's Delete User button is confirmed", () => {
+    const onDelete = jest.fn();
+    renderView({ onDelete });
+
+    fireEvent.click(screen.getByRole("button", { name: "Delete User" }));
+    fireEvent.click(screen.getByRole("button", { name: "Delete User" }));
+
+    expect(onDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows an error panel when deleteError is present", () => {
+    renderView({ deleteError: new Error("boom") });
+
+    expect(screen.getByText("Failed to delete user.")).toBeInTheDocument();
   });
 });

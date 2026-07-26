@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 import TextField from "@shared/uis/TextField.tsx";
 import { Button } from "@shared/uis/Button.tsx";
 import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
@@ -12,6 +16,9 @@ type Props = {
   onUpdate: (values: UpdateUserFormValues) => void;
   isUpdating: boolean;
   updateError: unknown;
+  onDelete: () => void;
+  isDeleting: boolean;
+  deleteError: unknown;
 };
 
 type EditableField = keyof UpdateUserFormValues;
@@ -25,11 +32,21 @@ const toFormValues = (profile: UserProfile): UpdateUserFormValues => ({
   email: profile.email,
 });
 
-export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: Props) {
+export function UserProfileView({
+  profile,
+  onUpdate,
+  isUpdating,
+  updateError,
+  onDelete,
+  isDeleting,
+  deleteError,
+}: Props) {
   const text = useText();
   const [editingField, setEditingField] = useState<EditableField | null>(null);
   const [fieldValue, setFieldValue] = useState("");
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const wasUpdatingRef = useRef(false);
+  const wasDeletingRef = useRef(false);
 
   useEffect(() => {
     if (wasUpdatingRef.current && !isUpdating && updateError == null) {
@@ -37,6 +54,13 @@ export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: 
     }
     wasUpdatingRef.current = isUpdating;
   }, [isUpdating, updateError]);
+
+  useEffect(() => {
+    if (wasDeletingRef.current && !isDeleting && deleteError != null) {
+      setIsConfirmingDelete(false);
+    }
+    wasDeletingRef.current = isDeleting;
+  }, [isDeleting, deleteError]);
 
   const startEditing = (field: EditableField) => {
     setFieldValue(profile[field]);
@@ -51,6 +75,10 @@ export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: 
     e.preventDefault();
     if (!editingField) return;
     onUpdate({ ...toFormValues(profile), [editingField]: fieldValue });
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete();
   };
 
   return (
@@ -118,6 +146,40 @@ export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: 
         <ProfileRow label={text.userAgeRange} value={profile.ageRange} />
         <ProfileRow label={text.userSubscriptionTier} value={profile.subscriptionTier} />
       </div>
+
+      {deleteError != null && <ErrorPanel message={text.userDeleteError} />}
+
+      <Button
+        type="button"
+        variant="destructive"
+        onClick={() => setIsConfirmingDelete(true)}
+        disabled={isDeleting}
+      >
+        {text.userDeleteButton}
+      </Button>
+
+      <Dialog open={isConfirmingDelete} onClose={() => setIsConfirmingDelete(false)}>
+        <DialogTitle>{text.userDeleteConfirmTitle}</DialogTitle>
+        <DialogContent>{text.userDeleteConfirmMessage}</DialogContent>
+        <DialogActions>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setIsConfirmingDelete(false)}
+            disabled={isDeleting}
+          >
+            {text.userUpdateCancel}
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={handleConfirmDelete}
+            isLoading={isDeleting}
+          >
+            {text.userDeleteButton}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
