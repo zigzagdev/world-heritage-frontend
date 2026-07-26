@@ -48,7 +48,7 @@ describe("UserProfileView", () => {
     expect(screen.getAllByText("taro@example.com").length).toBeGreaterThan(0);
   });
 
-  it("renders a profile row for each field", () => {
+  it("renders a profile row for each field, with an edit trigger only for editable ones", () => {
     renderView();
 
     expect(screen.getByText("First Name")).toBeInTheDocument();
@@ -57,24 +57,31 @@ describe("UserProfileView", () => {
     expect(screen.getByText("teens")).toBeInTheDocument();
     expect(screen.getByText("Subscription")).toBeInTheDocument();
     expect(screen.getByText("free")).toBeInTheDocument();
+
+    expect(screen.getByRole("button", { name: "Edit First Name" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit Last Name" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit Email" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Edit Age Range" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Edit Subscription" })).not.toBeInTheDocument();
   });
 
-  it("switches to an edit form pre-filled with the current profile when Edit is clicked", () => {
+  it("turns only the selected field into an input, pre-filled with its current value", () => {
     renderView();
 
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
 
     expect(screen.getByLabelText(/^First Name/)).toHaveValue("Taro");
-    expect(screen.getByLabelText(/^Last Name/)).toHaveValue("Yamada");
-    expect(screen.getByLabelText(/^Email/)).toHaveValue("taro@example.com");
-    expect(screen.queryByLabelText(/age range/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Last Name/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Email/)).not.toBeInTheDocument();
+    expect(screen.getByText("Yamada")).toBeInTheDocument();
+    expect(screen.getAllByText("taro@example.com").length).toBeGreaterThan(0);
   });
 
-  it("calls onUpdate with the edited values on save", () => {
+  it("calls onUpdate with the full field set, only the edited field changed, on save", () => {
     const onUpdate = jest.fn();
     renderView({ onUpdate });
 
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
     fireEvent.change(screen.getByLabelText(/^First Name/), { target: { value: "Jiro" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
@@ -85,64 +92,62 @@ describe("UserProfileView", () => {
     });
   });
 
+  it("switching to editing another field cancels the previous one", () => {
+    renderView();
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit Last Name" }));
+
+    expect(screen.queryByLabelText(/^First Name/)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/^Last Name/)).toHaveValue("Yamada");
+  });
+
   it("returns to view mode when Cancel is clicked", () => {
     renderView();
 
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
     fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
-    expect(screen.getByText("Taro Yamada")).toBeInTheDocument();
     expect(screen.queryByLabelText(/^First Name/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit First Name" })).toBeInTheDocument();
   });
 
-  it("shows an error panel in edit mode when updateError is present", () => {
+  it("shows an error panel when updateError is present", () => {
     renderView({ updateError: new Error("boom") });
-
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
     expect(screen.getByText("Failed to update user.")).toBeInTheDocument();
   });
 
-  it("stays in edit mode when isUpdating transitions to false with an error", () => {
-    const { rerender } = renderView({ isUpdating: true, updateError: null });
-
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-
+  const rerenderWith = (
+    rerender: (ui: React.ReactElement) => void,
+    props: { isUpdating: boolean; updateError: unknown },
+  ) =>
     rerender(
       <MemoryRouter>
         <LocaleProvider>
-          <UserProfileView
-            profile={profile}
-            onUpdate={jest.fn()}
-            isUpdating={false}
-            updateError={new Error("boom")}
-          />
+          <UserProfileView profile={profile} onUpdate={jest.fn()} {...props} />
         </LocaleProvider>
       </MemoryRouter>,
     );
+
+  it("stays in edit mode when isUpdating transitions to false with an error", () => {
+    const { rerender } = renderView();
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
+    rerenderWith(rerender, { isUpdating: true, updateError: null });
+    rerenderWith(rerender, { isUpdating: false, updateError: new Error("boom") });
 
     expect(screen.getByLabelText(/^First Name/)).toBeInTheDocument();
   });
 
   it("returns to view mode when isUpdating transitions to false without an error", () => {
-    const { rerender } = renderView({ isUpdating: true, updateError: null });
+    const { rerender } = renderView();
 
-    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
-
-    rerender(
-      <MemoryRouter>
-        <LocaleProvider>
-          <UserProfileView
-            profile={profile}
-            onUpdate={jest.fn()}
-            isUpdating={false}
-            updateError={null}
-          />
-        </LocaleProvider>
-      </MemoryRouter>,
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
+    rerenderWith(rerender, { isUpdating: true, updateError: null });
+    rerenderWith(rerender, { isUpdating: false, updateError: null });
 
     expect(screen.queryByLabelText(/^First Name/)).not.toBeInTheDocument();
-    expect(screen.getByText("Taro Yamada")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Edit First Name" })).toBeInTheDocument();
   });
 });
