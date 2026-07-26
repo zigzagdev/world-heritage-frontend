@@ -3,12 +3,17 @@
 import type { UserProfile } from "../../types";
 
 const useGetUserMock = jest.fn();
+const useUpdateUserMock = jest.fn();
 
 jest.mock("../../hooks/use-get-user", () => ({
   useGetUser: (id: number) => useGetUserMock(id),
 }));
 
-import { render, screen } from "@testing-library/react";
+jest.mock("../../hooks/use-update-user", () => ({
+  useUpdateUser: () => useUpdateUserMock(),
+}));
+
+import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { UserGetContainer } from "../user-get-container";
@@ -35,8 +40,16 @@ const renderContainer = (id = "1") =>
   );
 
 describe("UserGetContainer", () => {
+  const submitMock = jest.fn();
+
   beforeEach(() => {
     jest.clearAllMocks();
+    useUpdateUserMock.mockReturnValue({
+      submit: submitMock,
+      data: null,
+      isLoading: false,
+      error: null,
+    });
   });
 
   it("shows a spinner while loading", () => {
@@ -78,5 +91,34 @@ describe("UserGetContainer", () => {
     renderContainer();
 
     expect(screen.getByText("Failed to load user.")).toBeInTheDocument();
+  });
+
+  it("calls useUpdateUser's submit with the numeric id and form values on save", () => {
+    useGetUserMock.mockReturnValue({ data: profile, isLoading: false, error: null });
+
+    renderContainer("42");
+
+    fireEvent.click(screen.getByRole("button", { name: "Edit First Name" }));
+    fireEvent.change(screen.getByLabelText(/^First Name/), { target: { value: "Jiro" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+    expect(submitMock).toHaveBeenCalledWith(
+      42,
+      expect.objectContaining({ firstName: "Jiro", lastName: "Yamada", email: "taro@example.com" }),
+    );
+  });
+
+  it("reflects the updated profile immediately once useUpdateUser returns data", () => {
+    useGetUserMock.mockReturnValue({ data: profile, isLoading: false, error: null });
+    useUpdateUserMock.mockReturnValue({
+      submit: submitMock,
+      data: { ...profile, firstName: "Jiro" },
+      isLoading: false,
+      error: null,
+    });
+
+    renderContainer();
+
+    expect(screen.getByText("Jiro Yamada")).toBeInTheDocument();
   });
 });
