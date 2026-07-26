@@ -216,6 +216,29 @@ describe("createUserApi", () => {
     });
   });
 
+  describe("deleteUser", () => {
+    it("sends a DELETE request to the users endpoint", async () => {
+      fetchSpy.mockResolvedValue({ ok: true, status: 204, json: async () => ({}) } as Response);
+
+      await api.deleteUser(1);
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `${USERS_ENDPOINT}/1`,
+        expect.objectContaining({
+          method: "DELETE",
+          headers: expect.objectContaining({ Accept: "application/json" }),
+          credentials: "omit",
+        }),
+      );
+    });
+
+    it("throws on HTTP error", async () => {
+      fetchSpy.mockResolvedValue(makeNgResponse(404) as Response);
+
+      await expect(api.deleteUser(1)).rejects.toThrow("HTTP 404");
+    });
+  });
+
   it("throws when apiBase is empty", () => {
     expect(() => createUserApi({ apiBase: "", fetchImpl: fetchSpy })).toThrow(
       "apiBase is required",
