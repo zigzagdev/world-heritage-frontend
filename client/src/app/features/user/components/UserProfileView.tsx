@@ -14,6 +14,8 @@ type Props = {
   updateError: unknown;
 };
 
+type EditableField = keyof UpdateUserFormValues;
+
 const initials = (firstName: string, lastName: string): string =>
   `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
@@ -25,76 +27,31 @@ const toFormValues = (profile: UserProfile): UpdateUserFormValues => ({
 
 export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: Props) {
   const text = useText();
-  const [isEditing, setIsEditing] = useState(false);
-  const [formValues, setFormValues] = useState<UpdateUserFormValues>(() => toFormValues(profile));
+  const [editingField, setEditingField] = useState<EditableField | null>(null);
+  const [fieldValue, setFieldValue] = useState("");
   const wasUpdatingRef = useRef(false);
 
   useEffect(() => {
     if (wasUpdatingRef.current && !isUpdating && updateError == null) {
-      setIsEditing(false);
+      setEditingField(null);
     }
     wasUpdatingRef.current = isUpdating;
   }, [isUpdating, updateError]);
 
-  const handleField = <K extends keyof UpdateUserFormValues>(
-    key: K,
-    next: UpdateUserFormValues[K],
-  ) => {
-    setFormValues((prev) => ({ ...prev, [key]: next }));
+  const startEditing = (field: EditableField) => {
+    setFieldValue(profile[field]);
+    setEditingField(field);
   };
 
-  const handleEdit = () => {
-    setFormValues(toFormValues(profile));
-    setIsEditing(true);
+  const cancelEditing = () => {
+    setEditingField(null);
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
-
-  const handleSubmit = (e: FormEvent) => {
+  const handleSave = (e: FormEvent) => {
     e.preventDefault();
-    onUpdate(formValues);
+    if (!editingField) return;
+    onUpdate({ ...toFormValues(profile), [editingField]: fieldValue });
   };
-
-  if (isEditing) {
-    return (
-      <form onSubmit={handleSubmit} className="mx-auto flex max-w-xl flex-col gap-4 px-4 py-12">
-        <h1 className="text-xl font-bold">{text.userProfileTitle}</h1>
-
-        {updateError != null && <ErrorPanel message={text.userUpdateError} />}
-
-        <TextField
-          label={text.userFirstName}
-          value={formValues.firstName}
-          onChange={(e) => handleField("firstName", e.target.value)}
-          required
-        />
-        <TextField
-          label={text.userLastName}
-          value={formValues.lastName}
-          onChange={(e) => handleField("lastName", e.target.value)}
-          required
-        />
-        <TextField
-          label={text.userEmail}
-          type="email"
-          value={formValues.email}
-          onChange={(e) => handleField("email", e.target.value)}
-          required
-        />
-
-        <div className="flex gap-3">
-          <Button type="submit" variant="primary" isLoading={isUpdating}>
-            {text.userUpdateSubmit}
-          </Button>
-          <Button type="button" variant="secondary" onClick={handleCancel} disabled={isUpdating}>
-            {text.userUpdateCancel}
-          </Button>
-        </div>
-      </form>
-    );
-  }
 
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center gap-6 px-4 py-12">
@@ -109,17 +66,58 @@ export function UserProfileView({ profile, onUpdate, isUpdating, updateError }: 
         <p className="text-sm text-zinc-500">{profile.email}</p>
       </div>
 
+      {updateError != null && <ErrorPanel message={text.userUpdateError} />}
+
       <div className="w-full divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-white/70 shadow-sm">
-        <ProfileRow label={text.userFirstName} value={profile.firstName} />
-        <ProfileRow label={text.userLastName} value={profile.lastName} />
-        <ProfileRow label={text.userEmail} value={profile.email} />
+        <EditableProfileRow
+          label={text.userFirstName}
+          value={profile.firstName}
+          isEditing={editingField === "firstName"}
+          isEditDisabled={isUpdating && editingField !== "firstName"}
+          isSaving={isUpdating && editingField === "firstName"}
+          editValue={fieldValue}
+          onEditValueChange={setFieldValue}
+          onStartEdit={() => startEditing("firstName")}
+          onCancel={cancelEditing}
+          onSave={handleSave}
+          editLabel={text.userUpdateEdit}
+          saveLabel={text.userUpdateSubmit}
+          cancelLabel={text.userUpdateCancel}
+        />
+        <EditableProfileRow
+          label={text.userLastName}
+          value={profile.lastName}
+          isEditing={editingField === "lastName"}
+          isEditDisabled={isUpdating && editingField !== "lastName"}
+          isSaving={isUpdating && editingField === "lastName"}
+          editValue={fieldValue}
+          onEditValueChange={setFieldValue}
+          onStartEdit={() => startEditing("lastName")}
+          onCancel={cancelEditing}
+          onSave={handleSave}
+          editLabel={text.userUpdateEdit}
+          saveLabel={text.userUpdateSubmit}
+          cancelLabel={text.userUpdateCancel}
+        />
+        <EditableProfileRow
+          label={text.userEmail}
+          value={profile.email}
+          type="email"
+          isEditing={editingField === "email"}
+          isEditDisabled={isUpdating && editingField !== "email"}
+          isSaving={isUpdating && editingField === "email"}
+          editValue={fieldValue}
+          onEditValueChange={setFieldValue}
+          onStartEdit={() => startEditing("email")}
+          onCancel={cancelEditing}
+          onSave={handleSave}
+          editLabel={text.userUpdateEdit}
+          saveLabel={text.userUpdateSubmit}
+          cancelLabel={text.userUpdateCancel}
+        />
         <ProfileRow label={text.userAgeRange} value={profile.ageRange} />
         <ProfileRow label={text.userSubscriptionTier} value={profile.subscriptionTier} />
       </div>
-
-      <Button type="button" variant="secondary" onClick={handleEdit}>
-        {text.userUpdateEdit}
-      </Button>
     </div>
   );
 }
@@ -129,6 +127,88 @@ function ProfileRow({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between px-6 py-4">
       <span className="text-sm font-medium text-zinc-500">{label}</span>
       <span className="text-sm text-zinc-900">{value}</span>
+    </div>
+  );
+}
+
+type EditableProfileRowProps = {
+  label: string;
+  value: string;
+  type?: string;
+  isEditing: boolean;
+  isEditDisabled: boolean;
+  isSaving: boolean;
+  editValue: string;
+  onEditValueChange: (next: string) => void;
+  onStartEdit: () => void;
+  onCancel: () => void;
+  onSave: (e: FormEvent) => void;
+  editLabel: string;
+  saveLabel: string;
+  cancelLabel: string;
+};
+
+function EditableProfileRow({
+  label,
+  value,
+  type,
+  isEditing,
+  isEditDisabled,
+  isSaving,
+  editValue,
+  onEditValueChange,
+  onStartEdit,
+  onCancel,
+  onSave,
+  editLabel,
+  saveLabel,
+  cancelLabel,
+}: EditableProfileRowProps) {
+  if (isEditing) {
+    return (
+      <form onSubmit={onSave} className="flex items-center justify-between gap-3 px-6 py-4">
+        <TextField
+          label={label}
+          type={type}
+          value={editValue}
+          onChange={(e) => onEditValueChange(e.target.value)}
+          size="small"
+          required
+        />
+        <div className="flex shrink-0 gap-2">
+          <Button type="submit" variant="primary" size="sm" isLoading={isSaving}>
+            {saveLabel}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={onCancel}
+            disabled={isSaving}
+          >
+            {cancelLabel}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-between px-6 py-4">
+      <span className="text-sm font-medium text-zinc-500">{label}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-zinc-900">{value}</span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          aria-label={`${editLabel} ${label}`}
+          onClick={onStartEdit}
+          disabled={isEditDisabled}
+        >
+          {editLabel}
+        </Button>
+      </div>
     </div>
   );
 }
