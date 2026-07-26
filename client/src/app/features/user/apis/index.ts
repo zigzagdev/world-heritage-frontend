@@ -11,3 +11,4 @@ const userApi = createUserApi({ apiBase });
 export const createUser = userApi.createUser;
 export const getUser = userApi.getUser;
 export const updateUser = userApi.updateUser;
+export const deleteUser = userApi.deleteUser;
