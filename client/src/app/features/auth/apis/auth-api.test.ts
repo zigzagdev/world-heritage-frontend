@@ -46,7 +46,10 @@ describe("createAuthApi", () => {
   describe("login", () => {
     it("posts credentials and returns the bearer token from the envelope", async () => {
       fetchSpy.mockResolvedValue(
-        makeOkResponse({ status: "success", data: { token: TOKEN, token_type: "Bearer" } }) as Response,
+        makeOkResponse({
+          status: "success",
+          data: { token: TOKEN, token_type: "Bearer" },
+        }) as Response,
       );
 
       const result = await api.login({ email: "taro@example.com", password: "password123" });
@@ -64,9 +67,9 @@ describe("createAuthApi", () => {
     it("throws on HTTP error", async () => {
       fetchSpy.mockResolvedValue(makeNgResponse(422) as Response);
 
-      await expect(
-        api.login({ email: "taro@example.com", password: "wrong" }),
-      ).rejects.toThrow("HTTP 422");
+      await expect(api.login({ email: "taro@example.com", password: "wrong" })).rejects.toThrow(
+        "HTTP 422",
+      );
     });
   });
 
