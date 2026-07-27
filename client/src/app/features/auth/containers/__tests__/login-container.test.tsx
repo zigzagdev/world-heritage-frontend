@@ -1,8 +1,9 @@
 /** @jest-environment jsdom */
 
 import { jest } from "@jest/globals";
+import type { LoginFormValues } from "../../types";
 
-const submitMock = jest.fn();
+const submitMock = jest.fn<(values: LoginFormValues) => Promise<boolean>>();
 const useLoginMock = jest.fn();
 const navigateMock = jest.fn();
 
