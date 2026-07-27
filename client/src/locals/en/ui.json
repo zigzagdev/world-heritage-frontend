@@ -67,5 +67,6 @@
   "userEmail": "Email",
   "userPassword": "Password",
   "login": "Login",
-  "loginError": "Failed to log in."
+  "loginError": "Failed to log in.",
+  "logout": "Log out"
 }

@@ -67,5 +67,6 @@
   "userEmail": "メールアドレス",
   "userPassword": "パスワード",
   "login": "ログイン",
-  "loginError": "ログインに失敗しました。"
+  "loginError": "ログインに失敗しました。",
+  "logout": "ログアウト"
 }
