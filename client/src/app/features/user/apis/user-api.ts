@@ -10,6 +10,7 @@ export type CreateUserRequest = {
   last_name: string;
   email: string;
   password: string;
+  age_range: AgeRange;
 };
 
 export type UpdateUserRequest = {

@@ -32,6 +32,7 @@ const makeRequest = (overrides: Partial<CreateUserRequest> = {}): CreateUserRequ
   last_name: "Yamada",
   email: "taro@example.com",
   password: "password123",
+  age_range: "teens",
   ...overrides,
 });
 

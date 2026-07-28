@@ -13,6 +13,7 @@ const renderForm = (props: Partial<React.ComponentProps<typeof UserCreateForm>> 
     lastName: "",
     email: "",
     password: "",
+    ageRange: "teens",
   };
 
   const defaultProps: React.ComponentProps<typeof UserCreateForm> = {
@@ -35,15 +36,15 @@ const renderForm = (props: Partial<React.ComponentProps<typeof UserCreateForm>> 
 };
 
 describe("UserCreateForm", () => {
-  it("renders only first name, last name, email, and password fields", () => {
+  it("renders first name, last name, email, password, and age range fields, but not subscription", () => {
     renderForm();
 
     expect(screen.getByLabelText(/^First Name/)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Last Name/)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/age range/i)).toBeInTheDocument();
 
-    expect(screen.queryByLabelText(/age range/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/subscription/i)).not.toBeInTheDocument();
   });
 
@@ -54,7 +55,13 @@ describe("UserCreateForm", () => {
     fireEvent.change(screen.getByLabelText(/^First Name/), { target: { value: "Taro" } });
 
     expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ firstName: "Taro", lastName: "", email: "", password: "" }),
+      expect.objectContaining({
+        firstName: "Taro",
+        lastName: "",
+        email: "",
+        password: "",
+        ageRange: "teens",
+      }),
     );
   });
 
@@ -65,6 +72,7 @@ describe("UserCreateForm", () => {
       lastName: "Yamada",
       email: "taro@example.com",
       password: "password123",
+      ageRange: "20s",
     };
     renderForm({ onSubmit, value });
 
