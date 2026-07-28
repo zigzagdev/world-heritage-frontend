@@ -1,8 +1,10 @@
 import type { FormEvent } from "react";
+import MenuItem from "@mui/material/MenuItem";
 import TextField from "@shared/uis/TextField.tsx";
 import { Button } from "@shared/uis/Button.tsx";
 import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
+import { AGE_RANGES } from "../types";
 import type { CreateUserFormValues } from "../types";
 import type { ApiUserDto } from "../apis/user-api";
 
@@ -75,6 +77,21 @@ export function UserCreateForm({
         onChange={(e) => handleField("password", e.target.value)}
         required
       />
+      <TextField
+        select
+        label={text.userAgeRange}
+        value={value.ageRange}
+        onChange={(e) =>
+          handleField("ageRange", e.target.value as CreateUserFormValues["ageRange"])
+        }
+        required
+      >
+        {AGE_RANGES.map((ageRange) => (
+          <MenuItem key={ageRange} value={ageRange}>
+            {ageRange}
+          </MenuItem>
+        ))}
+      </TextField>
 
       <Button type="submit" variant="primary" isLoading={isLoading}>
         {text.userCreateSubmit}

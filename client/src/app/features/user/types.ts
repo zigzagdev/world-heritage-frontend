@@ -9,6 +9,7 @@ export type CreateUserFormValues = {
   lastName: string;
   email: string;
   password: string;
+  ageRange: AgeRange;
 };
 
 export type UserProfile = {
