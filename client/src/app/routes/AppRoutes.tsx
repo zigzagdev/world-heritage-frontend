@@ -4,29 +4,39 @@ import { WorldHeritageDetailContainer } from "@features/top/containers/world-her
 import { CriteriaDetailContainer } from "@features/top/containers/criteria-detail-container.tsx";
 import { HeritageGalleryContainer } from "@features/top/containers/heritage-gallery-container.tsx";
 import { SearchHeritageResultsContainer } from "@features/search/containers/search-heritage-result-container.tsx";
+import { LoginContainer } from "@features/auth/containers/login-container.tsx";
+import { MyPageContainer } from "@features/auth/containers/mypage-container.tsx";
 import { UserCreateContainer } from "@features/user/containers/user-create-container.tsx";
 import { UserGetContainer } from "@features/user/containers/user-get-container.tsx";
 import { BreadcrumbProvider } from "@features/breadcrumbs/BreadCrumbProvider.tsx";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { AppLayout } from "@shared/layout/AppLayout.tsx";
+import { AuthProvider } from "@shared/auth/AuthProvider.tsx";
+import { RequireAuth } from "@shared/auth/RequireAuth.tsx";
 
 export function AppRoutes() {
   return (
     <LocaleProvider>
-      <BreadcrumbProvider>
-        <AppLayout>
-          <Routes>
-            <Route path="/heritages" element={<TopPageContainer />} />
-            <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
-            <Route path="/heritages/criteria/:code" element={<CriteriaDetailContainer />} />
-            <Route path="/heritages/:id/gallery" element={<HeritageGalleryContainer />} />
-            <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
-            <Route path="/users/new" element={<UserCreateContainer />} />
-            <Route path="/users/:id" element={<UserGetContainer />} />
-            <Route path="*" element={<Navigate to="/heritages" replace />} />
-          </Routes>
-        </AppLayout>
-      </BreadcrumbProvider>
+      <AuthProvider>
+        <BreadcrumbProvider>
+          <AppLayout>
+            <Routes>
+              <Route path="/heritages" element={<TopPageContainer />} />
+              <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
+              <Route path="/heritages/criteria/:code" element={<CriteriaDetailContainer />} />
+              <Route path="/heritages/:id/gallery" element={<HeritageGalleryContainer />} />
+              <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
+              <Route path="/users/new" element={<UserCreateContainer />} />
+              <Route path="/users/:id" element={<UserGetContainer />} />
+              <Route path="/login" element={<LoginContainer />} />
+              <Route element={<RequireAuth />}>
+                <Route path="/mypage" element={<MyPageContainer />} />
+              </Route>
+              <Route path="*" element={<Navigate to="/heritages" replace />} />
+            </Routes>
+          </AppLayout>
+        </BreadcrumbProvider>
+      </AuthProvider>
     </LocaleProvider>
   );
 }

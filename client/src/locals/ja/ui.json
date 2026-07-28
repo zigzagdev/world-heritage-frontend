@@ -83,5 +83,8 @@
   "userDeleteButton": "ユーザーを削除",
   "userDeleteConfirmTitle": "ユーザーの削除",
   "userDeleteConfirmMessage": "このユーザーを削除してもよろしいですか？この操作は取り消せません。",
-  "userDeleteError": "ユーザーの削除に失敗しました。"
+  "userDeleteError": "ユーザーの削除に失敗しました。",
+  "login": "ログイン",
+  "loginError": "ログインに失敗しました。",
+  "logout": "ログアウト"
 }

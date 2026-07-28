@@ -83,5 +83,8 @@
   "userDeleteButton": "Delete User",
   "userDeleteConfirmTitle": "Delete User",
   "userDeleteConfirmMessage": "Are you sure you want to delete this user? This action cannot be undone.",
-  "userDeleteError": "Failed to delete user."
+  "userDeleteError": "Failed to delete user.",
+  "login": "Login",
+  "loginError": "Failed to log in.",
+  "logout": "Log out"
 }
