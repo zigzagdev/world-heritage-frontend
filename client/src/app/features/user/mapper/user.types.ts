@@ -5,4 +5,5 @@ export const DEFAULT_CREATE_USER_FORM_VALUES: CreateUserFormValues = {
   lastName: "",
   email: "",
   password: "",
+  ageRange: "teens",
 };

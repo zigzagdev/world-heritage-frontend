@@ -7,6 +7,7 @@ const makeFormValues = (overrides: Partial<CreateUserFormValues> = {}): CreateUs
   lastName: "Yamada",
   email: "taro@example.com",
   password: "password123",
+  ageRange: "20s",
   ...overrides,
 });
 
@@ -19,6 +20,7 @@ describe("toCreateUserRequest", () => {
       last_name: "Yamada",
       email: "taro@example.com",
       password: "password123",
+      age_range: "20s",
     });
   });
 

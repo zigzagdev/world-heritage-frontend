@@ -32,6 +32,7 @@ const formValues: CreateUserFormValues = {
   lastName: "Yamada",
   email: "taro@example.com",
   password: "password123",
+  ageRange: "teens",
 };
 
 const request: CreateUserRequest = {
@@ -39,6 +40,7 @@ const request: CreateUserRequest = {
   last_name: "Yamada",
   email: "taro@example.com",
   password: "password123",
+  age_range: "teens",
 };
 
 const user: ApiUserDto = {
