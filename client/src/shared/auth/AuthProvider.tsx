@@ -6,6 +6,10 @@ import { getStoredToken, clearStoredToken } from "./token-storage.ts";
 
 export type AuthUser = ApiCurrentUserDto;
 
+const isAbortError = (e: unknown): boolean => {
+  return e instanceof DOMException && e.name === "AbortError";
+};
+
 const AuthContext = createContext<
   | {
       user: AuthUser | null;
@@ -33,8 +37,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setUser(current);
         if (!current) clearStoredToken();
       })
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+      .catch((e) => {
+        if (!isAbortError(e)) setUser(null);
+      })
+      .finally(() => {
+        if (!abortController.signal.aborted) setLoading(false);
+      });
 
     return () => abortController.abort();
   }, []);
