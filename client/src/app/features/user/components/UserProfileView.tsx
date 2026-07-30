@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import { Link } from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -143,8 +144,17 @@ export function UserProfileView({
           saveLabel={text.userUpdateSubmit}
           cancelLabel={text.userUpdateCancel}
         />
-        <ProfileRow label={text.userAgeRange} value={profile.ageRange} />
         <ProfileRow label={text.userSubscriptionTier} value={profile.subscriptionTier} />
+        {profile.subscriptionTier === "free" && (
+          <div className="px-6 py-4">
+            <Link
+              to="/subscription/upgrade"
+              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+            >
+              {text.userUpgradeToPaid}
+            </Link>
+          </div>
+        )}
       </div>
 
       {deleteError != null && <ErrorPanel message={text.userDeleteError} />}
