@@ -86,5 +86,6 @@
   "userDeleteError": "Failed to delete user.",
   "login": "Login",
   "loginError": "Failed to log in.",
-  "logout": "Log out"
+  "logout": "Log out",
+  "userUpgradeToPaid": "Upgrade to Paid"
 }

@@ -56,16 +56,30 @@ describe("UserProfileView", () => {
 
     expect(screen.getByText("First Name")).toBeInTheDocument();
     expect(screen.getByText("Last Name")).toBeInTheDocument();
-    expect(screen.getByText("Age Range")).toBeInTheDocument();
-    expect(screen.getByText("teens")).toBeInTheDocument();
     expect(screen.getByText("Subscription")).toBeInTheDocument();
     expect(screen.getByText("free")).toBeInTheDocument();
+    expect(screen.queryByText("Age Range")).not.toBeInTheDocument();
+    expect(screen.queryByText("teens")).not.toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: "Edit First Name" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Edit Last Name" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Edit Email" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Edit Age Range" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Edit Subscription" })).not.toBeInTheDocument();
+  });
+
+  it("shows an upgrade-to-paid link when the subscription tier is free", () => {
+    renderView();
+
+    expect(screen.getByRole("link", { name: "Upgrade to Paid" })).toHaveAttribute(
+      "href",
+      "/subscription/upgrade",
+    );
+  });
+
+  it("does not show the upgrade-to-paid link when the subscription tier is paid", () => {
+    renderView({ profile: { ...profile, subscriptionTier: "paid" } });
+
+    expect(screen.queryByRole("link", { name: "Upgrade to Paid" })).not.toBeInTheDocument();
   });
 
   it("turns only the selected field into an input, pre-filled with its current value", () => {

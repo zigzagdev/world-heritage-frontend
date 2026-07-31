@@ -86,5 +86,6 @@
   "userDeleteError": "ユーザーの削除に失敗しました。",
   "login": "ログイン",
   "loginError": "ログインに失敗しました。",
-  "logout": "ログアウト"
+  "logout": "ログアウト",
+  "userUpgradeToPaid": "有料プランへアップグレード"
 }
