@@ -87,5 +87,6 @@
   "login": "Login",
   "loginError": "Failed to log in.",
   "logout": "Log out",
-  "userUpgradeToPaid": "Upgrade to Paid"
+  "userUpgradeToPaid": "Upgrade to Paid",
+  "myPage": "My Page"
 }

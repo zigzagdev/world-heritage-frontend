@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import PublicIcon from "@mui/icons-material/Public";
 import { LocaleToggle } from "@shared/locale/LocaleToggle.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
+import { AuthNavContainer } from "@features/auth/containers/auth-nav-container.tsx";
 import { STUDY_REGIONS } from "../../domain/types.ts";
 
 export function AppHeader() {
@@ -46,6 +47,7 @@ export function AppHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <AuthNavContainer />
           <LocaleToggle />
         </div>
       </div>
