@@ -87,5 +87,6 @@
   "login": "ログイン",
   "loginError": "ログインに失敗しました。",
   "logout": "ログアウト",
-  "userUpgradeToPaid": "有料プランへアップグレード"
+  "userUpgradeToPaid": "有料プランへアップグレード",
+  "myPage": "マイページ"
 }
