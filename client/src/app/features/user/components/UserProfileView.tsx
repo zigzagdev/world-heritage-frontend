@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
+import EditIcon from "@mui/icons-material/Edit";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -83,7 +84,7 @@ export function UserProfileView({
   };
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col items-center gap-6 px-4 py-12">
+    <div className="mx-auto flex max-w-2xl flex-col items-center gap-6 px-4 py-12">
       <div className="flex h-24 w-24 items-center justify-center rounded-full bg-indigo-600 text-3xl font-semibold text-white">
         {initials(profile.firstName, profile.lastName)}
       </div>
@@ -144,16 +145,20 @@ export function UserProfileView({
           saveLabel={text.userUpdateSubmit}
           cancelLabel={text.userUpdateCancel}
         />
-        <ProfileRow label={text.userSubscriptionTier} value={profile.subscriptionTier} />
+      </div>
+
+      <div className="flex w-full flex-col gap-2 rounded-2xl border border-zinc-200 bg-white/70 px-8 py-5 shadow-sm">
+        <div className="grid grid-cols-[8rem_1fr] items-center gap-4">
+          <span className="text-sm font-medium text-zinc-500">{text.userSubscriptionTier}</span>
+          <span className="text-sm text-zinc-900">{profile.subscriptionTier}</span>
+        </div>
         {profile.subscriptionTier === "free" && (
-          <div className="px-6 py-4">
-            <Link
-              to="/subscription/upgrade"
-              className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
-            >
-              {text.userUpgradeToPaid}
-            </Link>
-          </div>
+          <Link
+            to="/subscription/upgrade"
+            className="ml-32 text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+          >
+            {text.userUpgradeToPaid}
+          </Link>
         )}
       </div>
 
@@ -194,15 +199,6 @@ export function UserProfileView({
   );
 }
 
-function ProfileRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between px-6 py-4">
-      <span className="text-sm font-medium text-zinc-500">{label}</span>
-      <span className="text-sm text-zinc-900">{value}</span>
-    </div>
-  );
-}
-
 type EditableProfileRowProps = {
   label: string;
   value: string;
@@ -238,7 +234,7 @@ function EditableProfileRow({
 }: EditableProfileRowProps) {
   if (isEditing) {
     return (
-      <form onSubmit={onSave} className="flex items-center justify-between gap-3 px-6 py-4">
+      <form onSubmit={onSave} className="flex items-center justify-between gap-3 px-8 py-5">
         <TextField
           label={label}
           type={type}
@@ -266,21 +262,19 @@ function EditableProfileRow({
   }
 
   return (
-    <div className="flex items-center justify-between px-6 py-4">
+    <div className="grid grid-cols-[8rem_1fr_auto] items-center gap-4 px-8 py-5">
       <span className="text-sm font-medium text-zinc-500">{label}</span>
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-zinc-900">{value}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          aria-label={`${editLabel} ${label}`}
-          onClick={onStartEdit}
-          disabled={isEditDisabled}
-        >
-          {editLabel}
-        </Button>
-      </div>
+      <span className="text-sm text-zinc-900">{value}</span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        aria-label={`${editLabel} ${label}`}
+        onClick={onStartEdit}
+        disabled={isEditDisabled}
+      >
+        <EditIcon fontSize="small" />
+      </Button>
     </div>
   );
 }
