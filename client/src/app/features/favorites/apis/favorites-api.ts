@@ -1,12 +1,17 @@
+import type { ApiWorldHeritageDto } from "../../../../domain/types.ts";
+
 export type FavoritesApiDeps = {
   apiBase: string;
   fetchImpl?: typeof fetch;
 };
 
 export type AddFavoriteRequest = {
-  user_id: number;
-  heritage_id: number;
-  is_liked: boolean;
+  world_heritage_id: number;
+};
+
+type ApiEnvelope<T> = {
+  status: string;
+  data: T;
 };
 
 const normalizeApiBase = (apiBase: string): string => apiBase.replace(/\/+$/, "");
@@ -21,7 +26,7 @@ export const createFavoritesApi = ({ apiBase, fetchImpl = fetch }: FavoritesApiD
   }
 
   const base = normalizeApiBase(apiBase);
-  const favoritesEndpoint = `${base}/api/v1/users/me/favorites`;
+  const favoritesEndpoint = `${base}/api/v1/favorites`;
 
   return {
     async addFavorite(
@@ -46,10 +51,10 @@ export const createFavoritesApi = ({ apiBase, fetchImpl = fetch }: FavoritesApiD
       }
     },
 
-    async removeFavorite(heritageId: number, token: string, init?: RequestInit): Promise<void> {
-      const response = await fetchImpl(`${favoritesEndpoint}/${heritageId}`, {
+    async getFavorites(token: string, init?: RequestInit): Promise<ApiWorldHeritageDto[]> {
+      const response = await fetchImpl(favoritesEndpoint, {
         ...init,
-        method: "DELETE",
+        method: "GET",
         headers: {
           Accept: "application/json",
           ...withAuthHeader(token),
@@ -60,6 +65,9 @@ export const createFavoritesApi = ({ apiBase, fetchImpl = fetch }: FavoritesApiD
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
+
+      const body = (await response.json()) as ApiEnvelope<ApiWorldHeritageDto[]>;
+      return body.data;
     },
   };
 };
