@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { addFavorite } from "../apis";
 import { getStoredToken } from "@shared/auth/token-storage.ts";
 
-const isAbortError = (e: unknown): boolean => {
-  return e instanceof DOMException && e.name === "AbortError";
+const isAbortError = (element: unknown): boolean => {
+  return element instanceof DOMException && element.name === "AbortError";
 };
 
 export function useAddFavorite() {
@@ -34,8 +34,8 @@ export function useAddFavorite() {
         signal: abortController.signal,
       });
       setIsAdded(true);
-    } catch (e) {
-      if (!isAbortError(e)) setError(e);
+    } catch (element) {
+      if (!isAbortError(element)) setError(element);
     } finally {
       setLoading(false);
     }
