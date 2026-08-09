@@ -1,5 +1,6 @@
 import type { WorldHeritageDetailVm, WorldHeritageImageVm } from "../../../../../domain/types.ts";
 import { useText } from "@shared/locale/ui-text.ts";
+import { FavoriteButtonContainer } from "@features/favorites/containers/favorite-button-container.tsx";
 
 export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
   const text = useText();
@@ -9,14 +10,17 @@ export function HeritageHero({ item }: { item: WorldHeritageDetailVm }) {
   return (
     <header className="mx-auto w-full max-w-6xl px-4 pt-10 pb-6">
       <div className="mb-5 md:mb-6">
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
-          {item.title}
-          {item.displaySubName && (
-            <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
-              （{item.displaySubName}）
-            </span>
-          )}
-        </h1>
+        <div className="flex items-start gap-3">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-zinc-900">
+            {item.title}
+            {item.displaySubName && (
+              <span className="ml-2 text-xl md:text-2xl font-bold text-zinc-500">
+                （{item.displaySubName}）
+              </span>
+            )}
+          </h1>
+          <FavoriteButtonContainer heritageId={item.id} />
+        </div>
 
         {item.subtitle && (
           <p className="mt-2 text-sm font-medium text-zinc-700 md:text-base">{item.subtitle}</p>
