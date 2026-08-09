@@ -1,6 +1,7 @@
 import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { BaseCard } from "@shared/uis/BaseCard.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
+import { FavoriteButtonContainer } from "@features/favorites/containers/favorite-button-container.tsx";
 
 export function HeritageCard({
   item,
@@ -52,6 +53,10 @@ export function HeritageCard({
         )}
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+        <div className="absolute left-3 top-3">
+          <FavoriteButtonContainer heritageId={item.id} />
+        </div>
 
         {item.isEndangered && (
           <div className="absolute right-3 top-3">
