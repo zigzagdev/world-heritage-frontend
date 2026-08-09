@@ -55,7 +55,7 @@ export function HeritageCard({
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
         <div className="absolute left-3 top-3">
-          <FavoriteButtonContainer heritageId={item.id} />
+          <FavoriteButtonContainer heritageId={item.id} className="!text-white" />
         </div>
 
         {item.isEndangered && (
