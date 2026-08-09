@@ -1,5 +1,6 @@
 /** @jest-environment jsdom */
 
+import "@testing-library/jest-dom/jest-globals";
 import { jest } from "@jest/globals";
 
 const submitMock = jest.fn();
