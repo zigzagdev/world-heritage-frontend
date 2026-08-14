@@ -88,5 +88,7 @@
   "loginError": "ログインに失敗しました。",
   "logout": "ログアウト",
   "userUpgradeToPaid": "有料プランへアップグレード",
-  "myPage": "マイページ"
+  "myPage": "マイページ",
+  "favorites": "お気に入り",
+  "favoritesError": "お気に入りの取得に失敗しました。"
 }

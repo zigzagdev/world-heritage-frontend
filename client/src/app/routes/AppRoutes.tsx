@@ -8,6 +8,7 @@ import { LoginContainer } from "@features/auth/containers/login-container.tsx";
 import { MyPageContainer } from "@features/auth/containers/mypage-container.tsx";
 import { UserCreateContainer } from "@features/user/containers/user-create-container.tsx";
 import { UserGetContainer } from "@features/user/containers/user-get-container.tsx";
+import { FavoritesContainer } from "@features/favorites/containers/favorites-container.tsx";
 import { BreadcrumbProvider } from "@features/breadcrumbs/BreadCrumbProvider.tsx";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { AppLayout } from "@shared/layout/AppLayout.tsx";
@@ -31,6 +32,7 @@ export function AppRoutes() {
               <Route path="/login" element={<LoginContainer />} />
               <Route element={<RequireAuth />}>
                 <Route path="/mypage" element={<MyPageContainer />} />
+                <Route path="/favorites-list" element={<FavoritesContainer />} />
               </Route>
               <Route path="*" element={<Navigate to="/heritages" replace />} />
             </Routes>

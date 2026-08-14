@@ -51,7 +51,7 @@ describe("AuthNavContainer", () => {
     expect(screen.queryByRole("button", { name: "Log out" })).not.toBeInTheDocument();
   });
 
-  it("shows My Page and Logout when authenticated", () => {
+  it("shows My Page, Favorites and Logout when authenticated", () => {
     useAuthMock.mockReturnValue({
       user: { id: 1, first_name: "Taro", last_name: "Yamada", email: "taro@example.com" },
       isLoading: false,
@@ -60,6 +60,10 @@ describe("AuthNavContainer", () => {
     renderNav();
 
     expect(screen.getByRole("link", { name: "My Page" })).toHaveAttribute("href", "/mypage");
+    expect(screen.getByRole("link", { name: "Favorites" })).toHaveAttribute(
+      "href",
+      "/favorites-list",
+    );
     expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Login" })).not.toBeInTheDocument();
   });
