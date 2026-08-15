@@ -88,5 +88,7 @@
   "loginError": "Failed to log in.",
   "logout": "Log out",
   "userUpgradeToPaid": "Upgrade to Paid",
-  "myPage": "My Page"
+  "myPage": "My Page",
+  "favorites": "Favorites",
+  "favoritesError": "Failed to load favorites."
 }

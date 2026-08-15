@@ -30,6 +30,12 @@ export function AuthNavContainer() {
   return (
     <>
       <Link
+        to="/favorites-list"
+        className="rounded-full px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:bg-zinc-100"
+      >
+        {text.favorites}
+      </Link>
+      <Link
         to="/mypage"
         className="rounded-full px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:bg-zinc-100"
       >
