@@ -90,5 +90,7 @@
   "userUpgradeToPaid": "Upgrade to Paid",
   "myPage": "My Page",
   "favorites": "Favorites",
-  "favoritesError": "Failed to load favorites."
+  "favoritesError": "Failed to load favorites.",
+  "favoritesListTitle": "Favorites List",
+  "favoritesEmpty": "No favorites yet."
 }

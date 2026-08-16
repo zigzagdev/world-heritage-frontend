@@ -62,7 +62,7 @@ describe("AuthNavContainer", () => {
     expect(screen.getByRole("link", { name: "My Page" })).toHaveAttribute("href", "/mypage");
     expect(screen.getByRole("link", { name: "Favorites" })).toHaveAttribute(
       "href",
-      "/favorites-list",
+      "/users/1/favorite-list",
     );
     expect(screen.getByRole("button", { name: "Log out" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Login" })).not.toBeInTheDocument();

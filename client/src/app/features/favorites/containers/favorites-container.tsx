@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { useFavorites } from "../hooks/use-favorites";
-import { HeritageList } from "@features/top/components/HeritageList.tsx";
+import { FavoriteList } from "../components/FavoriteList";
 import { Spinner } from "@shared/uis/Spinner.tsx";
 import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
+import { FavoritesTitleBar } from "../components/FavoritesTitleBar";
 
 export function FavoritesContainer() {
   const navigate = useNavigate();
@@ -35,8 +36,11 @@ export function FavoritesContainer() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8">
-      <HeritageList items={data} onClickItem={handleClickItem} />
+    <main className="mx-auto max-w-7xl px-4 py-12">
+      <FavoritesTitleBar />
+      <div className="pt-8">
+        <FavoriteList items={data} onClickItem={handleClickItem} />
+      </div>
     </main>
   );
 }

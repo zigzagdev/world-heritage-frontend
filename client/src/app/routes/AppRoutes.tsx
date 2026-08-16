@@ -32,7 +32,7 @@ export function AppRoutes() {
               <Route path="/login" element={<LoginContainer />} />
               <Route element={<RequireAuth />}>
                 <Route path="/mypage" element={<MyPageContainer />} />
-                <Route path="/favorites-list" element={<FavoritesContainer />} />
+                <Route path="/users/:id/favorite-list" element={<FavoritesContainer />} />
               </Route>
               <Route path="*" element={<Navigate to="/heritages" replace />} />
             </Routes>
