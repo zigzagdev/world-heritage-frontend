@@ -20,6 +20,12 @@ jest.mock("../../hooks/use-favorites", () => ({
   useFavorites: () => useFavoritesMock(),
 }));
 
+const useAuthMock = jest.fn();
+
+jest.mock("@shared/auth/AuthHooks.ts", () => ({
+  useAuth: () => useAuthMock(),
+}));
+
 jest.mock("../../components/FavoriteList", () => ({
   __esModule: true,
   FavoriteList: function MockFavoriteList(props: {
@@ -41,15 +47,17 @@ jest.mock("../../components/FavoriteList", () => ({
 }));
 
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { FavoritesContainer } from "../favorites-container";
 
-const renderContainer = () =>
+const renderContainer = (path = "/users/1/favorite-list") =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <LocaleProvider>
-        <FavoritesContainer />
+        <Routes>
+          <Route path="/users/:id/favorite-list" element={<FavoritesContainer />} />
+        </Routes>
       </LocaleProvider>
     </MemoryRouter>,
   );
@@ -57,6 +65,35 @@ const renderContainer = () =>
 describe("FavoritesContainer", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useAuthMock.mockReturnValue({ user: { id: 1 } });
+  });
+
+  it("shows a spinner when the authenticated user isn't resolved yet", () => {
+    useAuthMock.mockReturnValue({ user: null });
+    useFavoritesMock.mockReturnValue({
+      data: [],
+      reload: jest.fn(),
+      isLoading: true,
+      error: null,
+    });
+
+    renderContainer();
+
+    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+  });
+
+  it("redirects to the authenticated user's own favorite-list when the URL id doesn't match", () => {
+    const items = [{ id: 1, title: "Site A" } as unknown as WorldHeritageVm];
+    useFavoritesMock.mockReturnValue({
+      data: items,
+      reload: jest.fn(),
+      isLoading: false,
+      error: null,
+    });
+
+    renderContainer("/users/999/favorite-list");
+
+    expect(screen.getByRole("heading", { name: "Favorites List" })).toBeInTheDocument();
   });
 
   it("shows a spinner while loading", () => {
