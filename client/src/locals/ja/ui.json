@@ -90,5 +90,7 @@
   "userUpgradeToPaid": "有料プランへアップグレード",
   "myPage": "マイページ",
   "favorites": "お気に入り",
-  "favoritesError": "お気に入りの取得に失敗しました。"
+  "favoritesError": "お気に入りの取得に失敗しました。",
+  "favoritesListTitle": "お気に入り一覧",
+  "favoritesEmpty": "まだお気に入りがありません。"
 }

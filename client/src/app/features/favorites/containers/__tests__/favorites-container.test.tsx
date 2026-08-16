@@ -20,9 +20,9 @@ jest.mock("../../hooks/use-favorites", () => ({
   useFavorites: () => useFavoritesMock(),
 }));
 
-jest.mock("@features/top/components/HeritageList.tsx", () => ({
+jest.mock("../../components/FavoriteList", () => ({
   __esModule: true,
-  HeritageList: function MockHeritageList(props: {
+  FavoriteList: function MockFavoriteList(props: {
     items: ReadonlyArray<WorldHeritageVm>;
     onClickItem?: (id: number) => void;
   }) {
@@ -89,7 +89,7 @@ describe("FavoritesContainer", () => {
     expect(reloadMock).toHaveBeenCalledTimes(1);
   });
 
-  it("renders the favorited world heritage sites and navigates to the detail page on click", () => {
+  it("renders the title bar and the favorited world heritage sites, navigating to the detail page on click", () => {
     const items = [{ id: 1, title: "Site A" } as unknown as WorldHeritageVm];
     useFavoritesMock.mockReturnValue({
       data: items,
@@ -99,6 +99,8 @@ describe("FavoritesContainer", () => {
     });
 
     renderContainer();
+
+    expect(screen.getByRole("heading", { name: "Favorites List" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Site A" }));
     expect(navigateMock).toHaveBeenCalledWith("/heritages/1");
