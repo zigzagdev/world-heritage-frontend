@@ -92,5 +92,7 @@
   "favorites": "Favorites",
   "favoritesError": "Failed to load favorites.",
   "favoritesListTitle": "Favorites List",
-  "favoritesEmpty": "No favorites yet."
+  "favoritesEmpty": "No favorites yet.",
+  "favoritesAccessDeniedTitle": "Access Denied",
+  "favoritesAccessDeniedMessage": "You can only view your own favorites."
 }

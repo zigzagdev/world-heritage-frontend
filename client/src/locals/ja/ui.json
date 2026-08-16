@@ -92,5 +92,7 @@
   "favorites": "お気に入り",
   "favoritesError": "お気に入りの取得に失敗しました。",
   "favoritesListTitle": "お気に入り一覧",
-  "favoritesEmpty": "まだお気に入りがありません。"
+  "favoritesEmpty": "まだお気に入りがありません。",
+  "favoritesAccessDeniedTitle": "アクセス拒否",
+  "favoritesAccessDeniedMessage": "自分のお気に入りのみ閲覧できます。"
 }

@@ -82,18 +82,15 @@ describe("FavoritesContainer", () => {
     expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
   });
 
-  it("redirects to the authenticated user's own favorite-list when the URL id doesn't match", () => {
-    const items = [{ id: 1, title: "Site A" } as unknown as WorldHeritageVm];
-    useFavoritesMock.mockReturnValue({
-      data: items,
-      reload: jest.fn(),
-      isLoading: false,
-      error: null,
-    });
-
+  it("shows an access-denied dialog without fetching data when the URL id doesn't match, and returns to the top page", () => {
     renderContainer("/users/999/favorite-list");
 
-    expect(screen.getByRole("heading", { name: "Favorites List" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Access Denied" })).toBeInTheDocument();
+    expect(screen.getByText("You can only view your own favorites.")).toBeInTheDocument();
+    expect(useFavoritesMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Back to all sites" }));
+    expect(navigateMock).toHaveBeenCalledWith("/heritages", { replace: true });
   });
 
   it("shows a spinner while loading", () => {
