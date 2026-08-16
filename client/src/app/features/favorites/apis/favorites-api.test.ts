@@ -96,6 +96,35 @@ describe("createFavoritesApi", () => {
     });
   });
 
+  describe("removeFavorite", () => {
+    it("sends a DELETE request to the resource URL with the bearer token", async () => {
+      fetchSpy.mockResolvedValue({
+        ok: true,
+        status: 204,
+        json: async () => ({}),
+      } as Response);
+
+      await api.removeFavorite(42, TOKEN);
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        `${FAVORITES_ENDPOINT}/42`,
+        expect.objectContaining({
+          method: "DELETE",
+          headers: expect.objectContaining({
+            Accept: "application/json",
+            Authorization: `Bearer ${TOKEN}`,
+          }),
+        }),
+      );
+    });
+
+    it("throws on HTTP error", async () => {
+      fetchSpy.mockResolvedValue(makeNgResponse(404) as Response);
+
+      await expect(api.removeFavorite(42, TOKEN)).rejects.toThrow("HTTP 404");
+    });
+  });
+
   describe("getFavorites", () => {
     it("fetches the list with the bearer token and returns the data", async () => {
       const heritages = [makeHeritageDto()];
