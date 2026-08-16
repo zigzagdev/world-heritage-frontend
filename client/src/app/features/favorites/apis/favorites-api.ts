@@ -51,6 +51,26 @@ export const createFavoritesApi = ({ apiBase, fetchImpl = fetch }: FavoritesApiD
       }
     },
 
+    async removeFavorite(
+      worldHeritageId: number,
+      token: string,
+      init?: RequestInit,
+    ): Promise<void> {
+      const response = await fetchImpl(`${favoritesEndpoint}/${worldHeritageId}`, {
+        ...init,
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          ...withAuthHeader(token),
+          ...(init?.headers ?? {}),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    },
+
     async getFavorites(token: string, init?: RequestInit): Promise<ApiWorldHeritageDto[]> {
       const response = await fetchImpl(favoritesEndpoint, {
         ...init,

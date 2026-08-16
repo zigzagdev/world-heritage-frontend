@@ -9,4 +9,5 @@ if (!apiBase) {
 const favoritesApi = createFavoritesApi({ apiBase });
 
 export const addFavorite = favoritesApi.addFavorite;
+export const removeFavorite = favoritesApi.removeFavorite;
 export const getFavorites = favoritesApi.getFavorites;
