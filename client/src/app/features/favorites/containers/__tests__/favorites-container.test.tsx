@@ -31,6 +31,7 @@ jest.mock("../../components/FavoriteList", () => ({
   FavoriteList: function MockFavoriteList(props: {
     items: ReadonlyArray<WorldHeritageVm>;
     onClickItem?: (id: number) => void;
+    onRemove?: () => void;
   }) {
     return (
       <ul>
@@ -41,6 +42,9 @@ jest.mock("../../components/FavoriteList", () => ({
             </button>
           </li>
         ))}
+        <button type="button" onClick={() => props.onRemove?.()}>
+          remove
+        </button>
       </ul>
     );
   },
@@ -138,5 +142,21 @@ describe("FavoritesContainer", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Site A" }));
     expect(navigateMock).toHaveBeenCalledWith("/heritages/1");
+  });
+
+  it("reloads the list when a favorite is removed", () => {
+    const reloadMock = jest.fn();
+    const items = [{ id: 1, title: "Site A" } as unknown as WorldHeritageVm];
+    useFavoritesMock.mockReturnValue({
+      data: items,
+      reload: reloadMock,
+      isLoading: false,
+      error: null,
+    });
+
+    renderContainer();
+
+    fireEvent.click(screen.getByRole("button", { name: "remove" }));
+    expect(reloadMock).toHaveBeenCalledTimes(1);
   });
 });

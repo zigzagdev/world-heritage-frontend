@@ -2,6 +2,7 @@
 
 import "@testing-library/jest-dom/jest-globals";
 import { jest } from "@jest/globals";
+import type { ReactNode } from "react";
 import type { WorldHeritageVm } from "../../../../../domain/types.ts";
 
 jest.mock("@features/top/cards/HeritageCard", () => ({
@@ -9,11 +10,28 @@ jest.mock("@features/top/cards/HeritageCard", () => ({
   HeritageCard: function MockHeritageCard(props: {
     item: WorldHeritageVm;
     onClickItem?: (id: number) => void;
-    action?: unknown;
+    action?: ReactNode;
   }) {
     return (
-      <button type="button" onClick={() => props.onClickItem?.(props.item.id)}>
-        {props.item.title}:{String(props.action)}
+      <div>
+        <button type="button" onClick={() => props.onClickItem?.(props.item.id)}>
+          {props.item.title}
+        </button>
+        {props.action}
+      </div>
+    );
+  },
+}));
+
+jest.mock("../../containers/favorite-remove-button-container", () => ({
+  __esModule: true,
+  FavoriteRemoveButtonContainer: function MockFavoriteRemoveButtonContainer(props: {
+    heritageId: number;
+    onRemoved?: () => void;
+  }) {
+    return (
+      <button type="button" onClick={() => props.onRemoved?.()}>
+        remove-{props.heritageId}
       </button>
     );
   },
@@ -40,7 +58,7 @@ describe("FavoriteList", () => {
     expect(screen.getByText("No favorites yet.")).toBeInTheDocument();
   });
 
-  it("お気に入りをHeritageCardでaction=nullとして描画し、クリックでonClickItemを呼ぶ", () => {
+  it("お気に入りをHeritageCardで描画し、クリックでonClickItemを呼ぶ", () => {
     const onClickItem = jest.fn();
     const items = [
       { id: 1, title: "Site A" },
@@ -49,10 +67,17 @@ describe("FavoriteList", () => {
 
     renderList({ items, onClickItem });
 
-    expect(screen.getByText("Site A:null")).toBeInTheDocument();
-    expect(screen.getByText("Site B:null")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText("Site A:null"));
+    fireEvent.click(screen.getByText("Site A"));
     expect(onClickItem).toHaveBeenCalledWith(1);
+  });
+
+  it("各カードにremoveボタンを配線し、クリックでonRemoveが呼ばれる", () => {
+    const onRemove = jest.fn();
+    const items = [{ id: 1, title: "Site A" }] as unknown as WorldHeritageVm[];
+
+    renderList({ items, onRemove });
+
+    fireEvent.click(screen.getByText("remove-1"));
+    expect(onRemove).toHaveBeenCalledTimes(1);
   });
 });

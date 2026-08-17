@@ -64,7 +64,7 @@ function FavoritesContent() {
     <main className="mx-auto max-w-7xl px-4 py-12">
       <FavoritesTitleBar />
       <div className="pt-8">
-        <FavoriteList items={data} onClickItem={handleClickItem} />
+        <FavoriteList items={data} onClickItem={handleClickItem} onRemove={reload} />
       </div>
     </main>
   );
