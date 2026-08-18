@@ -1,15 +1,26 @@
+import type { ReactNode } from "react";
 import type { WorldHeritageVm } from "../../../../domain/types.ts";
 import { BaseCard } from "@shared/uis/BaseCard.tsx";
 import { useText } from "@shared/locale/ui-text.ts";
+import { FavoriteButtonContainer } from "@features/favorites/containers/favorite-button-container.tsx";
 
 export function HeritageCard({
   item,
   onClickItem,
+  action,
 }: {
   item: WorldHeritageVm;
   onClickItem?: (id: number) => void;
+  /** 左上に表示するアクション。未指定ならお気に入り追加ボタン、`null` なら非表示。 */
+  action?: ReactNode;
 }) {
   const text = useText();
+  const resolvedAction =
+    action === undefined ? (
+      <FavoriteButtonContainer heritageId={item.id} className="!text-white" />
+    ) : (
+      action
+    );
 
   const handleCardClick = () => {
     if (onClickItem) onClickItem(item.id);
@@ -52,6 +63,8 @@ export function HeritageCard({
         )}
 
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+        {resolvedAction && <div className="absolute left-3 top-3">{resolvedAction}</div>}
 
         {item.isEndangered && (
           <div className="absolute right-3 top-3">

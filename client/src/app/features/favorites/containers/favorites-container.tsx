@@ -1,0 +1,93 @@
+import * as React from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import { useFavorites } from "../hooks/use-favorites";
+import { FavoriteList } from "../components/FavoriteList";
+import { Spinner } from "@shared/uis/Spinner.tsx";
+import { ErrorPanel } from "@shared/uis/ErrorPanel.tsx";
+import { Button } from "@shared/uis/Button.tsx";
+import { useText } from "@shared/locale/ui-text.ts";
+import { FavoritesTitleBar } from "../components/FavoritesTitleBar";
+import { useAuth } from "@shared/auth/AuthHooks.ts";
+
+function FavoritesAccessDeniedDialog() {
+  const navigate = useNavigate();
+  const text = useText();
+
+  const backToTop = () => navigate("/heritages", { replace: true });
+
+  return (
+    <Dialog open onClose={backToTop}>
+      <DialogTitle>{text.favoritesAccessDeniedTitle}</DialogTitle>
+      <DialogContent>{text.favoritesAccessDeniedMessage}</DialogContent>
+      <DialogActions>
+        <Button type="button" onClick={backToTop}>
+          {text.backToAllSites}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function FavoritesContent() {
+  const navigate = useNavigate();
+  const text = useText();
+  const { data, reload, isLoading, error } = useFavorites();
+
+  const handleClickItem = React.useCallback(
+    (id: number) => navigate(`/heritages/${id}`),
+    [navigate],
+  );
+
+  if (isLoading) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-12">
+        <Spinner />
+      </main>
+    );
+  }
+
+  if (error) {
+    const message = error instanceof Error ? error.message : text.favoritesError;
+
+    return (
+      <main className="mx-auto max-w-2xl px-4 py-12">
+        <ErrorPanel message={message} onRetry={reload} />
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto max-w-7xl px-4 py-12">
+      <FavoritesTitleBar />
+      <div className="pt-8">
+        <FavoriteList items={data} onClickItem={handleClickItem} onRemove={reload} />
+      </div>
+    </main>
+  );
+}
+
+export function FavoritesContainer() {
+  const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-12">
+        <Spinner />
+      </main>
+    );
+  }
+
+  // お気に入りは常に自分自身のものしか取得できないため、URLのidが自分のものと
+  // 異なる場合はダイアログで案内してトップページへ戻す。ここでuseFavorites()
+  // を呼ばないことで、不正なidに対して不要なAPIコールを発生させない。
+  if (id !== String(user.id)) {
+    return <FavoritesAccessDeniedDialog />;
+  }
+
+  return <FavoritesContent />;
+}
