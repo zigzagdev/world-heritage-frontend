@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { useAddFavorite } from "../hooks/use-add-favorite";
 import { useRemoveFavorite } from "../hooks/use-remove-favorite";
+import { useFavoritesLookup } from "../hooks/use-favorites-lookup";
 import { useAuth } from "@shared/auth/AuthHooks.ts";
 import { FavoriteHeartButton } from "../components/FavoriteHeartButton";
 
@@ -11,18 +13,24 @@ export function FavoriteButtonContainer({
   className?: string;
 }) {
   const { user } = useAuth();
-  const { submit: submitAdd, isAdded, isLoading: isAdding } = useAddFavorite();
-  const { submit: submitRemove, isRemoved, isLoading: isRemoving } = useRemoveFavorite();
+  const { isFavorited: isFavoritedInLookup } = useFavoritesLookup();
+  const { submit: submitAdd, isLoading: isAdding } = useAddFavorite();
+  const { submit: submitRemove, isLoading: isRemoving } = useRemoveFavorite();
+  const [override, setOverride] = useState<boolean | null>(null);
 
   if (!user) return null;
 
-  const isFavorited = isAdded && !isRemoved;
+  const isFavorited = override ?? isFavoritedInLookup(heritageId);
 
   const handleClick = () => {
     if (isFavorited) {
-      void submitRemove(heritageId);
+      void submitRemove(heritageId).then((ok) => {
+        if (ok) setOverride(false);
+      });
     } else {
-      void submitAdd(heritageId);
+      void submitAdd(heritageId).then((ok) => {
+        if (ok) setOverride(true);
+      });
     }
   };
 
