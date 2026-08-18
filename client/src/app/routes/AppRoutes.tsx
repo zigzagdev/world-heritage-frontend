@@ -9,6 +9,7 @@ import { MyPageContainer } from "@features/auth/containers/mypage-container.tsx"
 import { UserCreateContainer } from "@features/user/containers/user-create-container.tsx";
 import { UserGetContainer } from "@features/user/containers/user-get-container.tsx";
 import { FavoritesContainer } from "@features/favorites/containers/favorites-container.tsx";
+import { FavoritesLookupProvider } from "@features/favorites/FavoritesLookupProvider.tsx";
 import { BreadcrumbProvider } from "@features/breadcrumbs/BreadCrumbProvider.tsx";
 import { LocaleProvider } from "@shared/locale/LocaleProvider.tsx";
 import { AppLayout } from "@shared/layout/AppLayout.tsx";
@@ -19,25 +20,27 @@ export function AppRoutes() {
   return (
     <LocaleProvider>
       <AuthProvider>
-        <BreadcrumbProvider>
-          <AppLayout>
-            <Routes>
-              <Route path="/heritages" element={<TopPageContainer />} />
-              <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
-              <Route path="/heritages/criteria/:code" element={<CriteriaDetailContainer />} />
-              <Route path="/heritages/:id/gallery" element={<HeritageGalleryContainer />} />
-              <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
-              <Route path="/users/new" element={<UserCreateContainer />} />
-              <Route path="/users/:id" element={<UserGetContainer />} />
-              <Route path="/login" element={<LoginContainer />} />
-              <Route element={<RequireAuth />}>
-                <Route path="/mypage" element={<MyPageContainer />} />
-                <Route path="/users/:id/favorite-list" element={<FavoritesContainer />} />
-              </Route>
-              <Route path="*" element={<Navigate to="/heritages" replace />} />
-            </Routes>
-          </AppLayout>
-        </BreadcrumbProvider>
+        <FavoritesLookupProvider>
+          <BreadcrumbProvider>
+            <AppLayout>
+              <Routes>
+                <Route path="/heritages" element={<TopPageContainer />} />
+                <Route path="/heritages/results" element={<SearchHeritageResultsContainer />} />
+                <Route path="/heritages/criteria/:code" element={<CriteriaDetailContainer />} />
+                <Route path="/heritages/:id/gallery" element={<HeritageGalleryContainer />} />
+                <Route path="/heritages/:id" element={<WorldHeritageDetailContainer />} />
+                <Route path="/users/new" element={<UserCreateContainer />} />
+                <Route path="/users/:id" element={<UserGetContainer />} />
+                <Route path="/login" element={<LoginContainer />} />
+                <Route element={<RequireAuth />}>
+                  <Route path="/mypage" element={<MyPageContainer />} />
+                  <Route path="/users/:id/favorite-list" element={<FavoritesContainer />} />
+                </Route>
+                <Route path="*" element={<Navigate to="/heritages" replace />} />
+              </Routes>
+            </AppLayout>
+          </BreadcrumbProvider>
+        </FavoritesLookupProvider>
       </AuthProvider>
     </LocaleProvider>
   );
