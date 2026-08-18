@@ -59,7 +59,7 @@ describe("useRemoveFavorite", () => {
 
     const { result } = renderHook(() => useRemoveFavorite());
 
-    let submitPromise!: Promise<void>;
+    let submitPromise!: Promise<boolean>;
     act(() => {
       submitPromise = result.current.submit(42);
     });
@@ -104,7 +104,7 @@ describe("useRemoveFavorite", () => {
     const { result } = renderHook(() => useRemoveFavorite());
 
     const boom = new Error("boom");
-    let submitPromise!: Promise<void>;
+    let submitPromise!: Promise<boolean>;
     act(() => {
       submitPromise = result.current.submit(42);
     });
@@ -125,7 +125,7 @@ describe("useRemoveFavorite", () => {
 
     const { result } = renderHook(() => useRemoveFavorite());
 
-    let submitPromise!: Promise<void>;
+    let submitPromise!: Promise<boolean>;
     act(() => {
       submitPromise = result.current.submit(42);
     });
@@ -158,7 +158,7 @@ describe("useRemoveFavorite", () => {
 
     await waitFor(() => expect(signals).toHaveLength(1));
 
-    let secondSubmit!: Promise<void>;
+    let secondSubmit!: Promise<boolean>;
     act(() => {
       secondSubmit = result.current.submit(42);
     });
