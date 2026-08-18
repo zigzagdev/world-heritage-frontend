@@ -16,7 +16,7 @@ export function useRemoveFavorite() {
     return () => abortRef.current?.abort();
   }, []);
 
-  const submit = useCallback(async (worldHeritageId: number) => {
+  const submit = useCallback(async (worldHeritageId: number): Promise<boolean> => {
     abortRef.current?.abort();
     const abortController = new AbortController();
     abortRef.current = abortController;
@@ -34,8 +34,10 @@ export function useRemoveFavorite() {
         signal: abortController.signal,
       });
       setIsRemoved(true);
+      return true;
     } catch (element) {
       if (!isAbortError(element)) setError(element);
+      return false;
     } finally {
       setLoading(false);
     }
